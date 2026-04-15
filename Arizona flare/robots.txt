@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-# TODO: replace DOMAIN with final URL before deploy
-Sitemap: https://DOMAIN/sitemap.xml

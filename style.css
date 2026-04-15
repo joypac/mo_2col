@@ -1,9 +1,8 @@
 @font-face {
-  font-family: 'Neue Montreal';
-  src: url('assets/fonts/PPNeueMontreal-Book.woff2') format('woff2'),
-       url('assets/fonts/PPNeueMontreal-Book.otf') format('opentype');
+  font-family: 'Roboto Mono';
+  src: url('assets/fonts/RobotoMono-VariableFont_wght.ttf') format('truetype');
   font-style: normal;
-  font-weight: 400;
+  font-weight: 100 900;
   font-display: block;
 }
 
@@ -142,7 +141,7 @@ body {
   overflow-y: auto;
   padding: clamp(10px, 1.5vw, 14px) 0 clamp(20px, 3vh, 28px) 0;
   color: #111;
-  font-family: 'Neue Montreal', sans-serif;
+  font-family: 'Roboto Mono', monospace;
   text-transform: uppercase;
   transform: translateY(8px);
   transition: none;
@@ -168,9 +167,9 @@ body {
   background: transparent;
   color: #111;
   text-align: left;
-  font-family: 'Neue Montreal', sans-serif;
+  font-family: 'Roboto Mono', monospace;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   font-size: clamp(1rem, 1.5vw, 1.2rem);
   line-height: 1.1;
   padding: 2px 0;
@@ -210,9 +209,9 @@ body {
 
 .contact-section-content p,
 .contact-section-content a {
-  font-family: 'Neue Montreal', sans-serif;
+  font-family: 'Roboto Mono', monospace;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   font-size: clamp(0.88rem, 1.28vw, 1.03rem);
   line-height: 1.35;
 }
