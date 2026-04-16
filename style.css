@@ -113,8 +113,8 @@ img.wide-strip {
   width: calc(100% - 20% - 10px);
   margin-left: calc(10% + 5px);
   margin-right: calc(10% + 5px);
-  margin-top: clamp(9px, 1.35vw, 23px);
-  margin-bottom: clamp(9px, 1.35vw, 23px);
+  margin-top: clamp(18px, 2.7vw, 46px);
+  margin-bottom: clamp(18px, 2.7vw, 46px);
   object-fit: cover;
   object-position: center;
 }
@@ -255,6 +255,8 @@ img.wide-strip {
     width: calc(100% - 8px);
     margin-left: 4px;
     margin-right: 4px;
+    margin-top: clamp(12px, 3vw, 20px);
+    margin-bottom: clamp(12px, 3vw, 20px);
   }
 
   .mosaic-cell.is-zoomed {
