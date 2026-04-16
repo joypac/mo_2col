@@ -484,7 +484,8 @@ function buildMosaicLayout(container, isFirst) {
 
       var item = media[idx];
       var div  = document.createElement('div');
-      div.className = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
+      var zoomed = Math.random() < 0.5 ? ' is-zoomed' : '';
+      div.className = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '') + zoomed;
 
       // Randomly inject a decorative wide-strip into ~15% of cells.
       var strip = null;

@@ -244,10 +244,6 @@ img.wide-strip {
 }
 
 @media (max-width: 600px) {
-  #mosaic, .mosaic-grid {
-    grid-template-columns: 57fr 43fr;
-  }
-
   .mosaic-cell img,
   .mosaic-cell video {
     width: calc(100% - 8px);
@@ -259,6 +255,17 @@ img.wide-strip {
     width: calc(100% - 8px);
     margin-left: 4px;
     margin-right: 4px;
+  }
+
+  .mosaic-cell.is-zoomed {
+    overflow: hidden;
+  }
+
+  .mosaic-cell.is-zoomed img,
+  .mosaic-cell.is-zoomed video {
+    width: 150%;
+    margin-left: -25%;
+    margin-right: -25%;
   }
 }
 
