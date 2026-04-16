@@ -486,14 +486,8 @@ function buildMosaicLayout(container, isFirst) {
       var div  = document.createElement('div');
       div.className = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
 
-      // Keep each project visually compact: top rows hug down, bottom rows hug up.
-      if (r < projectCenterRow[pi]) {
-        div.classList.add('align-bottom');
-      }
-
-      // Randomly inject a decorative wide-strip into ~8% of cells.
-      // The strip is an extra cropped image placed after the main media,
-      // never replacing it.
+      // Randomly inject a decorative wide-strip into ~15% of cells.
+      var strip = null;
       if (Math.random() < 0.15) {
         var allImgs = [];
         projects.forEach(function(p) {
@@ -502,19 +496,15 @@ function buildMosaicLayout(container, isFirst) {
           });
         });
         if (allImgs.length) {
-          var stripSrc = allImgs[Math.floor(Math.random() * allImgs.length)];
-          var strip = document.createElement('img');
+          strip = document.createElement('img');
           strip.className = 'wide-strip';
-          strip.src = stripSrc;
+          strip.src = allImgs[Math.floor(Math.random() * allImgs.length)];
           strip.alt = '';
-          if (Math.random() < 0.5) {
-            div.insertBefore(strip, div.firstChild);
-          } else {
-            div.appendChild(strip);
-          }
+          strip.style.height = Math.round(120 + Math.random() * 180) + 'px';
         }
       }
 
+      var stripAbove = strip && Math.random() < 0.5;
       if (item.type === 'vid') {
         var video = document.createElement('video');
         video.muted = true;
@@ -524,7 +514,9 @@ function buildMosaicLayout(container, isFirst) {
         var vsrc = document.createElement('source');
         vsrc.src = item.src;
         video.appendChild(vsrc);
+        if (stripAbove) div.appendChild(strip);
         div.appendChild(video);
+        if (strip && !stripAbove) div.appendChild(strip);
         vidObs.observe(div);
       } else {
         var img = document.createElement('img');
@@ -532,7 +524,9 @@ function buildMosaicLayout(container, isFirst) {
         img.style.opacity = '0';
         img.onload = function() { this.style.opacity = '1'; };
         img.src = item.src;
+        if (stripAbove) div.appendChild(strip);
         div.appendChild(img);
+        if (strip && !stripAbove) div.appendChild(strip);
       }
 
       var label = document.createElement('span');

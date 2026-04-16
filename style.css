@@ -85,14 +85,10 @@ body {
   overflow: visible;
 }
 
-.mosaic-cell.align-bottom {
-  align-self: start;
-}
-
-/* Offset right column so each tile center aligns near left-column tile edges. */
+/* Offset right column — breathing space around smaller photos. */
 .mosaic-grid > .mosaic-cell:nth-child(even),
 #mosaic > .mosaic-cell:nth-child(even) {
-  transform: translateY(-50%);
+  transform: translateY(-30%);
 }
 
 /* Same margins for images and videos, with stable vertical rhythm and no crop. */
@@ -112,13 +108,13 @@ body {
 }
 
 /* Wide/cinematic strip — decorative extra element inside a cell */
-.wide-strip {
+img.wide-strip {
   display: block;
   width: calc(100% - 20% - 10px);
   margin-left: calc(10% + 5px);
   margin-right: calc(10% + 5px);
-  margin-top: 2px;
-  height: clamp(60px, 8vw, 110px);
+  margin-top: clamp(9px, 1.35vw, 23px);
+  margin-bottom: clamp(9px, 1.35vw, 23px);
   object-fit: cover;
   object-position: center;
 }
