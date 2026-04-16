@@ -341,11 +341,114 @@ var vidObs = new IntersectionObserver(function(entries) {
   });
 }, { threshold: [0, 0.15], rootMargin: '50% 0px' });
 
-function buildMosaicLayout(container) {
+/* ── First-grid layout constraints ───────────────────────────
+   Only applied to the very first grid (isFirst = true).
+   1. Pull every project's first appearance into the first N rows (round-robin).
+   2. Ensure at least one video cell sits in rows 0-1 (first viewport).
+      First checks if the random layout already has a video there — if yes,
+      does nothing. Only intervenes when needed, picking randomly among all
+      video-containing projects so the same project doesn't always show first.
+── */
+function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
+  var N = projects.length;
+
+  function swapCells(r1, c1, r2, c2) {
+    var t = grid[r1][c1]; grid[r1][c1] = grid[r2][c2]; grid[r2][c2] = t;
+  }
+
+  // ── 1. Round-robin: pull every project into the first N rows ──
+  var fRow = new Array(N).fill(ROWS), fCol = new Array(N).fill(0);
+  for (var r = 0; r < ROWS; r++)
+    for (var c = 0; c < COLS; c++) {
+      var pi = grid[r][c];
+      if (r < fRow[pi]) { fRow[pi] = r; fCol[pi] = c; }
+    }
+
+  for (var pi = 0; pi < N; pi++) {
+    if (fRow[pi] < N) continue;
+
+    var cnt = new Array(N).fill(0);
+    for (var r = 0; r < N; r++)
+      for (var c = 0; c < COLS; c++) cnt[grid[r][c]]++;
+
+    var donor = -1, best = 1;
+    for (var pj = 0; pj < N; pj++)
+      if (cnt[pj] > best) { best = cnt[pj]; donor = pj; }
+    if (donor < 0) continue;
+
+    var dr = -1, dc = -1;
+    search1: for (var r = N - 1; r >= 0; r--)
+      for (var c = 0; c < COLS; c++)
+        if (grid[r][c] === donor) { dr = r; dc = c; break search1; }
+    if (dr < 0) continue;
+
+    swapCells(dr, dc, fRow[pi], fCol[pi]);
+    fRow[pi] = dr; fCol[pi] = dc;
+  }
+
+  // ── 2. Video in first frame ───────────────────────────────────
+  // Simulate scan order to check if rows 0-1 already contain a video cell.
+  var imgIdx = new Array(N).fill(0);
+  var hasVideo = false;
+  for (var r = 0; r < 2; r++) {
+    for (var c = 0; c < COLS; c++) {
+      var pi = grid[r][c];
+      var item = displayedMedia[pi][imgIdx[pi]];
+      if (item && item.type === 'vid') hasVideo = true;
+      imgIdx[pi]++;
+    }
+  }
+  if (hasVideo) return; // Random layout already has a video — nothing to do.
+
+  // No video in first frame: collect all video-containing projects.
+  var videoPis = [];
+  for (var pi = 0; pi < N; pi++)
+    for (var mi = 0; mi < displayedMedia[pi].length; mi++)
+      if (displayedMedia[pi][mi].type === 'vid') { videoPis.push(pi); break; }
+  if (!videoPis.length) return;
+
+  // Pick one at random (so it's never always the same project).
+  var picked = shuffle(videoPis)[0];
+
+  // If picked isn't already in rows 0-1, swap it in.
+  if (fRow[picked] >= 2) {
+    var cnt2 = new Array(N).fill(0);
+    for (var r = 0; r < 2; r++)
+      for (var c = 0; c < COLS; c++) cnt2[grid[r][c]]++;
+
+    var donor2 = -1, best2 = 1;
+    for (var pj = 0; pj < N; pj++)
+      if (cnt2[pj] > best2 && pj !== picked) { best2 = cnt2[pj]; donor2 = pj; }
+
+    var sr = 0, sc = 0; // fallback
+    if (donor2 >= 0) {
+      search2: for (var r = 0; r < 2; r++)
+        for (var c = 0; c < COLS; c++)
+          if (grid[r][c] === donor2) { sr = r; sc = c; break search2; }
+    }
+    swapCells(sr, sc, fRow[picked], fCol[picked]);
+    fRow[picked] = sr; fCol[picked] = sc;
+  }
+
+  // The picked project's first scan encounter now shows displayedMedia[picked][0].
+  // If that item isn't a video, promote the first video in its list to position 0.
+  if (displayedMedia[picked].length && displayedMedia[picked][0].type !== 'vid') {
+    for (var mi = 1; mi < displayedMedia[picked].length; mi++) {
+      if (displayedMedia[picked][mi].type === 'vid') {
+        displayedMedia[picked].unshift(displayedMedia[picked].splice(mi, 1)[0]);
+        break;
+      }
+    }
+  }
+}
+
+function buildMosaicLayout(container, isFirst) {
   var COLS = 2;
   var displayedMedia = projects.map(function(p) { return shuffle(p.media); });
   var layout = buildGrid(projects, displayedMedia, COLS);
   var grid = layout.grid, ROWS = layout.rows;
+
+  if (isFirst) postProcessFirstGrid(grid, ROWS, COLS, displayedMedia);
 
   // Per project, compute vertical center of its blob in this generated layout.
   var rowStats = projects.map(function() {
@@ -388,6 +491,30 @@ function buildMosaicLayout(container) {
         div.classList.add('align-bottom');
       }
 
+      // Randomly inject a decorative wide-strip into ~8% of cells.
+      // The strip is an extra cropped image placed after the main media,
+      // never replacing it.
+      if (Math.random() < 0.15) {
+        var allImgs = [];
+        projects.forEach(function(p) {
+          p.media.forEach(function(m) {
+            if (m.type === 'img') allImgs.push(m.src);
+          });
+        });
+        if (allImgs.length) {
+          var stripSrc = allImgs[Math.floor(Math.random() * allImgs.length)];
+          var strip = document.createElement('img');
+          strip.className = 'wide-strip';
+          strip.src = stripSrc;
+          strip.alt = '';
+          if (Math.random() < 0.5) {
+            div.insertBefore(strip, div.firstChild);
+          } else {
+            div.appendChild(strip);
+          }
+        }
+      }
+
       if (item.type === 'vid') {
         var video = document.createElement('video');
         video.muted = true;
@@ -420,7 +547,7 @@ function buildMosaicLayout(container) {
 
 // First grid
 var mosaicEl = document.getElementById('mosaic');
-buildMosaicLayout(mosaicEl);
+buildMosaicLayout(mosaicEl, true);
 
 // Infinite scroll: append a new randomised grid when sentinel comes into view
 var sentinel = document.getElementById('scroll-sentinel');
@@ -632,7 +759,7 @@ var FrameNavigator = (function() {
   var lockUntil = 0;
   var lockTimer = 0;
   var lockMsSmooth = 460;
-  var lockMsInstant = 90;
+  var lockMsInstant = 430;
   var touchStartY = 0;
   var touchStartX = 0;
   var touchMoved = false;
@@ -681,6 +808,8 @@ var FrameNavigator = (function() {
     });
   }
 
+  var frameFadeEl = document.getElementById('frame-fade');
+
   function goByDirection(direction) {
     if (ContactOverlay.isOpen()) return;
     if (isLocked()) return;
@@ -699,7 +828,11 @@ var FrameNavigator = (function() {
     }
 
     lockForTransition();
-    scrollToY(target);
+    frameFadeEl.style.opacity = '1';
+    setTimeout(function() {
+      window.scrollTo({ top: target, behavior: 'auto' });
+      frameFadeEl.style.opacity = '0';
+    }, 200);
   }
 
   function goDown() {
@@ -841,6 +974,23 @@ FrameNavigator.init();
 warmImageCache();
 window.ContactOverlay = ContactOverlay;
 window.FrameNavigator = FrameNavigator;
+
+// Reveal M. ORTIGÃO on first interaction.
+(function() {
+  var trigger = document.getElementById('contact-trigger');
+  var revealed = false;
+  function reveal() {
+    if (revealed) return;
+    revealed = true;
+    trigger.style.opacity = '1';
+    document.removeEventListener('click', reveal, true);
+    window.removeEventListener('touchstart', reveal, true);
+    window.removeEventListener('wheel', reveal, true);
+  }
+  document.addEventListener('click', reveal, true);
+  window.addEventListener('touchstart', reveal, true);
+  window.addEventListener('wheel', reveal, true);
+})();
 
 // Prevent accidental drag/select highlight overlays on repeated taps/clicks.
 document.addEventListener('dragstart', function(e) {

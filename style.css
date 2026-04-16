@@ -15,12 +15,28 @@
   font-display: block;
 }
 
+@font-face {
+  font-family: 'Walter Neue Light';
+  src: url('assets/fonts/ABCWalterNeue-Light-Trial.otf') format('opentype');
+  font-style: normal;
+  font-weight: 300;
+  font-display: block;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
+}
+
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 img, video {
@@ -95,6 +111,18 @@ body {
   transition: opacity 200ms ease;
 }
 
+/* Wide/cinematic strip — decorative extra element inside a cell */
+.wide-strip {
+  display: block;
+  width: calc(100% - 20% - 10px);
+  margin-left: calc(10% + 5px);
+  margin-right: calc(10% + 5px);
+  margin-top: 2px;
+  height: clamp(60px, 8vw, 110px);
+  object-fit: cover;
+  object-position: center;
+}
+
 /* No hover effects */
 .mosaic-label {
   display: none;
@@ -114,6 +142,18 @@ body {
   line-height: 1;
   padding: 6px 8px;
   cursor: pointer;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+#frame-fade {
+  position: fixed;
+  inset: 0;
+  background: #f5f5f3;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 120;
+  transition: opacity 200ms ease;
 }
 
 #contact-overlay {
@@ -122,13 +162,13 @@ body {
   z-index: 130;
   pointer-events: none;
   background: #fff;
-  clip-path: inset(0 0 100% 0);
-  transition: none;
+  opacity: 0;
+  transition: opacity 400ms ease;
 }
 
 #contact-overlay.is-open {
   pointer-events: auto;
-  clip-path: inset(0 0 0 0);
+  opacity: 1;
 }
 
 #contact-panel {
@@ -138,17 +178,17 @@ body {
   width: min(92vw, 760px);
   max-width: calc(100vw - 28px);
   max-height: calc(100dvh - 20px);
-  overflow-y: auto;
+  overflow-y: hidden;
   padding: clamp(10px, 1.5vw, 14px) 0 clamp(20px, 3vh, 28px) 0;
   color: #111;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Walter Neue Light', sans-serif;
   text-transform: uppercase;
-  transform: translateY(8px);
-  transition: none;
+  opacity: 0;
+  transition: opacity 400ms ease;
 }
 
 #contact-overlay.is-open #contact-panel {
-  transform: translateY(0);
+  opacity: 1;
 }
 
 .contact-accordion {
@@ -167,7 +207,7 @@ body {
   background: transparent;
   color: #111;
   text-align: left;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Walter Neue Light', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-size: clamp(1rem, 1.5vw, 1.2rem);
@@ -209,7 +249,7 @@ body {
 
 .contact-section-content p,
 .contact-section-content a {
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Walter Neue Light', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.01em;
   font-size: clamp(0.88rem, 1.28vw, 1.03rem);
