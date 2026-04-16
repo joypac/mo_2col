@@ -243,33 +243,6 @@ img.wide-strip {
   }
 }
 
-@media (max-width: 600px) {
-  .mosaic-cell img,
-  .mosaic-cell video {
-    width: calc(100% - 8px);
-    margin-left: 4px;
-    margin-right: 4px;
-  }
-
-  img.wide-strip {
-    width: calc(100% - 8px);
-    margin-left: 4px;
-    margin-right: 4px;
-    margin-top: clamp(12px, 3vw, 20px);
-    margin-bottom: clamp(12px, 3vw, 20px);
-  }
-
-  .mosaic-cell.is-zoomed {
-    overflow: hidden;
-  }
-
-  .mosaic-cell.is-zoomed img,
-  .mosaic-cell.is-zoomed video {
-    width: 150%;
-    margin-left: -25%;
-    margin-right: -25%;
-  }
-}
 
 .contact-section-content p,
 .contact-section-content a {
