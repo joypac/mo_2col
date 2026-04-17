@@ -255,6 +255,8 @@ img.wide-strip {
   }
 
   #site-shell {
+    width: max-content;
+    min-width: 100vw;
     height: 100dvh;
   }
 
@@ -268,6 +270,7 @@ img.wide-strip {
     display: flex;
     flex-direction: row;
     flex: 1;
+    column-gap: 1px;
   }
 
   .mobile-row-bottom {
@@ -280,6 +283,7 @@ img.wide-strip {
     height: 100%;
     flex-shrink: 0;
     overflow: hidden;
+    padding: clamp(12px, 4vh, 40px) 0;
   }
 
   .mosaic-cell img,
