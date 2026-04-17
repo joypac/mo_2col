@@ -135,6 +135,10 @@ var projects = [
 
 /* ── Helpers ──────────────────────────────────────────── */
 
+function isMobile() {
+  return window.innerWidth <= 600;
+}
+
 function shuffle(arr) {
   var a = arr.slice();
   for (var i = a.length - 1; i > 0; i--) {
@@ -442,7 +446,69 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
   }
 }
 
+function buildMosaicLayoutMobile(container, isFirst) {
+  var COLS = 2;
+  var displayedMedia = projects.map(function(p) { return shuffle(p.media); });
+  var layout = buildGrid(projects, displayedMedia, COLS);
+  var grid = layout.grid, ROWS = layout.rows;
+
+  if (isFirst) postProcessFirstGrid(grid, ROWS, COLS, displayedMedia);
+
+  var rowTop = document.createElement('div');
+  rowTop.className = 'mobile-row mobile-row-top';
+  var rowBottom = document.createElement('div');
+  rowBottom.className = 'mobile-row mobile-row-bottom';
+  container.appendChild(rowTop);
+  container.appendChild(rowBottom);
+
+  var imgIdx = projects.map(function() { return 0; });
+
+  for (var r = 0; r < ROWS; r++) {
+    for (var c = 0; c < COLS; c++) {
+      var targetRow = (c === 0) ? rowTop : rowBottom;
+      var pi  = grid[r][c];
+      var idx = imgIdx[pi]++;
+      var media = displayedMedia[pi];
+
+      if (idx >= media.length) {
+        var emptyDiv = document.createElement('div');
+        emptyDiv.className = 'mosaic-cell';
+        targetRow.appendChild(emptyDiv);
+        continue;
+      }
+
+      var item = media[idx];
+      var div  = document.createElement('div');
+      div.className = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
+
+      if (item.type === 'vid') {
+        var video = document.createElement('video');
+        video.muted = true;
+        video.loop  = true;
+        video.setAttribute('playsinline', '');
+        video.setAttribute('preload', 'none');
+        var vsrc = document.createElement('source');
+        vsrc.src = item.src;
+        video.appendChild(vsrc);
+        div.appendChild(video);
+        vidObs.observe(div);
+      } else {
+        var img = document.createElement('img');
+        img.alt = projects[pi].name;
+        img.src = item.src;
+        div.appendChild(img);
+      }
+
+      targetRow.appendChild(div);
+    }
+  }
+}
+
 function buildMosaicLayout(container, isFirst) {
+  if (isMobile()) {
+    buildMosaicLayoutMobile(container, isFirst);
+    return;
+  }
   var COLS = 2;
   var displayedMedia = projects.map(function(p) { return shuffle(p.media); });
   var layout = buildGrid(projects, displayedMedia, COLS);
@@ -549,6 +615,7 @@ var sentinel = document.getElementById('scroll-sentinel');
 var appending = false;
 
 function appendGrid() {
+  if (isMobile()) return;
   if (appending) return;
   appending = true;
   var grid = document.createElement('div');
@@ -603,7 +670,7 @@ var gridRecycler = (function() {
 })();
 
 // Include the first grid in the recycler.
-gridRecycler.observe(mosaicEl);
+if (!isMobile()) gridRecycler.observe(mosaicEl);
 
 function dynamicRootMargin() {
   return Math.max(400, Math.round(window.innerHeight * 1.5)) + 'px';
@@ -611,6 +678,7 @@ function dynamicRootMargin() {
 
 var infiniteObs = null;
 function setupInfiniteObserver() {
+  if (isMobile()) return;
   if (infiniteObs) infiniteObs.disconnect();
   infiniteObs = new IntersectionObserver(function(entries) {
     if (!entries[0].isIntersecting) return;
@@ -623,6 +691,7 @@ setupInfiniteObserver();
 
 // Keeps enough content ahead so frame jumps do not hit the page end.
 function ensureContentAhead(minAheadPx) {
+  if (isMobile()) return;
   var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
   var remaining = maxScroll - window.scrollY;
   var attempts = 0;
@@ -781,11 +850,15 @@ var FrameNavigator = (function() {
   }
 
   function viewportStep() {
-    return Math.max(1, window.innerHeight || 1);
+    return isMobile()
+      ? Math.max(1, window.innerWidth || 1)
+      : Math.max(1, window.innerHeight || 1);
   }
 
   function maxScrollY() {
-    return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    return isMobile()
+      ? Math.max(0, document.documentElement.scrollWidth - window.innerWidth)
+      : Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
   }
 
   function lockForTransition() {
@@ -803,10 +876,11 @@ var FrameNavigator = (function() {
   }
 
   function scrollToY(yTarget) {
-    window.scrollTo({
-      top: yTarget,
-      behavior: smooth ? 'smooth' : 'auto'
-    });
+    if (isMobile()) {
+      window.scrollTo({ left: yTarget, behavior: smooth ? 'smooth' : 'auto' });
+    } else {
+      window.scrollTo({ top: yTarget, behavior: smooth ? 'smooth' : 'auto' });
+    }
   }
 
   var frameFadeEl = document.getElementById('frame-fade');
@@ -818,7 +892,8 @@ var FrameNavigator = (function() {
     ensureContentAhead(window.innerHeight * 2.5);
 
     var step = viewportStep();
-    var target = window.scrollY + (direction * step);
+    var currentPos = isMobile() ? window.scrollX : window.scrollY;
+    var target = currentPos + (direction * step);
     var maxY = maxScrollY();
 
     if (target < 0) target = 0;
@@ -831,7 +906,7 @@ var FrameNavigator = (function() {
     lockForTransition();
     frameFadeEl.style.opacity = '1';
     setTimeout(function() {
-      window.scrollTo({ top: target, behavior: 'auto' });
+      scrollToY(target);
       frameFadeEl.style.opacity = '0';
     }, 200);
   }
@@ -846,7 +921,7 @@ var FrameNavigator = (function() {
 
   function snapToNearestFrame() {
     var step = viewportStep();
-    var current = window.scrollY;
+    var current = isMobile() ? window.scrollX : window.scrollY;
     var snapped = Math.round(current / step) * step;
     var maxY = maxScrollY();
     if (snapped > maxY) snapped = maxY;
