@@ -730,13 +730,8 @@ var ContactOverlay = (function() {
     var left = Math.max(8, Math.round(textStartX));
     var top = Math.round(rect.bottom - 5);
     panel.style.top = top + 'px';
-    if (window.innerWidth <= 720) {
-      panel.style.left = '14px';
-      panel.style.right = '14px';
-    } else {
-      panel.style.left = left + 'px';
-      panel.style.right = '';
-    }
+    panel.style.left = left + 'px';
+    panel.style.right = window.innerWidth <= 720 ? '14px' : '';
   }
 
   function syncA11y() {
