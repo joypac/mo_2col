@@ -281,25 +281,15 @@ img.wide-strip {
 
   .mosaic-cell {
     flex-shrink: 0;
-    height: 100%;
     min-width: 40vw;
-    padding: clamp(9px, 5dvh, 50px) clamp(9px, 1.35vh, 23px);
-    display: flex;
-    align-items: center;
   }
 
   .mosaic-cell img,
   .mosaic-cell video {
     display: block;
-    height: 100%;
+    height: calc(50dvh - clamp(18px, 10dvh, 100px));
     width: auto;
-    margin: 0;
-  }
-
-  /* blob: células à esquerda do centro do projeto empurram imagem para a direita */
-  .mosaic-cell.align-right img,
-  .mosaic-cell.align-right video {
-    margin-left: auto;
+    margin: clamp(9px, 5dvh, 50px) clamp(9px, 1.35vh, 23px);
   }
 
   img.wide-strip {
