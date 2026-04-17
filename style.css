@@ -8,8 +8,7 @@
 
 @font-face {
   font-family: 'Walter Neue';
-  src: url('assets/fonts/ABCWalterNeue-Regular-Trial.woff2') format('woff2'),
-       url('assets/fonts/ABCWalterNeue-Regular-Trial.otf') format('opentype');
+  src: url('assets/fonts/ABCWalterNeue-Regular-Trial.otf') format('opentype');
   font-style: normal;
   font-weight: 400;
   font-display: block;
