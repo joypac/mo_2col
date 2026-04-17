@@ -264,6 +264,7 @@ img.wide-strip {
     display: flex;
     flex-direction: column;
     height: 100dvh;
+    row-gap: 1px;
   }
 
   .mobile-row {
@@ -271,7 +272,7 @@ img.wide-strip {
     flex-direction: row;
     flex: 1;
     width: max-content;
-    column-gap: clamp(12px, 4vw, 30px);
+    column-gap: 1px;
   }
 
   .mobile-row-bottom {
@@ -279,21 +280,26 @@ img.wide-strip {
   }
 
   .mosaic-cell {
-    width: 50vw;
-    min-width: 50vw;
-    height: 100%;
     flex-shrink: 0;
-    overflow: hidden;
-    padding: clamp(12px, 4vh, 40px) 0;
+    height: 100%;
+    min-width: 40vw;
+    padding: clamp(9px, 5dvh, 50px) clamp(9px, 1.35vh, 23px);
+    display: flex;
+    align-items: center;
   }
 
   .mosaic-cell img,
   .mosaic-cell video {
-    width: 100%;
+    display: block;
     height: 100%;
-    object-fit: cover;
-    object-position: center;
+    width: auto;
     margin: 0;
+  }
+
+  /* blob: células à esquerda do centro do projeto empurram imagem para a direita */
+  .mosaic-cell.align-right img,
+  .mosaic-cell.align-right video {
+    margin-left: auto;
   }
 
   img.wide-strip {

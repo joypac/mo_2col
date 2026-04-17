@@ -454,6 +454,19 @@ function buildMosaicLayoutMobile(container, isFirst) {
 
   if (isFirst) postProcessFirstGrid(grid, ROWS, COLS, displayedMedia);
 
+  // Compute horizontal center of each project's blob (by r position).
+  var colStats = projects.map(function() { return { min: Infinity, max: -Infinity }; });
+  for (var rr = 0; rr < ROWS; rr++) {
+    for (var cc = 0; cc < COLS; cc++) {
+      var pidx = grid[rr][cc];
+      if (rr < colStats[pidx].min) colStats[pidx].min = rr;
+      if (rr > colStats[pidx].max) colStats[pidx].max = rr;
+    }
+  }
+  var projectCenterCol = colStats.map(function(s) {
+    return s.min === Infinity ? 0 : (s.min + s.max) / 2;
+  });
+
   var rowTop = document.createElement('div');
   rowTop.className = 'mobile-row mobile-row-top';
   var rowBottom = document.createElement('div');
@@ -478,8 +491,9 @@ function buildMosaicLayoutMobile(container, isFirst) {
       }
 
       var item = media[idx];
+      var alignRight = r < projectCenterCol[pi] ? ' align-right' : '';
       var div  = document.createElement('div');
-      div.className = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
+      div.className = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '') + alignRight;
 
       if (item.type === 'vid') {
         var video = document.createElement('video');
