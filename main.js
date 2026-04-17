@@ -852,7 +852,7 @@ var FrameNavigator = (function() {
 
   function maxScrollY() {
     return isMobile()
-      ? Math.max(0, document.documentElement.scrollWidth - window.innerWidth)
+      ? Math.max(0, siteShellEl.scrollWidth - siteShellEl.clientWidth)
       : Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
   }
 
@@ -872,13 +872,14 @@ var FrameNavigator = (function() {
 
   function scrollToY(yTarget) {
     if (isMobile()) {
-      window.scrollTo({ left: yTarget, behavior: smooth ? 'smooth' : 'auto' });
+      siteShellEl.scrollLeft = yTarget;
     } else {
       window.scrollTo({ top: yTarget, behavior: smooth ? 'smooth' : 'auto' });
     }
   }
 
   var frameFadeEl = document.getElementById('frame-fade');
+  var siteShellEl = document.getElementById('site-shell');
 
   function goByDirection(direction) {
     if (ContactOverlay.isOpen()) return;
@@ -887,7 +888,7 @@ var FrameNavigator = (function() {
     ensureContentAhead(window.innerHeight * 2.5);
 
     var step = viewportStep();
-    var currentPos = isMobile() ? window.scrollX : window.scrollY;
+    var currentPos = isMobile() ? siteShellEl.scrollLeft : window.scrollY;
     var target = currentPos + (direction * step);
     var maxY = maxScrollY();
 
@@ -916,7 +917,7 @@ var FrameNavigator = (function() {
 
   function snapToNearestFrame() {
     var step = viewportStep();
-    var current = isMobile() ? window.scrollX : window.scrollY;
+    var current = isMobile() ? siteShellEl.scrollLeft : window.scrollY;
     var snapped = Math.round(current / step) * step;
     var maxY = maxScrollY();
     if (snapped > maxY) snapped = maxY;

@@ -243,20 +243,21 @@ img.wide-strip {
 }
 
 @media (max-width: 600px) {
-  html {
-    overflow-x: scroll;
-    overflow-y: hidden;
-  }
-
-  body {
-    overflow-x: visible;
-    overflow-y: hidden;
+  html, body {
+    overflow: hidden;
+    height: 100dvh;
   }
 
   #site-shell {
-    width: max-content;
-    min-width: 100vw;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    width: 100vw;
     height: 100dvh;
+    scrollbar-width: none;
+  }
+
+  #site-shell::-webkit-scrollbar {
+    display: none;
   }
 
   #mosaic, .mosaic-grid {
@@ -269,7 +270,8 @@ img.wide-strip {
     display: flex;
     flex-direction: row;
     flex: 1;
-    column-gap: 1px;
+    width: max-content;
+    column-gap: clamp(12px, 4vw, 30px);
   }
 
   .mobile-row-bottom {
