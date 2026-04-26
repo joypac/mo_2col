@@ -249,22 +249,72 @@ img.wide-strip {
 
 @media (max-width: 600px) {
   #mosaic, .mosaic-grid {
-    gap: 10px;
+    display: block;
+    gap: 0;
+    background: #f5f5f3;
   }
 
-  .mosaic-cell img,
-  .mosaic-cell video {
-    width: calc(100% - 24px);
-    margin-left: 12px;
-    margin-right: 12px;
+  .mobile-frame {
+    display: flex;
+    align-items: center;
+    height: 100dvh;
+    gap: 8px;
+    padding: 0 10px;
+    overflow: hidden;
+    background: #f5f5f3;
   }
 
-  img.wide-strip {
-    width: calc(100% - 24px);
-    margin-left: 12px;
-    margin-right: 12px;
-    margin-top: clamp(12px, 3vw, 20px);
-    margin-bottom: clamp(12px, 3vw, 20px);
+  .mobile-frame .mosaic-cell {
+    background: transparent;
+    overflow: hidden;
+    transform: none;
+  }
+
+  .mobile-frame .mosaic-cell img,
+  .mobile-frame .mosaic-cell video {
+    display: block;
+    margin: 0;
+    width: 100%;
+  }
+
+  .mobile-frame img.wide-strip {
+    display: none;
+  }
+
+  /* hero-left: 65% hero on the left, 35% accent on the right */
+  .mobile-frame.hero-left .mosaic-cell:nth-child(1) {
+    flex: 0 0 calc(65% - 4px);
+  }
+  .mobile-frame.hero-left .mosaic-cell:nth-child(2) {
+    flex: 0 0 calc(35% - 4px);
+  }
+
+  /* hero-right: order swap — 35% accent on the left, 65% hero on the right */
+  .mobile-frame.hero-right .mosaic-cell:nth-child(1) {
+    flex: 0 0 calc(35% - 4px);
+    order: 2;
+  }
+  .mobile-frame.hero-right .mosaic-cell:nth-child(2) {
+    flex: 0 0 calc(65% - 4px);
+    order: 1;
+  }
+
+  /* Hero: tall crop */
+  .mobile-frame.hero-left .mosaic-cell:nth-child(1) img,
+  .mobile-frame.hero-left .mosaic-cell:nth-child(1) video,
+  .mobile-frame.hero-right .mosaic-cell:nth-child(2) img,
+  .mobile-frame.hero-right .mosaic-cell:nth-child(2) video {
+    height: 72dvh;
+    object-fit: cover;
+  }
+
+  /* Accent: shorter crop */
+  .mobile-frame.hero-left .mosaic-cell:nth-child(2) img,
+  .mobile-frame.hero-left .mosaic-cell:nth-child(2) video,
+  .mobile-frame.hero-right .mosaic-cell:nth-child(1) img,
+  .mobile-frame.hero-right .mosaic-cell:nth-child(1) video {
+    height: 52dvh;
+    object-fit: cover;
   }
 }
 
