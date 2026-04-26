@@ -802,7 +802,6 @@ var FrameNavigator = (function() {
   }
 
   var frameFadeEl = document.getElementById('frame-fade');
-  var siteShellEl = document.getElementById('site-shell');
 
   function goByDirection(direction) {
     if (ContactOverlay.isOpen()) return;
