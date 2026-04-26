@@ -506,6 +506,8 @@ function buildMosaicLayout(container, isFirst) {
       }
 
       var stripAbove = strip && Math.random() < 0.5;
+      // First 2 rows (4 cells) are above-the-fold: high priority, no lazy load.
+      var aboveFold = isFirst && r < 2;
       if (item.type === 'vid') {
         var video = document.createElement('video');
         video.muted = true;
@@ -522,8 +524,15 @@ function buildMosaicLayout(container, isFirst) {
       } else {
         var img = document.createElement('img');
         img.alt = projects[pi].name;
-        img.style.opacity = '0';
-        img.onload = function() { this.style.opacity = '1'; };
+        if (aboveFold) {
+          img.setAttribute('fetchpriority', 'high');
+        } else {
+          img.setAttribute('loading', 'lazy');
+          if (!isFirst) {
+            img.style.opacity = '0';
+            img.onload = function() { this.style.opacity = '1'; };
+          }
+        }
         img.src = item.src;
         if (stripAbove) div.appendChild(strip);
         div.appendChild(img);
@@ -543,6 +552,48 @@ function buildMosaicLayout(container, isFirst) {
 // First grid
 var mosaicEl = document.getElementById('mosaic');
 buildMosaicLayout(mosaicEl, true);
+
+// Fade in first grid once above-the-fold images load AND 800ms have elapsed.
+// Only waits for the first 4 images (first 2 rows × 2 cols = first viewport).
+// warmImageCache starts after reveal so it doesn't compete for connections.
+(function() {
+  var imgs = Array.prototype.slice.call(
+    mosaicEl.querySelectorAll('img[fetchpriority="high"]')
+  );
+  var total = imgs.length;
+  var imgsDone = !total;
+  var timeDone = false;
+  var revealed = false;
+
+  function tryReveal() {
+    if (!revealed && imgsDone && timeDone) {
+      revealed = true;
+      mosaicEl.style.opacity = '1';
+      warmImageCache();
+    }
+  }
+
+  setTimeout(function() { timeDone = true; tryReveal(); }, 1000);
+
+  if (!total) { warmImageCache(); return; }
+
+  var loaded = 0;
+  var fallback = setTimeout(function() { imgsDone = true; tryReveal(); }, 4000);
+
+  function onOne() {
+    if (imgsDone) return;
+    if (++loaded >= total) {
+      imgsDone = true;
+      clearTimeout(fallback);
+      tryReveal();
+    }
+  }
+  imgs.forEach(function(img) {
+    if (img.complete && img.naturalWidth > 0) { onOne(); return; }
+    img.addEventListener('load',  onOne, { once: true });
+    img.addEventListener('error', onOne, { once: true });
+  });
+})();
 
 // Infinite scroll: append a new randomised grid when sentinel comes into view
 var sentinel = document.getElementById('scroll-sentinel');
@@ -750,12 +801,14 @@ var ContactOverlay = (function() {
   };
 })();
 
+var skipFirstNav = false;
+
 var FrameNavigator = (function() {
   var smooth = false;
   var lockUntil = 0;
   var lockTimer = 0;
-  var lockMsSmooth = 460;
-  var lockMsInstant = 430;
+  var lockMsSmooth = 1060;
+  var lockMsInstant = 1030;
   var touchStartY = 0;
   var touchStartX = 0;
   var touchMoved = false;
@@ -826,7 +879,7 @@ var FrameNavigator = (function() {
     setTimeout(function() {
       scrollToY(target);
       frameFadeEl.style.opacity = '0';
-    }, 200);
+    }, 500);
   }
 
   function goDown() {
@@ -899,7 +952,8 @@ var FrameNavigator = (function() {
 
     // Swipe/drag scrolling is disabled. Only a simple tap advances one frame.
     if (!touchMoved && absDy < 10) {
-      goDown();
+      if (skipFirstNav) { skipFirstNav = false; }
+      else { goDown(); }
     }
 
     lastTouchNavTs = Date.now();
@@ -965,25 +1019,47 @@ var FrameNavigator = (function() {
 })();
 
 FrameNavigator.init();
-warmImageCache();
 window.ContactOverlay = ContactOverlay;
 window.FrameNavigator = FrameNavigator;
 
 // Reveal M. ORTIGÃO on first interaction.
+// First click/touch only reveals the name — does not advance a frame.
 (function() {
   var trigger = document.getElementById('contact-trigger');
   var revealed = false;
-  function reveal() {
+
+  function revealClick(e) {
     if (revealed) return;
     revealed = true;
     trigger.style.opacity = '1';
-    document.removeEventListener('click', reveal, true);
-    window.removeEventListener('touchstart', reveal, true);
-    window.removeEventListener('wheel', reveal, true);
+    document.removeEventListener('click', revealClick, true);
+    window.removeEventListener('touchstart', revealTouch, true);
+    window.removeEventListener('wheel', revealWheel, true);
+    e.stopPropagation(); // prevent this click from navigating
   }
-  document.addEventListener('click', reveal, true);
-  window.addEventListener('touchstart', reveal, true);
-  window.addEventListener('wheel', reveal, true);
+
+  function revealTouch() {
+    if (revealed) return;
+    revealed = true;
+    skipFirstNav = true; // prevent the subsequent touchend from navigating
+    trigger.style.opacity = '1';
+    document.removeEventListener('click', revealClick, true);
+    window.removeEventListener('touchstart', revealTouch, true);
+    window.removeEventListener('wheel', revealWheel, true);
+  }
+
+  function revealWheel() {
+    if (revealed) return;
+    revealed = true;
+    trigger.style.opacity = '1';
+    document.removeEventListener('click', revealClick, true);
+    window.removeEventListener('touchstart', revealTouch, true);
+    window.removeEventListener('wheel', revealWheel, true);
+  }
+
+  document.addEventListener('click', revealClick, true);
+  window.addEventListener('touchstart', revealTouch, true);
+  window.addEventListener('wheel', revealWheel, true);
 })();
 
 // Prevent accidental drag/select highlight overlays on repeated taps/clicks.
