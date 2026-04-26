@@ -254,6 +254,7 @@ img.wide-strip {
   #mosaic, .mosaic-grid {
     grid-template-columns: 75vw 50vw;
     grid-auto-rows: 100dvh;
+    align-items: stretch;
     gap: 0;
   }
 
@@ -264,6 +265,7 @@ img.wide-strip {
 
   .mosaic-cell {
     overflow: hidden;
+    height: 100dvh;
   }
 
   .mosaic-cell img,
