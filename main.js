@@ -135,10 +135,6 @@ var projects = [
 
 /* ── Helpers ──────────────────────────────────────────── */
 
-function isMobile() {
-  return window.innerWidth <= 600;
-}
-
 function shuffle(arr) {
   var a = arr.slice();
   for (var i = a.length - 1; i > 0; i--) {
@@ -446,83 +442,7 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
   }
 }
 
-function buildMosaicLayoutMobile(container, isFirst) {
-  var COLS = 2;
-  var displayedMedia = projects.map(function(p) { return shuffle(p.media); });
-  var layout = buildGrid(projects, displayedMedia, COLS);
-  var grid = layout.grid, ROWS = layout.rows;
-
-  if (isFirst) postProcessFirstGrid(grid, ROWS, COLS, displayedMedia);
-
-  // Compute horizontal center of each project's blob (by r position).
-  var colStats = projects.map(function() { return { min: Infinity, max: -Infinity }; });
-  for (var rr = 0; rr < ROWS; rr++) {
-    for (var cc = 0; cc < COLS; cc++) {
-      var pidx = grid[rr][cc];
-      if (rr < colStats[pidx].min) colStats[pidx].min = rr;
-      if (rr > colStats[pidx].max) colStats[pidx].max = rr;
-    }
-  }
-  var projectCenterCol = colStats.map(function(s) {
-    return s.min === Infinity ? 0 : (s.min + s.max) / 2;
-  });
-
-  var rowTop = document.createElement('div');
-  rowTop.className = 'mobile-row mobile-row-top';
-  var rowBottom = document.createElement('div');
-  rowBottom.className = 'mobile-row mobile-row-bottom';
-  container.appendChild(rowTop);
-  container.appendChild(rowBottom);
-
-  var imgIdx = projects.map(function() { return 0; });
-
-  for (var r = 0; r < ROWS; r++) {
-    for (var c = 0; c < COLS; c++) {
-      var targetRow = (c === 0) ? rowTop : rowBottom;
-      var pi  = grid[r][c];
-      var idx = imgIdx[pi]++;
-      var media = displayedMedia[pi];
-
-      if (idx >= media.length) {
-        var emptyDiv = document.createElement('div');
-        emptyDiv.className = 'mosaic-cell';
-        targetRow.appendChild(emptyDiv);
-        continue;
-      }
-
-      var item = media[idx];
-      var alignRight = r < projectCenterCol[pi] ? ' align-right' : '';
-      var div  = document.createElement('div');
-      div.className = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '') + alignRight;
-
-      if (item.type === 'vid') {
-        var video = document.createElement('video');
-        video.muted = true;
-        video.loop  = true;
-        video.setAttribute('playsinline', '');
-        video.setAttribute('preload', 'none');
-        var vsrc = document.createElement('source');
-        vsrc.src = item.src;
-        video.appendChild(vsrc);
-        div.appendChild(video);
-        vidObs.observe(div);
-      } else {
-        var img = document.createElement('img');
-        img.alt = projects[pi].name;
-        img.src = item.src;
-        div.appendChild(img);
-      }
-
-      targetRow.appendChild(div);
-    }
-  }
-}
-
 function buildMosaicLayout(container, isFirst) {
-  if (isMobile()) {
-    buildMosaicLayoutMobile(container, isFirst);
-    return;
-  }
   var COLS = 2;
   var displayedMedia = projects.map(function(p) { return shuffle(p.media); });
   var layout = buildGrid(projects, displayedMedia, COLS);
@@ -629,7 +549,6 @@ var sentinel = document.getElementById('scroll-sentinel');
 var appending = false;
 
 function appendGrid() {
-  if (isMobile()) return;
   if (appending) return;
   appending = true;
   var grid = document.createElement('div');
@@ -684,7 +603,7 @@ var gridRecycler = (function() {
 })();
 
 // Include the first grid in the recycler.
-if (!isMobile()) gridRecycler.observe(mosaicEl);
+gridRecycler.observe(mosaicEl);
 
 function dynamicRootMargin() {
   return Math.max(400, Math.round(window.innerHeight * 1.5)) + 'px';
@@ -692,7 +611,6 @@ function dynamicRootMargin() {
 
 var infiniteObs = null;
 function setupInfiniteObserver() {
-  if (isMobile()) return;
   if (infiniteObs) infiniteObs.disconnect();
   infiniteObs = new IntersectionObserver(function(entries) {
     if (!entries[0].isIntersecting) return;
@@ -705,7 +623,6 @@ setupInfiniteObserver();
 
 // Keeps enough content ahead so frame jumps do not hit the page end.
 function ensureContentAhead(minAheadPx) {
-  if (isMobile()) return;
   var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
   var remaining = maxScroll - window.scrollY;
   var attempts = 0;
@@ -859,15 +776,11 @@ var FrameNavigator = (function() {
   }
 
   function viewportStep() {
-    return isMobile()
-      ? Math.max(1, window.innerWidth || 1)
-      : Math.max(1, window.innerHeight || 1);
+    return Math.max(1, window.innerHeight || 1);
   }
 
   function maxScrollY() {
-    return isMobile()
-      ? Math.max(0, siteShellEl.scrollWidth - siteShellEl.clientWidth)
-      : Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
   }
 
   function lockForTransition() {
@@ -885,11 +798,7 @@ var FrameNavigator = (function() {
   }
 
   function scrollToY(yTarget) {
-    if (isMobile()) {
-      siteShellEl.scrollLeft = yTarget;
-    } else {
-      window.scrollTo({ top: yTarget, behavior: smooth ? 'smooth' : 'auto' });
-    }
+    window.scrollTo({ top: yTarget, behavior: smooth ? 'smooth' : 'auto' });
   }
 
   var frameFadeEl = document.getElementById('frame-fade');
@@ -902,7 +811,7 @@ var FrameNavigator = (function() {
     ensureContentAhead(window.innerHeight * 2.5);
 
     var step = viewportStep();
-    var currentPos = isMobile() ? siteShellEl.scrollLeft : window.scrollY;
+    var currentPos = window.scrollY;
     var target = currentPos + (direction * step);
     var maxY = maxScrollY();
 
@@ -931,7 +840,7 @@ var FrameNavigator = (function() {
 
   function snapToNearestFrame() {
     var step = viewportStep();
-    var current = isMobile() ? siteShellEl.scrollLeft : window.scrollY;
+    var current = window.scrollY;
     var snapped = Math.round(current / step) * step;
     var maxY = maxScrollY();
     if (snapped > maxY) snapped = maxY;
