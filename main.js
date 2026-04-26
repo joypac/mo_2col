@@ -470,13 +470,6 @@ function buildMosaicLayout(container, isFirst) {
   });
 
   var imgIdx = projects.map(function() { return 0; });
-  var isMobile = window.matchMedia('(max-width: 600px)').matches;
-  var pendingCells = [];
-
-  function commit(node) {
-    if (isMobile) pendingCells.push(node);
-    else container.appendChild(node);
-  }
 
   for (var r = 0; r < ROWS; r++) {
     for (var c = 0; c < COLS; c++) {
@@ -485,7 +478,7 @@ function buildMosaicLayout(container, isFirst) {
       var media = displayedMedia[pi];
 
       if (idx >= media.length) {
-        commit(document.createElement('div'));
+        container.appendChild(document.createElement('div'));
         continue;
       }
 
@@ -551,17 +544,7 @@ function buildMosaicLayout(container, isFirst) {
       label.textContent = projects[pi].name;
       div.appendChild(label);
 
-      commit(div);
-    }
-  }
-
-  if (isMobile) {
-    for (var i = 0; i < pendingCells.length; i += 2) {
-      var frame = document.createElement('div');
-      frame.className = 'mobile-frame ' + (Math.random() < 0.5 ? 'peek-left' : 'peek-right');
-      frame.appendChild(pendingCells[i]);
-      if (pendingCells[i + 1]) frame.appendChild(pendingCells[i + 1]);
-      container.appendChild(frame);
+      container.appendChild(div);
     }
   }
 }

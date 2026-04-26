@@ -248,63 +248,36 @@ img.wide-strip {
 }
 
 @media (max-width: 600px) {
+  /* 75vw left + 50vw right = 125vw total.
+     body overflow-x:clip trims at screen edge —
+     leaving ~25vw of the right photo visible as the peek. */
   #mosaic, .mosaic-grid {
-    display: block;
+    grid-template-columns: 75vw 50vw;
+    grid-auto-rows: 100dvh;
     gap: 0;
-    background: #f5f5f3;
   }
 
-  .mobile-frame {
-    position: relative;
-    height: 100dvh;
-    overflow: hidden;
-    background: #f5f5f3;
+  .mosaic-grid > .mosaic-cell:nth-child(even),
+  #mosaic > .mosaic-cell:nth-child(even) {
+    transform: none;
   }
 
-  .mobile-frame .mosaic-cell {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
+  .mosaic-cell {
     overflow: hidden;
   }
 
-  .mobile-frame .mosaic-cell img,
-  .mobile-frame .mosaic-cell video {
+  .mosaic-cell img,
+  .mosaic-cell video {
     display: block;
-    margin: 0;
     width: 100%;
-    height: auto;
-    max-height: 84dvh;
-    object-fit: contain;
+    height: 100%;
+    margin: 0;
+    object-fit: cover;
+    object-position: center;
   }
 
-  .mobile-frame img.wide-strip {
+  img.wide-strip {
     display: none;
-  }
-
-  /* peek-right: hero anchored to left, peek bleeds off the right edge */
-  .mobile-frame.peek-right .mosaic-cell:nth-child(1) {
-    left: 0;
-    width: 75vw;
-    z-index: 2;
-  }
-  .mobile-frame.peek-right .mosaic-cell:nth-child(2) {
-    left: 75vw;
-    width: 50vw;
-    z-index: 1;
-  }
-
-  /* peek-left: peek bleeds off the left edge, hero anchored to right */
-  .mobile-frame.peek-left .mosaic-cell:nth-child(1) {
-    left: -25vw;
-    width: 50vw;
-    z-index: 1;
-  }
-  .mobile-frame.peek-left .mosaic-cell:nth-child(2) {
-    left: 25vw;
-    width: 75vw;
-    z-index: 2;
   }
 }
 
