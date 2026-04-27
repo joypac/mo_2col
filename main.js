@@ -444,6 +444,7 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
 
 function buildMosaicLayout(container, isFirst) {
   var COLS = 2;
+  var isMobile = window.innerWidth <= 600;
   var displayedMedia = projects.map(function(p) { return shuffle(p.media); });
   var layout = buildGrid(projects, displayedMedia, COLS);
   var grid = layout.grid, ROWS = layout.rows;
@@ -472,13 +473,19 @@ function buildMosaicLayout(container, isFirst) {
   var imgIdx = projects.map(function() { return 0; });
 
   for (var r = 0; r < ROWS; r++) {
+    var frame = null;
+    if (isMobile) {
+      frame = document.createElement('div');
+      frame.className = 'mobile-frame ' + (Math.random() < 0.5 ? 'peek-right' : 'peek-left');
+      container.appendChild(frame);
+    }
     for (var c = 0; c < COLS; c++) {
       var pi  = grid[r][c];
       var idx = imgIdx[pi]++;
       var media = displayedMedia[pi];
 
       if (idx >= media.length) {
-        container.appendChild(document.createElement('div'));
+        (isMobile ? frame : container).appendChild(document.createElement('div'));
         continue;
       }
 
@@ -544,7 +551,7 @@ function buildMosaicLayout(container, isFirst) {
       label.textContent = projects[pi].name;
       div.appendChild(label);
 
-      container.appendChild(div);
+      (isMobile ? frame : container).appendChild(div);
     }
   }
 }
