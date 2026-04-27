@@ -567,7 +567,9 @@ function buildMosaicLayout(container, isFirst) {
         if (allImgs.length) {
           strip = document.createElement('div');
           strip.className = 'wide-strip';
-          strip.style.height = Math.round(120 + Math.random() * 180) + 'px';
+          // Height proportional to viewport width — keeps "slice" feel
+          // on both desktop (~115–270px) and mobile (~24–56px).
+          strip.style.height = (6 + Math.random() * 8).toFixed(2) + 'vw';
 
           var stripImg = document.createElement('img');
           var stripSrc = allImgs[Math.floor(Math.random() * allImgs.length)];
