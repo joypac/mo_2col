@@ -259,11 +259,11 @@ img.wide-strip {
     transform: none;
   }
 
-  /* Even rows (cells 3,4 / 7,8 / 11,12 …): shift left 50vw → peek-left */
-  .mosaic-grid > .mosaic-cell:nth-child(4n+3),
-  .mosaic-grid > .mosaic-cell:nth-child(4n+4),
-  #mosaic > .mosaic-cell:nth-child(4n+3),
-  #mosaic > .mosaic-cell:nth-child(4n+4) {
+  /* Page-parity alternation: whole grid shifts -50vw on odd pages,
+     so all visible photos in a viewport share the same peek direction.
+     The shift happens during the white fade between pages → invisible. */
+  body.peek-shift #mosaic,
+  body.peek-shift .mosaic-grid {
     transform: translateX(-50vw);
   }
 

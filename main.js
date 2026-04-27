@@ -1079,3 +1079,17 @@ window.addEventListener('pointerup', function() {
     if (sel && sel.removeAllRanges) sel.removeAllRanges();
   }
 }, { passive: true });
+
+// Mobile peek alternation: shift entire grid on odd pages so every photo
+// in a viewport shares the same peek direction.
+function applyMobilePeekShift() {
+  if (window.innerWidth > 600) {
+    document.body.classList.remove('peek-shift');
+    return;
+  }
+  var pageIndex = Math.round(window.scrollY / Math.max(1, window.innerHeight));
+  document.body.classList.toggle('peek-shift', pageIndex % 2 === 1);
+}
+window.addEventListener('scroll', applyMobilePeekShift, { passive: true });
+window.addEventListener('resize', applyMobilePeekShift, { passive: true });
+applyMobilePeekShift();
