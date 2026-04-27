@@ -255,10 +255,11 @@ img.wide-strip {
     gap: 1px;
   }
 
-  /* Cancel desktop translateY stagger */
+  /* Keep desktop's translateY stagger on right column → "desencontro" feel.
+     The even cells shift up 30% of their own height, breaking the grid rhythm. */
   .mosaic-grid > .mosaic-cell:nth-child(even),
   #mosaic > .mosaic-cell:nth-child(even) {
-    transform: none;
+    transform: translateY(-30%);
   }
 
   /* Page-parity alternation: shift -33.33vw on odd pages so col 2 becomes
