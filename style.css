@@ -253,10 +253,18 @@ img.wide-strip {
     gap: 1px;
   }
 
-  /* Remove stagger offset — right column bleeds off-screen, offset looks odd */
+  /* Cancel desktop translateY stagger */
   .mosaic-grid > .mosaic-cell:nth-child(even),
   #mosaic > .mosaic-cell:nth-child(even) {
     transform: none;
+  }
+
+  /* Even rows (cells 3,4 / 7,8 / 11,12 …): shift left 50vw → peek-left */
+  .mosaic-grid > .mosaic-cell:nth-child(4n+3),
+  .mosaic-grid > .mosaic-cell:nth-child(4n+4),
+  #mosaic > .mosaic-cell:nth-child(4n+3),
+  #mosaic > .mosaic-cell:nth-child(4n+4) {
+    transform: translateX(-50vw);
   }
 
   .mosaic-cell img,
