@@ -249,7 +249,14 @@ img.wide-strip {
 
 @media (max-width: 600px) {
   #mosaic, .mosaic-grid {
-    gap: 10px;
+    grid-template-columns: 75vw 75vw;
+    gap: 1px;
+  }
+
+  /* Remove stagger offset — right column bleeds off-screen, offset looks odd */
+  .mosaic-grid > .mosaic-cell:nth-child(even),
+  #mosaic > .mosaic-cell:nth-child(even) {
+    transform: none;
   }
 
   .mosaic-cell img,
