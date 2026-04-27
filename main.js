@@ -133,6 +133,108 @@ var projects = [
   }
 ];
 
+/* Intrinsic dimensions per asset → reserves layout space before load,
+   eliminating CLS (cumulative layout shift) when images pop in. */
+var mediaDimensions = {
+  'assets/banco/banco1.webp': [1219, 813],
+  'assets/banco/banco2.webp': [1054, 1581],
+  'assets/banco/banco3.webp': [998, 1498],
+  'assets/fairly/fairly1.webp':  [777, 972],
+  'assets/fairly/fairly2.webp':  [910, 1138],
+  'assets/fairly/fairly3.webp':  [1020, 1275],
+  'assets/fairly/fairly5.webp':  [907, 1134],
+  'assets/fairly/fairly9.webp':  [942, 1178],
+  'assets/fairly/fairly10.webp': [1076, 1345],
+  'assets/fairly/fairly11.webp': [1189, 1486],
+  'assets/fairly/fairly12.webp': [818, 1022],
+  'assets/fairly/fairly13.webp': [844, 1055],
+  'assets/fairly/fairly16.webp': [1013, 1266],
+  'assets/fairly/fairly17.webp': [864, 1080],
+  'assets/fairly/fairly31.webp': [1370, 1827],
+  'assets/fairly/fairly32.webp': [1558, 2077],
+  'assets/fairly/fairly33.webp': [1247, 1663],
+  'assets/fairly/fairly34.webp': [737, 983],
+  'assets/fairly/fairly35.webp': [1198, 1597],
+  'assets/fairly/fairly36.webp': [1006, 1341],
+  'assets/fairly/fairly37.webp': [803, 1070],
+  'assets/fairly/fairly38.webp': [807, 1077],
+  'assets/fairly/fairly39.webp': [883, 1178],
+  'assets/fairly/fairly41.webp': [883, 1177],
+  'assets/fairly/fairly42.webp': [1005, 1341],
+  'assets/fairly/fairly43.webp': [919, 1224],
+  'assets/fairly/fairly18.mp4': [720, 720],
+  'assets/fairly/fairly19.mp4': [720, 720],
+  'assets/fairly/fairly20.mp4': [720, 720],
+  'assets/fairly/fairly21.mp4': [720, 720],
+  'assets/fairly/fairly22.mp4': [720, 720],
+  'assets/fairly/fairly23.mp4': [720, 720],
+  'assets/fairly/fairly24.mp4': [720, 720],
+  'assets/fairly/fairly25.mp4': [720, 720],
+  'assets/fairly/fairly26.mp4': [720, 720],
+  'assets/fairly/fairly27.mp4': [720, 1280],
+  'assets/fairly/fairly28.mp4': [720, 1280],
+  'assets/fairly/fairly30.mp4': [720, 1280],
+  'assets/fairly/Fairly Normal_H264-Scene-001.mp4': [1920, 1080],
+  'assets/fairly/Fairly Normal_H264-Scene-002.mp4': [1920, 1080],
+  'assets/fairly/Fairly Normal_H264-Scene-003.mp4': [1920, 1080],
+  'assets/fairly/Fairly Normal_H264-Scene-004.mp4': [1920, 1080],
+  'assets/fairly/Fairly Normal_H264-Scene-005.mp4': [1920, 1080],
+  'assets/fairly/Fairly Normal_H264-Scene-006.mp4': [1920, 1080],
+  'assets/fairly/Fairly Normal_H264-Scene-007.mp4': [1920, 1080],
+  'assets/fairly/Fairly Normal_H264-Scene-008.mp4': [1920, 1080],
+  'assets/fairly/Fairly Normal_H264-Scene-009.mp4': [1920, 1080],
+  'assets/fairly/Fairly Normal_H264-Scene-010.mp4': [1920, 1080],
+  'assets/mustique/mustique1.webp':  [1075, 1340],
+  'assets/mustique/mustique2.webp':  [1022, 1277],
+  'assets/mustique/mustique3.webp':  [1321, 1652],
+  'assets/mustique/mustique4.webp':  [812, 1014],
+  'assets/mustique/mustique5.webp':  [692, 865],
+  'assets/mustique/mustique7.webp':  [927, 1158],
+  'assets/mustique/mustique9.webp':  [967, 1208],
+  'assets/mustique/mustique13.webp': [1005, 1256],
+  'assets/mustique/mustique14.webp': [670, 892],
+  'assets/mustique/mustique15.webp': [749, 999],
+  'assets/mustique/mustique16.webp': [627, 836],
+  'assets/mustique/mustique17.webp': [627, 835],
+  'assets/mustique/mustique18.webp': [756, 1008],
+  'assets/mustique/mustique19.webp': [678, 905],
+  'assets/mustique/mustique20.webp': [723, 965],
+  'assets/mustique/mustique21.webp': [634, 845],
+  'assets/mustique/mustique22.webp': [750, 1000],
+  'assets/mustique/mustique23.webp': [688, 918],
+  'assets/mustique/mustique24.webp': [1032, 1375],
+  'assets/mustique/mustique27.webp': [840, 1120],
+  'assets/mustique/mustique28.webp': [876, 1168],
+  'assets/mustique/mustique29.webp': [812, 1083],
+  'assets/paez/paez1.webp':  [692, 864],
+  'assets/paez/paez2.webp':  [750, 937],
+  'assets/paez/paez3.webp':  [786, 983],
+  'assets/paez/paez4.webp':  [760, 950],
+  'assets/paez/paez5.webp':  [609, 760],
+  'assets/paez/paez8.webp':  [807, 1010],
+  'assets/paez/paez9.webp':  [749, 999],
+  'assets/paez/paez10.webp': [660, 878],
+  'assets/paez/paez11.webp': [721, 961],
+  'assets/paez/paez12.webp': [724, 965],
+  'assets/paez/paez13.webp': [751, 1002],
+  'assets/paez/paez14.webp': [571, 762],
+  'assets/paez/paez15.webp': [733, 978],
+  'assets/paez/paez16.webp': [755, 1006],
+  'assets/paez/paez17.webp': [667, 891],
+  'assets/paez/paez18.webp': [1089, 1452],
+  'assets/paez/paez19.webp': [610, 813],
+  'assets/paez/paez_video1.mp4': [960, 736],
+  'assets/paez/paez_video2.mp4': [960, 736],
+  'assets/paez/paez_video3.mp4': [960, 736],
+  'assets/paez/paez_video4.mp4': [960, 736],
+  'assets/paez/paez_video5.mp4': [960, 736],
+  'assets/paez/paez_video6.mp4': [960, 736],
+  'assets/peca/peca1.webp': [1024, 665],
+  'assets/peca/peca2.webp': [1024, 673],
+  'assets/peca/peca3.webp': [655, 418],
+  'assets/lapa-lofts/lapa_lofts.mp4': [1280, 720]
+};
+
 /* ── Helpers ──────────────────────────────────────────── */
 
 function shuffle(arr) {
@@ -151,53 +253,19 @@ var imageCache = [];
 
 function warmImageCache() {
   var seen = Object.create(null);
-  var queue = [];
 
   projects.forEach(function(project) {
     project.media.forEach(function(item) {
       if (item.type !== 'img') return;
       if (seen[item.src]) return;
       seen[item.src] = true;
-      queue.push(item.src);
-    });
-  });
-
-  if (!queue.length) return;
-
-  function consumeChunk(deadline) {
-    var budget = deadline && typeof deadline.timeRemaining === 'function'
-      ? Math.max(2, Math.floor(deadline.timeRemaining()))
-      : 5;
-
-    var count = 0;
-    while (queue.length && count < budget) {
-      var src = queue.shift();
       var img = new Image();
       img.decoding = 'async';
       img.loading = 'eager';
-      img.src = src;
+      img.src = item.src;
       imageCache.push(img);
-      count++;
-    }
-
-    if (!queue.length) return;
-
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(consumeChunk, { timeout: 800 });
-    } else {
-      setTimeout(function() {
-        consumeChunk();
-      }, 80);
-    }
-  }
-
-  if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(consumeChunk, { timeout: 1200 });
-  } else {
-    setTimeout(function() {
-      consumeChunk();
-    }, 220);
-  }
+    });
+  });
 }
 
 /* ── Compact grid builder ─────────────────────────────────
@@ -502,7 +570,10 @@ function buildMosaicLayout(container, isFirst) {
           strip.style.height = Math.round(120 + Math.random() * 180) + 'px';
 
           var stripImg = document.createElement('img');
-          stripImg.src = allImgs[Math.floor(Math.random() * allImgs.length)];
+          var stripSrc = allImgs[Math.floor(Math.random() * allImgs.length)];
+          stripImg.src = stripSrc;
+          var stripDims = mediaDimensions[stripSrc];
+          if (stripDims) { stripImg.width = stripDims[0]; stripImg.height = stripDims[1]; }
           stripImg.alt = '';
           stripImg.style.opacity = '0';
           stripImg.onload = function() { this.style.opacity = '1'; };
@@ -515,6 +586,8 @@ function buildMosaicLayout(container, isFirst) {
       var aboveFold = isFirst && r < 2;
       if (item.type === 'vid') {
         var video = document.createElement('video');
+        var vidDims = mediaDimensions[item.src];
+        if (vidDims) { video.width = vidDims[0]; video.height = vidDims[1]; }
         video.muted = true;
         video.loop  = true;
         video.setAttribute('playsinline', '');
@@ -528,6 +601,8 @@ function buildMosaicLayout(container, isFirst) {
         vidObs.observe(div);
       } else {
         var img = document.createElement('img');
+        var imgDims = mediaDimensions[item.src];
+        if (imgDims) { img.width = imgDims[0]; img.height = imgDims[1]; }
         img.alt = projects[pi].name;
         if (aboveFold) {
           img.setAttribute('fetchpriority', 'high');
