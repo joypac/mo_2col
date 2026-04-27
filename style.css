@@ -132,6 +132,7 @@ body {
   left: 0;
   width: 100%;
   height: auto;
+  margin: 0;             /* override .mosaic-cell img margins → no horizontal shift */
   transform: translateY(-50%);
 }
 
