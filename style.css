@@ -108,7 +108,7 @@ body {
 }
 
 .mosaic-cell img {
-  transition: opacity 200ms ease;
+  transition: opacity 500ms ease;
 }
 
 /* Wide/cinematic strip — decorative extra element inside a cell */
@@ -248,8 +248,10 @@ img.wide-strip {
 }
 
 @media (max-width: 600px) {
+  /* True 1.5 photos: each column 2/3 viewport wide.
+     Visible: full main col (66.66vw) + half-width peek (33.33vw). */
   #mosaic, .mosaic-grid {
-    grid-template-columns: 75vw 75vw;
+    grid-template-columns: 66.66vw 66.66vw;
     gap: 1px;
   }
 
@@ -259,28 +261,16 @@ img.wide-strip {
     transform: none;
   }
 
-  /* Page-parity alternation: whole grid shifts -50vw on odd pages,
-     so all visible photos in a viewport share the same peek direction.
+  /* Page-parity alternation: shift -33.33vw on odd pages so col 2 becomes
+     the main visible photo and col 1 becomes the left-bleeding peek.
      The shift happens during the white fade between pages → invisible. */
   body.peek-shift #mosaic,
   body.peek-shift .mosaic-grid {
-    transform: translateX(-50vw);
+    transform: translateX(-33.33vw);
   }
 
-  .mosaic-cell img,
-  .mosaic-cell video {
-    width: calc(100% - 24px);
-    margin-left: 12px;
-    margin-right: 12px;
-  }
-
-  img.wide-strip {
-    width: calc(100% - 24px);
-    margin-left: 12px;
-    margin-right: 12px;
-    margin-top: clamp(12px, 3vw, 20px);
-    margin-bottom: clamp(12px, 3vw, 20px);
-  }
+  /* Image margins inherit from the desktop rule (10% + 5px laterally,
+     clamp 9px–23px vertically), so mobile keeps the same proportions. */
 }
 
 .contact-section-content p,

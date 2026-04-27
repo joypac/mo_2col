@@ -502,6 +502,8 @@ function buildMosaicLayout(container, isFirst) {
           strip.src = allImgs[Math.floor(Math.random() * allImgs.length)];
           strip.alt = '';
           strip.style.height = Math.round(120 + Math.random() * 180) + 'px';
+          strip.style.opacity = '0';
+          strip.onload = function() { this.style.opacity = '1'; };
         }
       }
 
@@ -528,10 +530,9 @@ function buildMosaicLayout(container, isFirst) {
           img.setAttribute('fetchpriority', 'high');
         } else {
           img.setAttribute('loading', 'lazy');
-          if (!isFirst) {
-            img.style.opacity = '0';
-            img.onload = function() { this.style.opacity = '1'; };
-          }
+          // Fade in on load to avoid sudden pop-in (applies to all grids).
+          img.style.opacity = '0';
+          img.onload = function() { this.style.opacity = '1'; };
         }
         img.src = item.src;
         if (stripAbove) div.appendChild(strip);
