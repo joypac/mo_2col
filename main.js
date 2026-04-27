@@ -497,13 +497,16 @@ function buildMosaicLayout(container, isFirst) {
           });
         });
         if (allImgs.length) {
-          strip = document.createElement('img');
+          strip = document.createElement('div');
           strip.className = 'wide-strip';
-          strip.src = allImgs[Math.floor(Math.random() * allImgs.length)];
-          strip.alt = '';
           strip.style.height = Math.round(120 + Math.random() * 180) + 'px';
-          strip.style.opacity = '0';
-          strip.onload = function() { this.style.opacity = '1'; };
+
+          var stripImg = document.createElement('img');
+          stripImg.src = allImgs[Math.floor(Math.random() * allImgs.length)];
+          stripImg.alt = '';
+          stripImg.style.opacity = '0';
+          stripImg.onload = function() { this.style.opacity = '1'; };
+          strip.appendChild(stripImg);
         }
       }
 

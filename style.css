@@ -111,16 +111,28 @@ body {
   transition: opacity 500ms ease;
 }
 
-/* Wide/cinematic strip — decorative extra element inside a cell */
-img.wide-strip {
+/* Wide/cinematic strip — decorative extra element inside a cell.
+   Wrapper div clips height; inner image keeps full width & natural ratio
+   so the sides are NEVER cropped, only the vertical overflow is hidden. */
+.wide-strip {
   display: block;
   width: calc(100% - 20% - 10px);
   margin-left: calc(10% + 5px);
   margin-right: calc(10% + 5px);
   margin-top: clamp(18px, 2.7vw, 46px);
   margin-bottom: clamp(18px, 2.7vw, 46px);
-  object-fit: cover;
-  object-position: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.wide-strip img {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: auto;
+  transform: translateY(-50%);
 }
 
 /* No hover effects */
