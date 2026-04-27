@@ -271,17 +271,6 @@ img.wide-strip {
     background: transparent;
   }
 
-  /* Default image style (main cell) — same proportions as desktop */
-  .mobile-frame .mosaic-cell img,
-  .mobile-frame .mosaic-cell video {
-    display: block;
-    width: calc(100% - 20% - 10px);
-    margin-left: calc(10% + 5px);
-    margin-right: calc(10% + 5px);
-    height: auto;
-    max-height: 84dvh;
-  }
-
   /* Main cell: vertically centered, shrinks to image height */
   .mobile-frame.peek-right .mosaic-cell:nth-child(1),
   .mobile-frame.peek-left  .mosaic-cell:nth-child(2) {
@@ -289,17 +278,31 @@ img.wide-strip {
     transform: translateY(-50%);
   }
 
-  /* Peek cell: full frame height, image covers */
+  /* Main cell image: fills cell width, natural height, no crop */
+  .mobile-frame.peek-right .mosaic-cell:nth-child(1) img,
+  .mobile-frame.peek-right .mosaic-cell:nth-child(1) video,
+  .mobile-frame.peek-left  .mosaic-cell:nth-child(2) img,
+  .mobile-frame.peek-left  .mosaic-cell:nth-child(2) video {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 84dvh;
+    margin: 0;
+  }
+
+  /* Peek cell: full frame height */
   .mobile-frame.peek-right .mosaic-cell:nth-child(2),
   .mobile-frame.peek-left  .mosaic-cell:nth-child(1) {
     top: 0;
     bottom: 0;
   }
 
+  /* Peek cell image: covers the sliver */
   .mobile-frame.peek-right .mosaic-cell:nth-child(2) img,
   .mobile-frame.peek-right .mosaic-cell:nth-child(2) video,
   .mobile-frame.peek-left  .mosaic-cell:nth-child(1) img,
   .mobile-frame.peek-left  .mosaic-cell:nth-child(1) video {
+    display: block;
     width: 100%;
     height: 100%;
     margin: 0;
@@ -308,7 +311,7 @@ img.wide-strip {
     object-position: center;
   }
 
-  /* peek-right: main on left, peek bleeds off right */
+  /* peek-right: main left (0–75vw), peek bleeds off right */
   .mobile-frame.peek-right .mosaic-cell:nth-child(1) {
     left: 0;
     width: 75vw;
@@ -320,7 +323,7 @@ img.wide-strip {
     z-index: 1;
   }
 
-  /* peek-left: peek bleeds off left, main on right */
+  /* peek-left: peek bleeds off left, main right (25vw–100vw) */
   .mobile-frame.peek-left .mosaic-cell:nth-child(1) {
     left: -25vw;
     width: 50vw;
