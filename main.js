@@ -248,24 +248,30 @@ function shuffle(arr) {
 
 var DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
 
-// Retained references prevent GC from evicting preloaded images.
-var imageCache = [];
+var preloadedHeroImages = Object.create(null);
 
-function warmImageCache() {
-  var seen = Object.create(null);
+function setIntrinsicDimensions(el, src) {
+  var dims = mediaDimensions[src];
+  if (!dims) return;
+  el.width = dims[0];
+  el.height = dims[1];
+  el.style.aspectRatio = dims[0] + ' / ' + dims[1];
+}
 
-  projects.forEach(function(project) {
-    project.media.forEach(function(item) {
-      if (item.type !== 'img') return;
-      if (seen[item.src]) return;
-      seen[item.src] = true;
-      var img = new Image();
-      img.decoding = 'async';
-      img.loading = 'eager';
-      img.src = item.src;
-      imageCache.push(img);
-    });
-  });
+function preloadHeroImage(src) {
+  if (!src || preloadedHeroImages[src]) return;
+  preloadedHeroImages[src] = true;
+
+  var link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'image';
+  link.href = src;
+  document.head.appendChild(link);
+}
+
+function markMediaLoaded(cell, mediaEl) {
+  if (mediaEl) mediaEl.classList.add('is-loaded');
+  if (cell) cell.classList.add('has-loaded-media');
 }
 
 /* ── Compact grid builder ─────────────────────────────────
@@ -573,12 +579,19 @@ function buildMosaicLayout(container, isFirst) {
 
           var stripImg = document.createElement('img');
           var stripSrc = allImgs[Math.floor(Math.random() * allImgs.length)];
-          stripImg.src = stripSrc;
-          var stripDims = mediaDimensions[stripSrc];
-          if (stripDims) { stripImg.width = stripDims[0]; stripImg.height = stripDims[1]; }
+          stripImg.className = 'mosaic-media is-strip-media';
+          stripImg.decoding = 'async';
+          stripImg.setAttribute('loading', 'lazy');
+          stripImg.setAttribute('fetchpriority', 'low');
+          setIntrinsicDimensions(stripImg, stripSrc);
           stripImg.alt = '';
-          stripImg.style.opacity = '0';
-          stripImg.onload = function() { this.style.opacity = '1'; };
+          stripImg.addEventListener('load', function() {
+            markMediaLoaded(this.closest('.mosaic-cell'), this);
+          }, { once: true });
+          stripImg.addEventListener('error', function() {
+            markMediaLoaded(this.closest('.mosaic-cell'), this);
+          }, { once: true });
+          stripImg.src = stripSrc;
           strip.appendChild(stripImg);
         }
       }
@@ -588,12 +601,18 @@ function buildMosaicLayout(container, isFirst) {
       var aboveFold = isFirst && r < 2;
       if (item.type === 'vid') {
         var video = document.createElement('video');
-        var vidDims = mediaDimensions[item.src];
-        if (vidDims) { video.width = vidDims[0]; video.height = vidDims[1]; }
+        video.className = 'mosaic-media';
+        setIntrinsicDimensions(video, item.src);
         video.muted = true;
         video.loop  = true;
         video.setAttribute('playsinline', '');
-        video.setAttribute('preload', 'none');
+        video.setAttribute('preload', aboveFold ? 'metadata' : 'none');
+        video.addEventListener('loadeddata', function() {
+          markMediaLoaded(this.closest('.mosaic-cell'), this);
+        }, { once: true });
+        video.addEventListener('error', function() {
+          markMediaLoaded(this.closest('.mosaic-cell'), this);
+        }, { once: true });
         var vsrc = document.createElement('source');
         vsrc.src = item.src;
         video.appendChild(vsrc);
@@ -603,17 +622,23 @@ function buildMosaicLayout(container, isFirst) {
         vidObs.observe(div);
       } else {
         var img = document.createElement('img');
-        var imgDims = mediaDimensions[item.src];
-        if (imgDims) { img.width = imgDims[0]; img.height = imgDims[1]; }
+        img.className = 'mosaic-media';
+        img.decoding = 'async';
+        setIntrinsicDimensions(img, item.src);
         img.alt = projects[pi].name;
+        img.setAttribute('loading', aboveFold ? 'eager' : 'lazy');
         if (aboveFold) {
           img.setAttribute('fetchpriority', 'high');
+          preloadHeroImage(item.src);
         } else {
-          img.setAttribute('loading', 'lazy');
-          // Fade in on load to avoid sudden pop-in (applies to all grids).
-          img.style.opacity = '0';
-          img.onload = function() { this.style.opacity = '1'; };
+          img.setAttribute('fetchpriority', 'low');
         }
+        img.addEventListener('load', function() {
+          markMediaLoaded(this.closest('.mosaic-cell'), this);
+        }, { once: true });
+        img.addEventListener('error', function() {
+          markMediaLoaded(this.closest('.mosaic-cell'), this);
+        }, { once: true });
         img.src = item.src;
         if (stripAbove) div.appendChild(strip);
         div.appendChild(img);
@@ -633,48 +658,6 @@ function buildMosaicLayout(container, isFirst) {
 // First grid
 var mosaicEl = document.getElementById('mosaic');
 buildMosaicLayout(mosaicEl, true);
-
-// Fade in first grid once above-the-fold images load AND 800ms have elapsed.
-// Only waits for the first 4 images (first 2 rows × 2 cols = first viewport).
-// warmImageCache starts after reveal so it doesn't compete for connections.
-(function() {
-  var imgs = Array.prototype.slice.call(
-    mosaicEl.querySelectorAll('img[fetchpriority="high"]')
-  );
-  var total = imgs.length;
-  var imgsDone = !total;
-  var timeDone = false;
-  var revealed = false;
-
-  function tryReveal() {
-    if (!revealed && imgsDone && timeDone) {
-      revealed = true;
-      mosaicEl.style.opacity = '1';
-      warmImageCache();
-    }
-  }
-
-  setTimeout(function() { timeDone = true; tryReveal(); }, 1000);
-
-  if (!total) { warmImageCache(); return; }
-
-  var loaded = 0;
-  var fallback = setTimeout(function() { imgsDone = true; tryReveal(); }, 4000);
-
-  function onOne() {
-    if (imgsDone) return;
-    if (++loaded >= total) {
-      imgsDone = true;
-      clearTimeout(fallback);
-      tryReveal();
-    }
-  }
-  imgs.forEach(function(img) {
-    if (img.complete && img.naturalWidth > 0) { onOne(); return; }
-    img.addEventListener('load',  onOne, { once: true });
-    img.addEventListener('error', onOne, { once: true });
-  });
-})();
 
 // Infinite scroll: append a new randomised grid when sentinel comes into view
 var sentinel = document.getElementById('scroll-sentinel');

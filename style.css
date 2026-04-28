@@ -79,14 +79,27 @@ body {
 }
 
 #mosaic {
-  opacity: 0;
-  transition: opacity 1000ms ease;
+  opacity: 1;
 }
 
 .mosaic-cell {
   position: relative;
-  background: #f5f5f3;
+  background: #ebe9e3;
   overflow: visible;
+}
+
+.mosaic-cell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, rgba(255,255,255,0.18) 0%, rgba(214,210,199,0.34) 45%, rgba(255,255,255,0.18) 100%);
+  opacity: 0.75;
+  transition: opacity 280ms ease;
+  pointer-events: none;
+}
+
+.mosaic-cell.has-loaded-media::before {
+  opacity: 0;
 }
 
 /* Offset right column — breathing space around smaller photos. */
@@ -105,10 +118,20 @@ body {
   margin-top: clamp(9px, 1.35vw, 23px);
   margin-bottom: clamp(9px, 1.35vw, 23px);
   height: auto;
+  background: #e4e1d8;
 }
 
-.mosaic-cell img {
-  transition: opacity 500ms ease;
+.mosaic-cell .mosaic-media {
+  opacity: 0;
+  filter: blur(10px);
+  transform: scale(1.015);
+  transition: opacity 360ms ease, filter 520ms ease, transform 520ms ease;
+}
+
+.mosaic-cell .mosaic-media.is-loaded {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
 }
 
 /* Wide/cinematic strip — decorative extra element inside a cell.
