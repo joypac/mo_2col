@@ -159,7 +159,7 @@ body {
   font-size: clamp(1.1rem, 2.2vw, 1.7rem);
   letter-spacing: 0.03em;
   line-height: 1;
-  padding: 6px 8px;
+  padding: 6px 0;
   cursor: pointer;
   opacity: 0;
   transition: opacity 1000ms ease;
