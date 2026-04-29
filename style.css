@@ -89,19 +89,6 @@ body {
   overflow: visible;
 }
 
-.mosaic-cell::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: #f5f5f3;
-  opacity: 1;
-  transition: opacity 280ms ease;
-  pointer-events: none;
-}
-
-.mosaic-cell.has-loaded-media::before {
-  opacity: 0;
-}
 
 /* Offset right column — breathing space around smaller photos. */
 .mosaic-grid > .mosaic-cell:nth-child(even),
