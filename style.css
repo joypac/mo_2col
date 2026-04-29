@@ -196,7 +196,7 @@ body {
   left: 14px;
   right: 14px;
   width: auto;
-  max-width: 760px;
+  max-width: none;
   max-height: calc(100dvh - 20px);
   overflow-y: hidden;
   padding: clamp(10px, 1.5vw, 14px) 0 clamp(20px, 3vh, 28px) 0;
