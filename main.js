@@ -829,13 +829,20 @@ var ContactOverlay = (function() {
 
   function positionPanelBelowTrigger() {
     var rect = trigger.getBoundingClientRect();
-    var triggerStyles = window.getComputedStyle(trigger);
-    var textStartX = rect.left + parseFloat(triggerStyles.paddingLeft || '0');
-    var left = Math.max(8, Math.round(textStartX));
     var top = Math.round(rect.bottom - 5);
     panel.style.top = top + 'px';
-    panel.style.left = left + 'px';
-    panel.style.right = window.innerWidth <= 720 ? '14px' : '';
+
+    if (window.innerWidth <= 720) {
+      // Mobile: let CSS handle horizontal positioning for symmetric margins
+      panel.style.left = '';
+      panel.style.right = '';
+    } else {
+      var triggerStyles = window.getComputedStyle(trigger);
+      var textStartX = rect.left + parseFloat(triggerStyles.paddingLeft || '0');
+      var left = Math.max(8, Math.round(textStartX));
+      panel.style.left = left + 'px';
+      panel.style.right = '';
+    }
   }
 
   function syncA11y() {
