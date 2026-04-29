@@ -561,22 +561,49 @@ function buildMosaicLayout(container, isFirst) {
   });
 
   var imgIdx = projects.map(function() { return 0; });
+  var skipNextCell = false;
+  var renderedCol = 0; // Tracks the actual column position after spans
 
   for (var r = 0; r < ROWS; r++) {
     for (var c = 0; c < COLS; c++) {
+      if (skipNextCell) {
+        skipNextCell = false;
+        var skippedPi = grid[r][c];
+        if (skippedPi >= 0) imgIdx[skippedPi]++; // Consume skipped photo too
+        continue;
+      }
+
       var pi  = grid[r][c];
       var idx = imgIdx[pi]++;
       var media = displayedMedia[pi];
 
       if (idx >= media.length) {
         container.appendChild(document.createElement('div'));
+        renderedCol = (renderedCol + 1) % COLS;
         continue;
       }
 
       var item = media[idx];
       var div  = document.createElement('div');
+
+      // Feature opportunity: BFS placed the same project in both columns
+      // of this row, AND this is the first photo we're showing for this
+      // project (idx 0). Promote it to a full-width hero shot ~40% of
+      // the time — frequent enough to feel intentional, rare enough to
+      // stay surprising.
+      var isFeature = (
+        c === 0 && c + 1 < COLS &&
+        grid[r][c + 1] === pi &&
+        idx === 0 &&
+        Math.random() < 0.4
+      );
+      if (isFeature) skipNextCell = true;
+
       var zoomed = Math.random() < 0.5 ? ' is-zoomed' : '';
-      div.className = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '') + zoomed;
+      var classes = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '') + zoomed;
+      if (isFeature) classes += ' is-feature';
+      else if (renderedCol === 1) classes += ' is-right';
+      div.className = classes;
 
       // Randomly inject a decorative wide-strip into ~15% of cells.
       var strip = null;
@@ -668,6 +695,11 @@ function buildMosaicLayout(container, isFirst) {
       div.appendChild(label);
 
       container.appendChild(div);
+
+      // Update visual column tracker. Feature cells consume both columns
+      // and reset to col 0; normal cells advance one column.
+      if (isFeature) renderedCol = 0;
+      else renderedCol = (renderedCol + 1) % COLS;
     }
   }
 }
@@ -1209,16 +1241,5 @@ window.addEventListener('pointerup', function() {
   }
 }, { passive: true });
 
-// Mobile peek alternation: shift entire grid on odd pages so every photo
-// in a viewport shares the same peek direction.
-function applyMobilePeekShift() {
-  if (window.innerWidth > 600) {
-    document.body.classList.remove('peek-shift');
-    return;
-  }
-  var pageIndex = Math.round(window.scrollY / Math.max(1, window.innerHeight));
-  document.body.classList.toggle('peek-shift', pageIndex % 2 === 1);
-}
-window.addEventListener('scroll', applyMobilePeekShift, { passive: true });
-window.addEventListener('resize', applyMobilePeekShift, { passive: true });
-applyMobilePeekShift();
+// crazy: same desktop layout at all viewport sizes — no peek-shift.
+document.body.classList.remove('peek-shift');

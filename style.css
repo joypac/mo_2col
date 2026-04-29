@@ -90,10 +90,28 @@ body {
 }
 
 
-/* Offset right column — breathing space around smaller photos. */
-.mosaic-grid > .mosaic-cell:nth-child(even),
-#mosaic > .mosaic-cell:nth-child(even) {
+/* Offset right column — breathing space around smaller photos.
+   Set via .is-right class (JS) so span-2 feature cells don't
+   desync the alternation. */
+.mosaic-cell.is-right {
   transform: translateY(-30%);
+}
+
+/* Candy-crush feature cells: occasional full-width "hero" shots that
+   break the 2-col rhythm. The BFS layout opportunistically creates
+   these when a project naturally clusters across both columns of a row. */
+.mosaic-cell.is-feature {
+  grid-column: span 2;
+  transform: none;
+}
+
+.mosaic-cell.is-feature img,
+.mosaic-cell.is-feature video {
+  width: calc(100% - 10% - 10px);
+  margin-left: calc(5% + 5px);
+  margin-right: calc(5% + 5px);
+  margin-top: clamp(18px, 2.5vw, 40px);
+  margin-bottom: clamp(18px, 2.5vw, 40px);
 }
 
 /* Same margins for images and videos, with stable vertical rhythm and no crop. */
@@ -108,13 +126,19 @@ body {
   height: auto;
 }
 
+/* Drop-in entrance: photos slide into place from below with a subtle
+   spring curve when they finish loading — candy-crush "blocks settling
+   into the board" feel. */
 .mosaic-cell .mosaic-media {
   opacity: 0;
-  transition: opacity 360ms ease;
+  transform: translateY(28px) scale(0.97);
+  transition: opacity 380ms ease,
+              transform 620ms cubic-bezier(0.34, 1.18, 0.64, 1);
 }
 
 .mosaic-cell .mosaic-media.is-loaded {
   opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 /* Wide/cinematic strip — decorative extra element inside a cell.
@@ -257,31 +281,16 @@ body {
 }
 
 
+/* Mobile: same 2-col layout as desktop (no peek, no special cases).
+   Photos smaller but the visual rhythm and feature cells stay identical. */
 @media (max-width: 600px) {
-  /* True 1.5 photos: each column 2/3 viewport wide.
-     Visible: full main col (66.66vw) + half-width peek (33.33vw). */
-  #mosaic, .mosaic-grid {
-    grid-template-columns: 66.66vw 66.66vw;
-    gap: 1px;
+  /* Tighten horizontal margins on small cells for breathing room. */
+  .mosaic-cell:not(.is-feature) img,
+  .mosaic-cell:not(.is-feature) video {
+    width: calc(100% - 16% - 8px);
+    margin-left: calc(8% + 4px);
+    margin-right: calc(8% + 4px);
   }
-
-  /* Keep desktop's translateY stagger on right column → "desencontro" feel.
-     The even cells shift up 30% of their own height, breaking the grid rhythm. */
-  .mosaic-grid > .mosaic-cell:nth-child(even),
-  #mosaic > .mosaic-cell:nth-child(even) {
-    transform: translateY(-30%);
-  }
-
-  /* Page-parity alternation: shift -33.33vw on odd pages so col 2 becomes
-     the main visible photo and col 1 becomes the left-bleeding peek.
-     The shift happens during the white fade between pages → invisible. */
-  body.peek-shift #mosaic,
-  body.peek-shift .mosaic-grid {
-    transform: translateX(-33.33vw);
-  }
-
-  /* Image margins inherit from the desktop rule (10% + 5px laterally,
-     clamp 9px–23px vertically), so mobile keeps the same proportions. */
 }
 
 .contact-section-content p,
