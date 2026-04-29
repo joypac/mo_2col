@@ -249,6 +249,23 @@ function shuffle(arr) {
 var DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
 
 var preloadedHeroImages = Object.create(null);
+var imageCache = [];
+
+function warmImageCache() {
+  var seen = Object.create(null);
+  projects.forEach(function(project) {
+    project.media.forEach(function(item) {
+      if (item.type !== 'img') return;
+      if (seen[item.src]) return;
+      seen[item.src] = true;
+      var img = new Image();
+      img.decoding = 'async';
+      img.loading = 'eager';
+      img.src = item.src;
+      imageCache.push(img);
+    });
+  });
+}
 
 function setIntrinsicDimensions(el, src) {
   var dims = mediaDimensions[src];
@@ -658,6 +675,47 @@ function buildMosaicLayout(container, isFirst) {
 // First grid
 var mosaicEl = document.getElementById('mosaic');
 buildMosaicLayout(mosaicEl, true);
+
+// Reveal mosaic once above-the-fold images load AND 1s has elapsed.
+// warmImageCache starts after reveal so it doesn't compete for connections.
+(function() {
+  var imgs = Array.prototype.slice.call(
+    mosaicEl.querySelectorAll('img[fetchpriority="high"]')
+  );
+  var total = imgs.length;
+  var imgsDone = !total;
+  var timeDone = false;
+  var revealed = false;
+
+  function tryReveal() {
+    if (!revealed && imgsDone && timeDone) {
+      revealed = true;
+      mosaicEl.style.opacity = '1';
+      warmImageCache();
+    }
+  }
+
+  setTimeout(function() { timeDone = true; tryReveal(); }, 1000);
+
+  if (!total) { warmImageCache(); return; }
+
+  var loaded = 0;
+  var fallback = setTimeout(function() { imgsDone = true; tryReveal(); }, 4000);
+
+  function onOne() {
+    if (imgsDone) return;
+    if (++loaded >= total) {
+      imgsDone = true;
+      clearTimeout(fallback);
+      tryReveal();
+    }
+  }
+  imgs.forEach(function(img) {
+    if (img.complete && img.naturalWidth > 0) { onOne(); return; }
+    img.addEventListener('load',  onOne, { once: true });
+    img.addEventListener('error', onOne, { once: true });
+  });
+})();
 
 // Infinite scroll: append a new randomised grid when sentinel comes into view
 var sentinel = document.getElementById('scroll-sentinel');
