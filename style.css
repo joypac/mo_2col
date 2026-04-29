@@ -194,9 +194,8 @@ body {
   position: absolute;
   top: 60px;
   left: 14px;
-  right: 14px;
-  width: auto;
-  max-width: none;
+  width: calc(100% - 28px);
+  max-width: 760px;
   max-height: calc(100dvh - 20px);
   overflow-y: hidden;
   padding: clamp(10px, 1.5vw, 14px) 0 clamp(20px, 3vh, 28px) 0;
