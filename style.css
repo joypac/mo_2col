@@ -194,8 +194,9 @@ body {
   position: absolute;
   top: 60px;
   left: 14px;
-  width: min(92vw, 760px);
-  max-width: calc(100vw - 28px);
+  right: 14px;
+  width: auto;
+  max-width: 760px;
   max-height: calc(100dvh - 20px);
   overflow-y: hidden;
   padding: clamp(10px, 1.5vw, 14px) 0 clamp(20px, 3vh, 28px) 0;
@@ -256,15 +257,6 @@ body {
   margin-top: 8px;
 }
 
-@media (max-width: 720px) {
-  #contact-panel {
-    left: 14px;
-    right: 14px;
-    width: auto;
-    max-width: none;
-    max-height: calc(100dvh - 14px);
-  }
-}
 
 @media (max-width: 600px) {
   /* True 1.5 photos: each column 2/3 viewport wide.
