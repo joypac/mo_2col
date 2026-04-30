@@ -181,7 +181,7 @@ body {
   opacity: 0;
   pointer-events: none;
   z-index: 120;
-  transition: opacity 500ms ease;
+  transition: opacity 420ms ease-out;
 }
 
 #contact-overlay {

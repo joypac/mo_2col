@@ -958,8 +958,8 @@ var FrameNavigator = (function() {
   var smooth = false;
   var lockUntil = 0;
   var lockTimer = 0;
-  var lockMsSmooth = 1060;
-  var lockMsInstant = 1030;
+  var lockMsSmooth = 1170;
+  var lockMsInstant = 1150;
   var touchStartY = 0;
   var touchStartX = 0;
   var touchMoved = false;
@@ -1026,11 +1026,13 @@ var FrameNavigator = (function() {
     }
 
     lockForTransition();
+    frameFadeEl.style.transition = 'opacity 420ms ease-out';
     frameFadeEl.style.opacity = '1';
     setTimeout(function() {
       scrollToY(target);
+      frameFadeEl.style.transition = 'opacity 700ms cubic-bezier(0.25, 0, 0.2, 1)';
       frameFadeEl.style.opacity = '0';
-    }, 500);
+    }, 420);
   }
 
   function goDown() {
