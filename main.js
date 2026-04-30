@@ -562,7 +562,8 @@ function buildMosaicLayout(container, isFirst) {
   });
 
   var imgIdx = projects.map(function() { return 0; });
-  var visualCol = 0; // Tracks the actual column position for offset stagger
+  var visualCol = 0;
+  var lastStripRow = -9;
 
   for (var r = 0; r < ROWS; r++) {
     for (var c = 0; c < COLS; c++) {
@@ -600,9 +601,9 @@ function buildMosaicLayout(container, isFirst) {
       visualCol += spans;
       if (visualCol >= COLS) visualCol = 0;
 
-      // Randomly inject a decorative wide-strip into ~15% of cells.
+      // Inject a decorative wide-strip: max 1 per ~3 rows (≈1 viewport).
       var strip = null;
-      if (Math.random() < 0.15) {
+      if (r - lastStripRow >= 3 && Math.random() < 0.35) {
         var allImgs = [];
         projects.forEach(function(p) {
           p.media.forEach(function(m) {
@@ -610,6 +611,7 @@ function buildMosaicLayout(container, isFirst) {
           });
         });
         if (allImgs.length) {
+          lastStripRow = r;
           strip = document.createElement('div');
           strip.className = 'wide-strip';
           // Height proportional to viewport width — keeps "slice" feel
@@ -958,8 +960,8 @@ var FrameNavigator = (function() {
   var smooth = false;
   var lockUntil = 0;
   var lockTimer = 0;
-  var lockMsSmooth = 1170;
-  var lockMsInstant = 1150;
+  var lockMsSmooth = 1520;
+  var lockMsInstant = 1500;
   var touchStartY = 0;
   var touchStartX = 0;
   var touchMoved = false;
@@ -1026,13 +1028,13 @@ var FrameNavigator = (function() {
     }
 
     lockForTransition();
-    frameFadeEl.style.transition = 'opacity 420ms ease-out';
+    frameFadeEl.style.transition = 'opacity 500ms ease-out';
     frameFadeEl.style.opacity = '1';
     setTimeout(function() {
       scrollToY(target);
-      frameFadeEl.style.transition = 'opacity 700ms cubic-bezier(0.25, 0, 0.2, 1)';
+      frameFadeEl.style.transition = 'opacity 900ms cubic-bezier(0.25, 0, 0.2, 1)';
       frameFadeEl.style.opacity = '0';
-    }, 420);
+    }, 500);
   }
 
   function goDown() {

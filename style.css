@@ -84,7 +84,7 @@ body {
 
 #mosaic {
   opacity: 0;
-  transition: opacity 1000ms ease;
+  transition: opacity 1600ms cubic-bezier(0.25, 0, 0.2, 1);
 }
 
 .mosaic-cell {
@@ -106,13 +106,14 @@ body {
   margin-top: clamp(50px, 6vw, 110px);
 }
 
-/* Same image margins as desktop original — generous breathing room. */
+/* Viewport-relative margins — 4vw from each cell edge, consistent
+   across single-col and wide (2-col) cells. */
 .mosaic-cell > img,
 .mosaic-cell > video {
   display: block;
-  width: calc(100% - 20% - 10px);
-  margin-left: calc(10% + 5px);
-  margin-right: calc(10% + 5px);
+  width: calc(100% - 8vw);
+  margin-left: 4vw;
+  margin-right: 4vw;
   margin-top: clamp(9px, 1.35vw, 23px);
   margin-bottom: clamp(9px, 1.35vw, 23px);
   height: auto;
@@ -120,20 +121,19 @@ body {
 
 .mosaic-cell .mosaic-media {
   opacity: 0;
-  transition: opacity 360ms ease;
+  transition: opacity 500ms cubic-bezier(0.25, 0, 0.2, 1);
 }
 
 .mosaic-cell .mosaic-media.is-loaded {
   opacity: 1;
 }
 
-/* Wide/cinematic strip — decorative extra element inside a cell.
-   Same generous margins as the regular cell media. */
+/* Wide/cinematic strip — decorative extra element inside a cell. */
 .wide-strip {
   display: block;
-  width: calc(100% - 20% - 10px);
-  margin-left: calc(10% + 5px);
-  margin-right: calc(10% + 5px);
+  width: calc(100% - 8vw);
+  margin-left: 4vw;
+  margin-right: 4vw;
   margin-top: clamp(18px, 2.7vw, 46px);
   margin-bottom: clamp(18px, 2.7vw, 46px);
   overflow: hidden;
@@ -171,7 +171,7 @@ body {
   padding: 6px 0;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 1000ms ease;
+  transition: opacity 1400ms cubic-bezier(0.25, 0, 0.2, 1);
 }
 
 #frame-fade {
@@ -191,7 +191,7 @@ body {
   pointer-events: none;
   background: #fff;
   opacity: 0;
-  transition: opacity 1000ms ease;
+  transition: opacity 900ms cubic-bezier(0.25, 0, 0.2, 1);
 }
 
 #contact-overlay.is-open {
@@ -207,12 +207,12 @@ body {
   max-width: 760px;
   max-height: calc(100dvh - 20px);
   overflow-y: hidden;
-  padding: clamp(10px, 1.5vw, 14px) 0 clamp(20px, 3vh, 28px) 0;
+  padding: clamp(4px, 0.8vw, 8px) 0 clamp(20px, 3vh, 28px) 0;
   color: #111;
   font-family: 'Walter Neue Light', sans-serif;
   text-transform: uppercase;
   opacity: 0;
-  transition: opacity 1000ms ease;
+  transition: opacity 700ms cubic-bezier(0.25, 0, 0.2, 1);
 }
 
 #contact-overlay.is-open #contact-panel {
@@ -221,12 +221,11 @@ body {
 
 .contact-accordion {
   display: grid;
-  gap: 10px;
+  gap: 4px;
 }
 
 .contact-section {
-  border-top: 1px solid #111;
-  padding-top: 8px;
+  padding-top: 3px;
 }
 
 .contact-section-toggle {
@@ -252,7 +251,7 @@ body {
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  transition: grid-template-rows 220ms cubic-bezier(0.22, 1, 0.36, 1), opacity 160ms ease;
+  transition: grid-template-rows 500ms cubic-bezier(0.25, 0, 0.2, 1), opacity 400ms cubic-bezier(0.25, 0, 0.2, 1);
 }
 
 .contact-section-inner {
