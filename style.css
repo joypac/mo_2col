@@ -261,7 +261,7 @@ body {
 .contact-section.is-open .contact-section-content {
   grid-template-rows: 1fr;
   opacity: 1;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 
