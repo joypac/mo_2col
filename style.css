@@ -98,10 +98,12 @@ body {
   grid-column: span 2;
 }
 
-/* Column stagger ("desencontrado") — the visual column is tracked by
-   JS via .is-offset since :nth-child breaks when wide cells span. */
-.mosaic-cell.is-offset {
-  transform: translateY(-30%);
+/* Column stagger ("desencontrado") via margin-top instead of translateY,
+   so cells never overlap each other. Cells in the "high" visual column
+   (col 1 for both 2- and 3-col grids) keep no margin; cells in other
+   columns get pushed down — same staircase look, only white space. */
+.mosaic-cell.is-staggered {
+  margin-top: clamp(50px, 6vw, 110px);
 }
 
 /* Same image margins as desktop original — generous breathing room. */

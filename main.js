@@ -588,12 +588,13 @@ function buildMosaicLayout(container, isFirst) {
       // Mirror that here so visualCol stays in sync.
       if (visualCol + spans > COLS) visualCol = 0;
 
-      // Offset the visual middle column on 3-col grids (visualCol === 1)
-      // and the right column on 2-col grids (also visualCol === 1).
-      // Wide cells span across, so they don't get offset themselves.
+      // Stagger via margin-top on cells NOT in the "high" column.
+      // High column is visualCol === 1 (middle on 3-col, right on 2-col),
+      // matching the desktop original where the right cells read higher.
+      // Wide cells span across, so they sit at base level (no stagger).
       var classes = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
       if (isWide) classes += ' is-wide';
-      else if (visualCol === 1) classes += ' is-offset';
+      else if (visualCol !== 1) classes += ' is-staggered';
       div.className = classes;
 
       visualCol += spans;
