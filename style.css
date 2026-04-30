@@ -248,10 +248,12 @@ body {
 }
 
 .contact-section-content {
-  display: grid;
-  grid-template-rows: 0fr;
+  overflow: hidden;
+  max-height: 0;
   opacity: 0;
-  transition: grid-template-rows 500ms cubic-bezier(0.25, 0, 0.2, 1), opacity 400ms cubic-bezier(0.25, 0, 0.2, 1);
+  /* on close: fade out first, then collapse */
+  transition: opacity 500ms cubic-bezier(0.25, 0, 0.2, 1),
+              max-height 0ms linear 500ms;
 }
 
 .contact-section-inner {
@@ -259,9 +261,12 @@ body {
 }
 
 .contact-section.is-open .contact-section-content {
-  grid-template-rows: 1fr;
+  max-height: 400px;
   opacity: 1;
   margin-top: 6px;
+  /* on open: expand instantly, then fade in */
+  transition: opacity 500ms cubic-bezier(0.25, 0, 0.2, 1),
+              max-height 0ms linear 0ms;
 }
 
 

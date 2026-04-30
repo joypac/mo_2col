@@ -566,6 +566,8 @@ function buildMosaicLayout(container, isFirst) {
   var lastStripRow = -9;
 
   for (var r = 0; r < ROWS; r++) {
+    var highCol = Math.floor(Math.random() * COLS); /* random "up" col per row */
+
     for (var c = 0; c < COLS; c++) {
       var pi  = grid[r][c];
       var idx = imgIdx[pi]++;
@@ -579,47 +581,39 @@ function buildMosaicLayout(container, isFirst) {
       var item = media[idx];
       var div  = document.createElement('div');
 
-      // ~22% of cells become wide heroes (span 2 cols).
-      // On mobile this means full width; on desktop it's 2/3 width.
       var isWide = Math.random() < 0.22;
       var spans = isWide ? 2 : 1;
 
-      // If a wide cell can't fit in the remaining cols of the current
-      // row, CSS will wrap it to the next row (grid-auto-flow: row).
-      // Mirror that here so visualCol stays in sync.
       if (visualCol + spans > COLS) visualCol = 0;
 
-      // Stagger via margin-top on cells NOT in the "high" column.
-      // High column is visualCol === 1 (middle on 3-col, right on 2-col),
-      // matching the desktop original where the right cells read higher.
-      // Wide cells span across, so they sit at base level (no stagger).
       var classes = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
       if (isWide) classes += ' is-wide';
-      else if (visualCol !== 1) classes += ' is-staggered';
+      else if (visualCol !== highCol) classes += ' is-staggered';
       div.className = classes;
 
       visualCol += spans;
       if (visualCol >= COLS) visualCol = 0;
 
       // Inject a decorative wide-strip: max 1 per ~3 rows (≈1 viewport).
+      // Image comes from the same project as the host cell.
       var strip = null;
       if (r - lastStripRow >= 3 && Math.random() < 0.35) {
-        var allImgs = [];
-        projects.forEach(function(p) {
-          p.media.forEach(function(m) {
-            if (m.type === 'img') allImgs.push(m.src);
+        var projImgs = projects[pi].media
+          .filter(function(m) { return m.type === 'img' && m.src !== item.src; })
+          .map(function(m) { return m.src; });
+        if (!projImgs.length) {
+          projects.forEach(function(p) {
+            p.media.forEach(function(m) { if (m.type === 'img') projImgs.push(m.src); });
           });
-        });
-        if (allImgs.length) {
+        }
+        if (projImgs.length) {
           lastStripRow = r;
           strip = document.createElement('div');
           strip.className = 'wide-strip';
-          // Height proportional to viewport width — keeps "slice" feel
-          // on both desktop (~115–270px) and mobile (~24–56px).
           strip.style.height = (6 + Math.random() * 8).toFixed(2) + 'vw';
 
           var stripImg = document.createElement('img');
-          var stripSrc = allImgs[Math.floor(Math.random() * allImgs.length)];
+          var stripSrc = projImgs[Math.floor(Math.random() * projImgs.length)];
           stripImg.className = 'mosaic-media is-strip-media';
           stripImg.decoding = 'async';
           stripImg.setAttribute('loading', 'lazy');
