@@ -533,8 +533,38 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
   }
 }
 
+/* ── Reveal cascade ────────────────────────────────────
+   When a cell scrolls into view, give it a stagger delay
+   based on the order it became visible, then add .is-revealed
+   so the CSS drop-in transition fires. Cells entering the
+   viewport in quick succession cascade in like blocks settling.
+── */
+var revealCounter = 0;
+var revealResetTimer = 0;
+
+var revealObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (!entry.isIntersecting) return;
+    var cell = entry.target;
+    if (cell.classList.contains('is-revealed')) return;
+
+    // Cap stagger at 8 cells per cascade so delays stay within ~360ms.
+    cell.style.setProperty('--reveal-delay', ((revealCounter % 8) * 45) + 'ms');
+    cell.classList.add('is-revealed');
+    revealCounter++;
+    revealObserver.unobserve(cell);
+
+    // Reset the cascade counter after a brief lull so the next batch
+    // of cells starts fresh from delay 0.
+    clearTimeout(revealResetTimer);
+    revealResetTimer = setTimeout(function() {
+      revealCounter = 0;
+    }, 220);
+  });
+}, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
+
 function buildMosaicLayout(container, isFirst) {
-  var COLS = 2;
+  var COLS = 3;
   var displayedMedia = projects.map(function(p) { return shuffle(p.media); });
   var layout = buildGrid(projects, displayedMedia, COLS);
   var grid = layout.grid, ROWS = layout.rows;
@@ -561,48 +591,27 @@ function buildMosaicLayout(container, isFirst) {
   });
 
   var imgIdx = projects.map(function() { return 0; });
-  var skipNextCell = false;
-  var renderedCol = 0; // Tracks the actual column position after spans
 
   for (var r = 0; r < ROWS; r++) {
     for (var c = 0; c < COLS; c++) {
-      if (skipNextCell) {
-        skipNextCell = false;
-        var skippedPi = grid[r][c];
-        if (skippedPi >= 0) imgIdx[skippedPi]++; // Consume skipped photo too
-        continue;
-      }
-
       var pi  = grid[r][c];
       var idx = imgIdx[pi]++;
       var media = displayedMedia[pi];
 
       if (idx >= media.length) {
         container.appendChild(document.createElement('div'));
-        renderedCol = (renderedCol + 1) % COLS;
         continue;
       }
 
       var item = media[idx];
       var div  = document.createElement('div');
 
-      // Feature opportunity: BFS placed the same project in both columns
-      // of this row, AND this is the first photo we're showing for this
-      // project (idx 0). Promote it to a full-width hero shot ~40% of
-      // the time — frequent enough to feel intentional, rare enough to
-      // stay surprising.
-      var isFeature = (
-        c === 0 && c + 1 < COLS &&
-        grid[r][c + 1] === pi &&
-        idx === 0 &&
-        Math.random() < 0.4
-      );
-      if (isFeature) skipNextCell = true;
-
-      var zoomed = Math.random() < 0.5 ? ' is-zoomed' : '';
-      var classes = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '') + zoomed;
-      if (isFeature) classes += ' is-feature';
-      else if (renderedCol === 1) classes += ' is-right';
+      // ~22% of cells become wide heroes (span 2 cols).
+      // On mobile this means full width; on desktop it's 2/3 width
+      // — both create candy-crush rhythm breaks.
+      var isWide = Math.random() < 0.22;
+      var classes = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
+      if (isWide) classes += ' is-wide';
       div.className = classes;
 
       // Randomly inject a decorative wide-strip into ~15% of cells.
@@ -695,11 +704,7 @@ function buildMosaicLayout(container, isFirst) {
       div.appendChild(label);
 
       container.appendChild(div);
-
-      // Update visual column tracker. Feature cells consume both columns
-      // and reset to col 0; normal cells advance one column.
-      if (isFeature) renderedCol = 0;
-      else renderedCol = (renderedCol + 1) % COLS;
+      revealObserver.observe(div);
     }
   }
 }
