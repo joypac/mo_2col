@@ -599,7 +599,7 @@ function buildMosaicLayout(container, isFirst) {
       var strip = null;
       if (r - lastStripRow >= 3 && Math.random() < 0.35) {
         var projImgs = projects[pi].media
-          .filter(function(m) { return m.type === 'img' && m.src !== item.src; })
+          .filter(function(m) { return m.type === 'img'; })
           .map(function(m) { return m.src; });
         if (!projImgs.length) {
           projects.forEach(function(p) {
