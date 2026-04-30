@@ -871,10 +871,17 @@ var ContactOverlay = (function() {
   function openOverlay() {
     if (open) return;
     open = true;
+    // Instantly collapse any previously open section before the overlay fades in,
+    // so the user never sees a section animating closed while the menu appears.
+    var contents = Array.prototype.slice.call(panel.querySelectorAll('.contact-section-content'));
+    contents.forEach(function(el) { el.style.transition = 'none'; });
+    setOpenSection(-1);
+    requestAnimationFrame(function() {
+      contents.forEach(function(el) { el.style.transition = ''; });
+    });
     overlay.style.willChange = 'clip-path';
     overlay.classList.add('is-open');
     positionPanelBelowTrigger();
-    setOpenSection(-1);
     syncA11y();
     setTimeout(function() {
       panel.focus();
