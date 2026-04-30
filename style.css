@@ -69,39 +69,28 @@ body {
   Images: width 100%, height auto → preserves ratio, no crop.
 */
 
-/* Crazy: 3 cols on desktop, 2 on mobile. Tight packing — cells feel
-   like blocks on a board. Some cells span 2 cols (full width on mobile,
-   2/3 width on desktop) creating variety. */
+/* Crazy: 3 cols on desktop, 2 on mobile. Wide cells (~22%) span 2 cols
+   creating full-width heroes on mobile, 2/3 width on desktop. Uses
+   default row flow (not dense) so wide cells leave intentional white
+   spaces in the rhythm. */
 #mosaic, .mosaic-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: auto;
-  grid-auto-flow: dense;
   align-items: start;
-  gap: 4px;
-  padding: 4px;
+  gap: 1px;
   background: #f5f5f3;
+}
+
+#mosaic {
+  opacity: 0;
+  transition: opacity 1000ms ease;
 }
 
 .mosaic-cell {
   position: relative;
   background: #f5f5f3;
   overflow: visible;
-
-  /* Drop-in starting state. Released when .is-revealed is added by
-     the IntersectionObserver. Stagger handled via --reveal-delay.
-     The cells themselves carry the entrance animation — no mosaic-
-     level fade needed (the cascade IS the reveal). */
-  opacity: 0;
-  transform: translateY(-46px) scale(0.92);
-}
-
-.mosaic-cell.is-revealed {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  transition: opacity 480ms ease,
-              transform 720ms cubic-bezier(0.34, 1.36, 0.52, 1);
-  transition-delay: var(--reveal-delay, 0ms);
 }
 
 /* Wide cells: span 2 columns. Hero shots that break the rhythm. */
@@ -109,17 +98,24 @@ body {
   grid-column: span 2;
 }
 
-/* Tighter image margins — photos feel like packed blocks rather than
-   floating in whitespace. */
+/* Column stagger ("desencontrado") — the visual column is tracked by
+   JS via .is-offset since :nth-child breaks when wide cells span. */
+.mosaic-cell.is-offset {
+  transform: translateY(-30%);
+}
+
+/* Same image margins as desktop original — generous breathing room. */
 .mosaic-cell > img,
 .mosaic-cell > video {
   display: block;
-  width: 92%;
-  margin: clamp(6px, 0.8vw, 14px) 4%;
+  width: calc(100% - 20% - 10px);
+  margin-left: calc(10% + 5px);
+  margin-right: calc(10% + 5px);
+  margin-top: clamp(9px, 1.35vw, 23px);
+  margin-bottom: clamp(9px, 1.35vw, 23px);
   height: auto;
 }
 
-/* Image fade-in when loaded (independent of cell drop-in). */
 .mosaic-cell .mosaic-media {
   opacity: 0;
   transition: opacity 360ms ease;
@@ -130,22 +126,16 @@ body {
 }
 
 /* Wide/cinematic strip — decorative extra element inside a cell.
-   Wrapper div clips height; inner image keeps full width & natural ratio
-   so the sides are NEVER cropped, only the vertical overflow is hidden.
-   Margins match the regular cell media (4% on each side). */
+   Same generous margins as the regular cell media. */
 .wide-strip {
   display: block;
-  width: 92%;
-  margin: clamp(12px, 1.6vw, 28px) 4%;
+  width: calc(100% - 20% - 10px);
+  margin-left: calc(10% + 5px);
+  margin-right: calc(10% + 5px);
+  margin-top: clamp(18px, 2.7vw, 46px);
+  margin-bottom: clamp(18px, 2.7vw, 46px);
   overflow: hidden;
   position: relative;
-}
-
-@media (max-width: 600px) {
-  .wide-strip {
-    width: 94%;
-    margin: clamp(10px, 2vw, 20px) 3%;
-  }
 }
 
 .wide-strip img {
@@ -278,19 +268,6 @@ body {
 @media (max-width: 600px) {
   #mosaic, .mosaic-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 3px;
-    padding: 3px;
-  }
-
-  /* On 2-col grid a span-2 cell IS the full width. */
-  .mosaic-cell.is-wide {
-    grid-column: span 2;
-  }
-
-  .mosaic-cell > img,
-  .mosaic-cell > video {
-    width: 94%;
-    margin: clamp(5px, 1vw, 10px) 3%;
   }
 }
 

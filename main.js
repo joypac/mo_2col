@@ -533,38 +533,9 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
   }
 }
 
-/* ── Reveal cascade ────────────────────────────────────
-   When a cell scrolls into view, give it a stagger delay
-   based on the order it became visible, then add .is-revealed
-   so the CSS drop-in transition fires. Cells entering the
-   viewport in quick succession cascade in like blocks settling.
-── */
-var revealCounter = 0;
-var revealResetTimer = 0;
-
-var revealObserver = new IntersectionObserver(function(entries) {
-  entries.forEach(function(entry) {
-    if (!entry.isIntersecting) return;
-    var cell = entry.target;
-    if (cell.classList.contains('is-revealed')) return;
-
-    // Cap stagger at 8 cells per cascade so delays stay within ~360ms.
-    cell.style.setProperty('--reveal-delay', ((revealCounter % 8) * 45) + 'ms');
-    cell.classList.add('is-revealed');
-    revealCounter++;
-    revealObserver.unobserve(cell);
-
-    // Reset the cascade counter after a brief lull so the next batch
-    // of cells starts fresh from delay 0.
-    clearTimeout(revealResetTimer);
-    revealResetTimer = setTimeout(function() {
-      revealCounter = 0;
-    }, 220);
-  });
-}, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
-
 function buildMosaicLayout(container, isFirst) {
-  var COLS = 3;
+  var isMobile = window.innerWidth <= 600;
+  var COLS = isMobile ? 2 : 3;
   var displayedMedia = projects.map(function(p) { return shuffle(p.media); });
   var layout = buildGrid(projects, displayedMedia, COLS);
   var grid = layout.grid, ROWS = layout.rows;
@@ -591,6 +562,7 @@ function buildMosaicLayout(container, isFirst) {
   });
 
   var imgIdx = projects.map(function() { return 0; });
+  var visualCol = 0; // Tracks the actual column position for offset stagger
 
   for (var r = 0; r < ROWS; r++) {
     for (var c = 0; c < COLS; c++) {
@@ -607,12 +579,25 @@ function buildMosaicLayout(container, isFirst) {
       var div  = document.createElement('div');
 
       // ~22% of cells become wide heroes (span 2 cols).
-      // On mobile this means full width; on desktop it's 2/3 width
-      // — both create candy-crush rhythm breaks.
+      // On mobile this means full width; on desktop it's 2/3 width.
       var isWide = Math.random() < 0.22;
+      var spans = isWide ? 2 : 1;
+
+      // If a wide cell can't fit in the remaining cols of the current
+      // row, CSS will wrap it to the next row (grid-auto-flow: row).
+      // Mirror that here so visualCol stays in sync.
+      if (visualCol + spans > COLS) visualCol = 0;
+
+      // Offset the visual middle column on 3-col grids (visualCol === 1)
+      // and the right column on 2-col grids (also visualCol === 1).
+      // Wide cells span across, so they don't get offset themselves.
       var classes = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
       if (isWide) classes += ' is-wide';
+      else if (visualCol === 1) classes += ' is-offset';
       div.className = classes;
+
+      visualCol += spans;
+      if (visualCol >= COLS) visualCol = 0;
 
       // Randomly inject a decorative wide-strip into ~15% of cells.
       var strip = null;
@@ -704,7 +689,6 @@ function buildMosaicLayout(container, isFirst) {
       div.appendChild(label);
 
       container.appendChild(div);
-      revealObserver.observe(div);
     }
   }
 }
