@@ -566,12 +566,33 @@ function buildMosaicLayout(container, isFirst) {
   var lastStripRow = -9;
 
   for (var r = 0; r < ROWS; r++) {
-    var highCol = Math.floor(Math.random() * COLS); /* random "up" col per row */
+    var highCol = Math.floor(Math.random() * COLS);
+    /* Desktop 3-col: skip one edge col (0 or 2 only — never middle) so rows
+       show 2 consecutive photos with breathing room on one side.
+       Mobile 2-col: skip one col so only 1 photo shows per row. */
+    var skipCol = (COLS === 3)
+      ? (Math.random() < 0.5 ? 0 : 2)
+      : Math.floor(Math.random() * 2);
 
     for (var c = 0; c < COLS; c++) {
       var pi  = grid[r][c];
-      var idx = imgIdx[pi]++;
       var media = displayedMedia[pi];
+
+      var isWide = Math.random() < 0.22;
+      var spans = isWide ? 2 : 1;
+      if (visualCol + spans > COLS) visualCol = 0;
+
+      /* Leave this column empty — don't consume media so it shifts forward */
+      if (!isWide && c === skipCol) {
+        var emptyCell = document.createElement('div');
+        emptyCell.className = 'mosaic-cell';
+        container.appendChild(emptyCell);
+        visualCol++;
+        if (visualCol >= COLS) visualCol = 0;
+        continue;
+      }
+
+      var idx = imgIdx[pi]++;
 
       if (idx >= media.length) {
         container.appendChild(document.createElement('div'));
@@ -580,11 +601,6 @@ function buildMosaicLayout(container, isFirst) {
 
       var item = media[idx];
       var div  = document.createElement('div');
-
-      var isWide = Math.random() < 0.22;
-      var spans = isWide ? 2 : 1;
-
-      if (visualCol + spans > COLS) visualCol = 0;
 
       var classes = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
       if (isWide) classes += ' is-wide';

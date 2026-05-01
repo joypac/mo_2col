@@ -251,8 +251,9 @@ body {
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  transition: grid-template-rows 500ms cubic-bezier(0.25, 0, 0.2, 1),
-              opacity 500ms cubic-bezier(0.25, 0, 0.2, 1);
+  /* close: same speed as frame-fade hide (500ms ease-out) */
+  transition: grid-template-rows 500ms ease-out,
+              opacity 500ms ease-out;
 }
 
 .contact-section-inner {
@@ -263,6 +264,11 @@ body {
   grid-template-rows: 1fr;
   opacity: 1;
   margin-top: 6px;
+  /* open: same curve as frame-fade reveal (900ms slow-start) —
+     height and text breathe in together; sections below slide
+     at the same pace as the text appears */
+  transition: grid-template-rows 900ms cubic-bezier(0.25, 0, 0.2, 1),
+              opacity 900ms cubic-bezier(0.25, 0, 0.2, 1);
 }
 
 
