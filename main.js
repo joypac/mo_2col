@@ -563,31 +563,32 @@ function buildMosaicLayout(container, isFirst) {
 
   var imgIdx = projects.map(function() { return 0; });
   var visualCol = 0;
+  var smallCellsInRow = 0;
+  /* Desktop: max 2 small (1-col) cells per CSS grid row — applies to img and vid.
+     Mobile:  max 1. Wide cells (2-col) are exempt — wide + small is always fine. */
+  var maxSmallPerRow = COLS - 1;
   var lastStripRow = -9;
 
   for (var r = 0; r < ROWS; r++) {
-    /* Desktop 3-col: skip one edge col (0 or 2 only — never middle) so rows
-       show 2 consecutive photos with breathing room on one side.
-       Mobile 2-col: skip one col so only 1 photo shows per row. */
-    var skipCol = (COLS === 3)
-      ? (Math.random() < 0.5 ? 0 : 2)
-      : Math.floor(Math.random() * 2);
-
     for (var c = 0; c < COLS; c++) {
       var pi  = grid[r][c];
       var media = displayedMedia[pi];
 
       var isWide = Math.random() < 0.22;
       var spans = isWide ? 2 : 1;
-      if (visualCol + spans > COLS) visualCol = 0;
+      if (visualCol + spans > COLS) {
+        visualCol = 0;
+        smallCellsInRow = 0;
+      }
 
-      /* Leave this column empty — don't consume media so it shifts forward */
-      if (!isWide && c === skipCol) {
+      /* Limit small cells per visual CSS grid row (img and vid).
+         Skip by placing an empty cell so media shifts to the next slot. */
+      if (!isWide && smallCellsInRow >= maxSmallPerRow) {
         var emptyCell = document.createElement('div');
         emptyCell.className = 'mosaic-cell';
         container.appendChild(emptyCell);
         visualCol++;
-        if (visualCol >= COLS) visualCol = 0;
+        if (visualCol >= COLS) { visualCol = 0; smallCellsInRow = 0; }
         continue;
       }
 
@@ -605,8 +606,9 @@ function buildMosaicLayout(container, isFirst) {
       if (isWide) classes += ' is-wide';
       div.className = classes;
 
+      if (!isWide) smallCellsInRow++;
       visualCol += spans;
-      if (visualCol >= COLS) visualCol = 0;
+      if (visualCol >= COLS) { visualCol = 0; smallCellsInRow = 0; }
 
       // Inject a decorative wide-strip: max 1 per ~3 rows (≈1 viewport).
       // Image comes from the same project as the host cell.
