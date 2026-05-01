@@ -98,14 +98,6 @@ body {
   grid-column: span 2;
 }
 
-/* Column stagger ("desencontrado") via margin-top instead of translateY,
-   so cells never overlap each other. Cells in the "high" visual column
-   (col 1 for both 2- and 3-col grids) keep no margin; cells in other
-   columns get pushed down — same staircase look, only white space. */
-.mosaic-cell.is-staggered {
-  margin-top: clamp(50px, 6vw, 110px);
-}
-
 /* Viewport-relative margins — 4vw from each cell edge, consistent
    across single-col and wide (2-col) cells. */
 .mosaic-cell > img,
@@ -248,12 +240,11 @@ body {
 }
 
 .contact-section-content {
-  display: grid;
-  grid-template-rows: 0fr;
+  overflow: hidden;
+  max-height: 0;
   opacity: 0;
-  /* close: same speed as frame-fade hide (500ms ease-out) */
-  transition: grid-template-rows 500ms ease-out,
-              opacity 500ms ease-out;
+  pointer-events: none;
+  transition: opacity 500ms ease-out;
 }
 
 .contact-section-inner {
@@ -261,14 +252,11 @@ body {
 }
 
 .contact-section.is-open .contact-section-content {
-  grid-template-rows: 1fr;
+  max-height: none;
   opacity: 1;
+  pointer-events: auto;
   margin-top: 6px;
-  /* open: same curve as frame-fade reveal (900ms slow-start) —
-     height and text breathe in together; sections below slide
-     at the same pace as the text appears */
-  transition: grid-template-rows 900ms cubic-bezier(0.25, 0, 0.2, 1),
-              opacity 900ms cubic-bezier(0.25, 0, 0.2, 1);
+  transition: opacity 900ms cubic-bezier(0.25, 0, 0.2, 1);
 }
 
 

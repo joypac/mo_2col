@@ -566,7 +566,6 @@ function buildMosaicLayout(container, isFirst) {
   var lastStripRow = -9;
 
   for (var r = 0; r < ROWS; r++) {
-    var highCol = Math.floor(Math.random() * COLS);
     /* Desktop 3-col: skip one edge col (0 or 2 only — never middle) so rows
        show 2 consecutive photos with breathing room on one side.
        Mobile 2-col: skip one col so only 1 photo shows per row. */
@@ -604,7 +603,6 @@ function buildMosaicLayout(container, isFirst) {
 
       var classes = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
       if (isWide) classes += ' is-wide';
-      else if (visualCol !== highCol) classes += ' is-staggered';
       div.className = classes;
 
       visualCol += spans;
