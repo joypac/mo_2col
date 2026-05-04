@@ -581,6 +581,15 @@ function buildMosaicLayout(container, isFirst) {
         smallCellsInRow = 0;
       }
 
+      /* Random left/right: at the start of a new CSS grid row, randomly offset
+         small cells by 1 column so photos don't always land on the same side. */
+      if (!isWide && visualCol === 0 && smallCellsInRow === 0 && Math.random() < 0.5) {
+        var leadCell = document.createElement('div');
+        leadCell.className = 'mosaic-cell';
+        container.appendChild(leadCell);
+        visualCol = 1;
+      }
+
       /* Limit small cells per visual CSS grid row (img and vid).
          Skip by placing an empty cell so media shifts to the next slot. */
       if (!isWide && smallCellsInRow >= maxSmallPerRow) {
