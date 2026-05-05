@@ -235,7 +235,7 @@ body {
   background: transparent;
   color: #111;
   text-align: left;
-  font-family: 'Walter Neue Light', sans-serif;
+  font-family: 'Walter Neue', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-size: clamp(1rem, 1.5vw, 1.2rem);
