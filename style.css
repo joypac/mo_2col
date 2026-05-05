@@ -258,6 +258,7 @@ body {
   opacity: 1;
   pointer-events: auto;
   margin-top: 6px;
+  margin-bottom: 6px;
   transition: opacity 900ms cubic-bezier(0.25, 0, 0.2, 1),
               grid-template-rows 900ms cubic-bezier(0.25, 0, 0.2, 1);
 }
@@ -290,7 +291,7 @@ body {
 .contact-link {
   color: #111;
   text-decoration: none;
-  display: inline-block;
+  display: block;
   text-transform: none;
   letter-spacing: 0;
 }
