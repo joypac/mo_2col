@@ -953,12 +953,35 @@ var ContactOverlay = (function() {
     e.stopPropagation();
   });
 
+  var switching = false;
+
+  function switchSection(nextIndex) {
+    if (switching) return;
+    switching = true;
+    panel.style.transition = 'opacity 200ms ease-out';
+    panel.style.opacity = '0';
+    setTimeout(function() {
+      setOpenSection(nextIndex);
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          panel.style.transition = 'opacity 400ms cubic-bezier(0.25, 0, 0.2, 1)';
+          panel.style.opacity = '1';
+          setTimeout(function() {
+            panel.style.transition = '';
+            panel.style.opacity = '';
+            switching = false;
+          }, 400);
+        });
+      });
+    }, 200);
+  }
+
   toggles.forEach(function(toggle, idx) {
     toggle.addEventListener('click', function(e) {
       e.stopPropagation();
       var section = sections[idx];
       var willOpen = !section.classList.contains('is-open');
-      setOpenSection(willOpen ? idx : -1);
+      switchSection(willOpen ? idx : -1);
     });
   });
 
