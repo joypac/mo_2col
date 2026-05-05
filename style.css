@@ -168,6 +168,13 @@ body {
   width: auto;
 }
 
+#contact-trigger span {
+  font-family: 'Walter Neue', sans-serif;
+  font-size: clamp(1.1rem, 2.2vw, 1.7rem);
+  letter-spacing: 0.03em;
+  line-height: 1;
+}
+
 #frame-fade {
   position: fixed;
   inset: 0;
