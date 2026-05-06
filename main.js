@@ -698,26 +698,39 @@ function buildMosaicLayout(container, isFirst) {
     return (s.min + s.max) / 2;
   });
 
-  // Pre-scan: count transition points (project changes in reading order = exterior of blob)
-  var mixTransitionCount = 0;
-  var mixScanPrev = -1;
+  // Pre-scan: build MIX injection plan.
+  // A cell is an injection point if it is spatially exterior (has a 4-dir neighbour
+  // of a different project) OR is the last cell before a project change in reading
+  // order. MIX photos are injected AFTER such cells, so they appear at blob edges
+  // rather than trapped inside a single project's area.
+  var mixSdirs = [[-1,0],[1,0],[0,-1],[0,1]];
+  var mixPlanMap = {};
+  var mixInjKeys = [];
   for (var rr = 0; rr < ROWS; rr++) {
     for (var cc = 0; cc < COLS; cc++) {
       var pp = grid[rr][cc];
-      if (mixScanPrev >= 0 && pp !== mixScanPrev) mixTransitionCount++;
-      mixScanPrev = pp;
+      var ext = false;
+      for (var sd = 0; sd < mixSdirs.length; sd++) {
+        var snr = rr + mixSdirs[sd][0], snc = cc + mixSdirs[sd][1];
+        if (snr >= 0 && snr < ROWS && snc >= 0 && snc < COLS && grid[snr][snc] !== pp) { ext = true; break; }
+      }
+      var ncc = cc + 1, nrr = rr;
+      if (ncc >= COLS) { ncc = 0; nrr = rr + 1; }
+      var beforeTransition = nrr < ROWS && grid[nrr][ncc] !== pp;
+      if (ext || beforeTransition) {
+        var k = rr + ',' + cc;
+        if (!mixPlanMap[k]) { mixPlanMap[k] = 0; mixInjKeys.push(k); }
+      }
     }
   }
-  // Distribute ALL MIX photos across transition points (guaranteed all appear)
+  // Randomly distribute ALL MIX photos across injection points.
+  // Each point gets 0-3 photos; total is guaranteed to equal mixMedia.length.
   var mixQueue = shuffle(mixMedia.slice());
-  var mixPlan = [];
-  for (var t = 0; t < mixTransitionCount; t++) mixPlan.push(0);
-  if (mixTransitionCount > 0) {
+  if (mixInjKeys.length > 0) {
     for (var m = 0; m < mixQueue.length; m++) {
-      mixPlan[Math.floor(Math.random() * mixTransitionCount)]++;
+      mixPlanMap[mixInjKeys[Math.floor(Math.random() * mixInjKeys.length)]]++;
     }
   }
-  var mixPlanIdx = 0;
   var mixQueueIdx = 0;
 
   var imgIdx = projects.map(function() { return 0; });
@@ -728,35 +741,11 @@ function buildMosaicLayout(container, isFirst) {
   var maxSmallPerRow = COLS - 1;
   var lastStripRow = -9;
   var consecutiveWide = 0;  // track runs of wide cells to prevent long monotone sequences
-  var prevPi = -1;
 
   for (var r = 0; r < ROWS; r++) {
     for (var c = 0; c < COLS; c++) {
       var pi  = grid[r][c];
       var media = displayedMedia[pi];
-
-      /* === MIX injection at project-boundary transitions (exterior of blob) ===
-         All MIX photos are guaranteed to appear. The distribution across
-         transition points is random (some get 0, some get 1-3). */
-      if (prevPi >= 0 && pi !== prevPi) {
-        var mixCount = mixPlan[mixPlanIdx++] || 0;
-        for (var mi = 0; mi < mixCount; mi++) {
-          var mixItem = mixQueue[mixQueueIdx++];
-          if (!mixItem) break;
-          if (visualCol >= COLS || smallCellsInRow >= maxSmallPerRow) {
-            while (visualCol < COLS) {
-              container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
-              visualCol++;
-            }
-            visualCol = 0; smallCellsInRow = 0;
-          }
-          appendMixCell(mixItem, container, isFirst && r < 2);
-          smallCellsInRow++;
-          visualCol++;
-          if (visualCol >= COLS) { visualCol = 0; smallCellsInRow = 0; }
-        }
-      }
-      prevPi = pi;
 
       /* Wide cell: 22% chance, but capped at 2 consecutive to avoid long
          monotone columns of wide-only photos. After 2 in a row, force small. */
@@ -903,6 +892,24 @@ function buildMosaicLayout(container, isFirst) {
       div.appendChild(label);
 
       container.appendChild(div);
+
+      // Inject MIX photos after this cell if it is an injection point.
+      var injCount = mixPlanMap[r + ',' + c] || 0;
+      for (var mj = 0; mj < injCount; mj++) {
+        var mxItem = mixQueue[mixQueueIdx++];
+        if (!mxItem) break;
+        if (visualCol >= COLS || smallCellsInRow >= maxSmallPerRow) {
+          while (visualCol < COLS) {
+            container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
+            visualCol++;
+          }
+          visualCol = 0; smallCellsInRow = 0;
+        }
+        appendMixCell(mxItem, container, isFirst && r < 2);
+        smallCellsInRow++;
+        visualCol++;
+        if (visualCol >= COLS) { visualCol = 0; smallCellsInRow = 0; }
+      }
     }
   }
 }
