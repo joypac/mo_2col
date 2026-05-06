@@ -7,232 +7,271 @@ var projects = [
   {
     name: 'banco',
     media: [
-      { src: 'assets/banco/banco1.webp', type: 'img' },
-      { src: 'assets/banco/banco2.webp', type: 'img' },
-      { src: 'assets/banco/banco3.webp', type: 'img' }
+      { src: 'assets/BANCO/banco1.webp', type: 'img' },
+      { src: 'assets/BANCO/banco2.webp', type: 'img' },
+      { src: 'assets/BANCO/banco3.webp', type: 'img' },
+      { src: 'assets/BANCO/banco4.webp', type: 'img' },
+      { src: 'assets/BANCO/banco5.webp', type: 'img' },
+      { src: 'assets/BANCO/banco6.webp', type: 'img' },
+      { src: 'assets/BANCO/banco7.webp', type: 'img' },
+      { src: 'assets/BANCO/banco8.webp', type: 'img' },
+      { src: 'assets/BANCO/banco9.webp', type: 'img' }
     ]
   },
   {
-    name: 'fairly',
+    name: 'fairly normal',
     media: [
-      { src: 'assets/fairly/fairly1.webp',  type: 'img' },
-      { src: 'assets/fairly/fairly2.webp',  type: 'img' },
-      { src: 'assets/fairly/fairly3.webp',  type: 'img' },
-      { src: 'assets/fairly/fairly5.webp',  type: 'img' },
-      { src: 'assets/fairly/fairly9.webp',  type: 'img' },
-      { src: 'assets/fairly/fairly10.webp', type: 'img' },
-      { src: 'assets/fairly/fairly11.webp', type: 'img' },
-      { src: 'assets/fairly/fairly12.webp', type: 'img' },
-      { src: 'assets/fairly/fairly13.webp', type: 'img' },
-      { src: 'assets/fairly/fairly16.webp', type: 'img' },
-      { src: 'assets/fairly/fairly17.webp', type: 'img' },
-      { src: 'assets/fairly/fairly31.webp', type: 'img' },
-      { src: 'assets/fairly/fairly32.webp', type: 'img' },
-      { src: 'assets/fairly/fairly33.webp', type: 'img' },
-      { src: 'assets/fairly/fairly34.webp', type: 'img' },
-      { src: 'assets/fairly/fairly35.webp', type: 'img' },
-      { src: 'assets/fairly/fairly36.webp', type: 'img' },
-      { src: 'assets/fairly/fairly37.webp', type: 'img' },
-      { src: 'assets/fairly/fairly38.webp', type: 'img' },
-      { src: 'assets/fairly/fairly39.webp', type: 'img' },
-      { src: 'assets/fairly/fairly41.webp', type: 'img' },
-      { src: 'assets/fairly/fairly42.webp', type: 'img' },
-      { src: 'assets/fairly/fairly43.webp', type: 'img' },
-      { src: 'assets/fairly/fairly18.mp4', type: 'vid' },
-      { src: 'assets/fairly/fairly19.mp4', type: 'vid' },
-      { src: 'assets/fairly/fairly20.mp4', type: 'vid' },
-      { src: 'assets/fairly/fairly21.mp4', type: 'vid' },
-      { src: 'assets/fairly/fairly22.mp4', type: 'vid' },
-      { src: 'assets/fairly/fairly23.mp4', type: 'vid' },
-      { src: 'assets/fairly/fairly24.mp4', type: 'vid' },
-      { src: 'assets/fairly/fairly25.mp4', type: 'vid' },
-      { src: 'assets/fairly/fairly26.mp4', type: 'vid' },
-      { src: 'assets/fairly/fairly27.mp4', type: 'vid' },
-      { src: 'assets/fairly/fairly28.mp4', type: 'vid' },
-      { src: 'assets/fairly/fairly30.mp4', type: 'vid' }
-        ,{ src: 'assets/fairly/Fairly Normal_H264-Scene-001.mp4', type: 'vid' }
-        ,{ src: 'assets/fairly/Fairly Normal_H264-Scene-002.mp4', type: 'vid' }
-        ,{ src: 'assets/fairly/Fairly Normal_H264-Scene-003.mp4', type: 'vid' }
-        ,{ src: 'assets/fairly/Fairly Normal_H264-Scene-004.mp4', type: 'vid' }
-        ,{ src: 'assets/fairly/Fairly Normal_H264-Scene-005.mp4', type: 'vid' }
-        ,{ src: 'assets/fairly/Fairly Normal_H264-Scene-006.mp4', type: 'vid' }
-        ,{ src: 'assets/fairly/Fairly Normal_H264-Scene-007.mp4', type: 'vid' }
-        ,{ src: 'assets/fairly/Fairly Normal_H264-Scene-008.mp4', type: 'vid' }
-        ,{ src: 'assets/fairly/Fairly Normal_H264-Scene-009.mp4', type: 'vid' }
-        ,{ src: 'assets/fairly/Fairly Normal_H264-Scene-010.mp4', type: 'vid' }
-    ]
-  },
-  {
-    name: 'mustique',
-    media: [
-      { src: 'assets/mustique/mustique1.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique2.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique3.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique4.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique5.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique7.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique9.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique13.webp', type: 'img' },
-      { src: 'assets/mustique/mustique14.webp', type: 'img' },
-      { src: 'assets/mustique/mustique15.webp', type: 'img' },
-      { src: 'assets/mustique/mustique16.webp', type: 'img' },
-      { src: 'assets/mustique/mustique17.webp', type: 'img' },
-      { src: 'assets/mustique/mustique18.webp', type: 'img' },
-      { src: 'assets/mustique/mustique19.webp', type: 'img' },
-      { src: 'assets/mustique/mustique20.webp', type: 'img' },
-      { src: 'assets/mustique/mustique21.webp', type: 'img' },
-      { src: 'assets/mustique/mustique22.webp', type: 'img' },
-      { src: 'assets/mustique/mustique23.webp', type: 'img' },
-      { src: 'assets/mustique/mustique24.webp', type: 'img' },
-      { src: 'assets/mustique/mustique27.webp', type: 'img' },
-      { src: 'assets/mustique/mustique28.webp', type: 'img' },
-      { src: 'assets/mustique/mustique29.webp', type: 'img' }
-    ]
-  },
-  {
-    name: 'paez',
-    media: [
-      { src: 'assets/paez/paez1.webp',       type: 'img' },
-      { src: 'assets/paez/paez2.webp',       type: 'img' },
-      { src: 'assets/paez/paez3.webp',       type: 'img' },
-      { src: 'assets/paez/paez4.webp',       type: 'img' },
-      { src: 'assets/paez/paez5.webp',       type: 'img' },
-      { src: 'assets/paez/paez8.webp',       type: 'img' },
-      { src: 'assets/paez/paez9.webp',       type: 'img' },
-      { src: 'assets/paez/paez10.webp',      type: 'img' },
-      { src: 'assets/paez/paez11.webp',      type: 'img' },
-      { src: 'assets/paez/paez12.webp',      type: 'img' },
-      { src: 'assets/paez/paez13.webp',      type: 'img' },
-      { src: 'assets/paez/paez14.webp',      type: 'img' },
-      { src: 'assets/paez/paez15.webp',      type: 'img' },
-      { src: 'assets/paez/paez16.webp',      type: 'img' },
-      { src: 'assets/paez/paez17.webp',      type: 'img' },
-      { src: 'assets/paez/paez18.webp',      type: 'img' },
-      { src: 'assets/paez/paez19.webp',      type: 'img' },
-      { src: 'assets/paez/paez_video1.mp4', type: 'vid' },
-      { src: 'assets/paez/paez_video2.mp4', type: 'vid' },
-      { src: 'assets/paez/paez_video3.mp4', type: 'vid' },
-      { src: 'assets/paez/paez_video4.mp4', type: 'vid' },
-      { src: 'assets/paez/paez_video5.mp4', type: 'vid' },
-      { src: 'assets/paez/paez_video6.mp4', type: 'vid' }
-    ]
-  },
-  {
-    name: 'peça',
-    media: [
-      { src: 'assets/peca/peca1.webp', type: 'img' },
-      { src: 'assets/peca/peca2.webp', type: 'img' },
-      { src: 'assets/peca/peca3.webp', type: 'img' }
+      { src: 'assets/FAIRLY NORMAL/fairly1.mp4',  type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/fairly2.webp',  type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly3.webp',  type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly4.webp',  type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly5.webp',  type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly6.webp',  type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly7.webp',  type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly8.webp',  type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly10.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly11.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly12.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly13.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly14.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly15.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly16.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly17.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly18.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly20.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly21.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly22.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly23.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly24.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly25.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly26.webp', type: 'img' },
+      { src: 'assets/FAIRLY NORMAL/fairly27.mp4',  type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/fairly29.mp4',  type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/fairly31.mp4',  type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/fairly32.mp4',  type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/fairly33.mp4',  type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/fairly34.mp4',  type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/fairly35.mp4',  type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/fairly36.mp4',  type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/fairly37.mp4',  type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/fairly38.mp4',  type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-001.mp4', type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-002.mp4', type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-003.mp4', type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-004.mp4', type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-005.mp4', type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-006.mp4', type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-007.mp4', type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-008.mp4', type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-009.mp4', type: 'vid' },
+      { src: 'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-010.mp4', type: 'vid' }
     ]
   },
   {
     name: 'lapa lofts',
     media: [
-      { src: 'assets/lapa-lofts/lapa_lofts.mp4', type: 'vid' }
+      { src: 'assets/LAPA LOFTS/lapa.mp4', type: 'vid' }
+    ]
+  },
+  {
+    name: 'lareira',
+    media: [
+      { src: 'assets/LAREIRA/lareira1.webp', type: 'img' },
+      { src: 'assets/LAREIRA/lareira2.webp', type: 'img' }
+    ]
+  },
+  {
+    name: 'mustique',
+    media: [
+      { src: 'assets/MUSTIQUE/MUSTIQUE1.webp',  type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE2.webp',  type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE3.webp',  type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE4.webp',  type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE5.webp',  type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE6.webp',  type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE7.webp',  type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE8.webp',  type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE9.webp',  type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE10.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE11.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE12.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE13.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE14.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE15.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE16.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE17.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE18.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE19.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE20.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE21.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE22.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE23.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE24.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE25.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE26.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE27.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE28.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE30.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE31.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE32.webp', type: 'img' },
+      { src: 'assets/MUSTIQUE/MUSTIQUE33.webp', type: 'img' }
+    ]
+  },
+  {
+    name: 'paez',
+    media: [
+      { src: 'assets/PAEZ/PAEZ1.webp',  type: 'img' },
+      { src: 'assets/PAEZ/PAEZ2.webp',  type: 'img' },
+      { src: 'assets/PAEZ/PAEZ3.webp',  type: 'img' },
+      { src: 'assets/PAEZ/PAEZ4.webp',  type: 'img' },
+      { src: 'assets/PAEZ/PAEZ5.webp',  type: 'img' },
+      { src: 'assets/PAEZ/PAEZ6.webp',  type: 'img' },
+      { src: 'assets/PAEZ/PAEZ7.webp',  type: 'img' },
+      { src: 'assets/PAEZ/PAEZ8.webp',  type: 'img' },
+      { src: 'assets/PAEZ/PAEZ9.webp',  type: 'img' },
+      { src: 'assets/PAEZ/PAEZ10.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ11.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ12.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ13.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ14.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ15.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ16.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ17.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ18.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ19.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ20.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ21.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ22.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ23.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ24.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ25.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ26.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ27.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ28.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ29.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ30.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ31.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ32.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ33.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ34.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ37.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ38.webp', type: 'img' },
+      { src: 'assets/PAEZ/PAEZ39.webp', type: 'img' },
+      { src: 'assets/PAEZ/IMG_5969.mp4',    type: 'vid' },
+      { src: 'assets/PAEZ/IMG_5971.mp4',    type: 'vid' },
+      { src: 'assets/PAEZ/paez_video1.mp4', type: 'vid' },
+      { src: 'assets/PAEZ/paez_video2.mp4', type: 'vid' },
+      { src: 'assets/PAEZ/paez_video3.mp4', type: 'vid' },
+      { src: 'assets/PAEZ/paez_video4.mp4', type: 'vid' },
+      { src: 'assets/PAEZ/paez_video5.mp4', type: 'vid' },
+      { src: 'assets/PAEZ/paez_video6.mp4', type: 'vid' }
+    ]
+  },
+  {
+    name: 'peça',
+    media: [
+      { src: 'assets/PEÇA/PEÇA1.jpg', type: 'img' },
+      { src: 'assets/PEÇA/PECA2.jpg', type: 'img' },
+      { src: 'assets/PEÇA/PEÇA3.jpg', type: 'img' }
     ]
   }
+];
+
+/* MIX: loose photos/videos that appear between projects, never mid-project. */
+var mixMedia = [
+  { src: 'assets/MIX/MIX1.webp',  type: 'img' },
+  { src: 'assets/MIX/MIX2.webp',  type: 'img' },
+  { src: 'assets/MIX/MIX3.webp',  type: 'img' },
+  { src: 'assets/MIX/MIX4.webp',  type: 'img' },
+  { src: 'assets/MIX/MIX5.webp',  type: 'img' },
+  { src: 'assets/MIX/MIX6.mp4',   type: 'vid' },
+  { src: 'assets/MIX/MIX7.webp',  type: 'img' },
+  { src: 'assets/MIX/MIX8.webp',  type: 'img' },
+  { src: 'assets/MIX/MIX9.webp',  type: 'img' },
+  { src: 'assets/MIX/MIX10.webp', type: 'img' },
+  { src: 'assets/MIX/MIX11.webp', type: 'img' },
+  { src: 'assets/MIX/MIX12.webp', type: 'img' },
+  { src: 'assets/MIX/MIX13.webp', type: 'img' },
+  { src: 'assets/MIX/MIX14.webp', type: 'img' },
+  { src: 'assets/MIX/MIX15.webp', type: 'img' },
+  { src: 'assets/MIX/MIX16.webp', type: 'img' },
+  { src: 'assets/MIX/MIX17.webp', type: 'img' }
 ];
 
 /* Intrinsic dimensions per asset → reserves layout space before load,
    eliminating CLS (cumulative layout shift) when images pop in. */
 var mediaDimensions = {
-  'assets/banco/banco1.webp': [1219, 813],
-  'assets/banco/banco2.webp': [1054, 1581],
-  'assets/banco/banco3.webp': [998, 1498],
-  'assets/fairly/fairly1.webp':  [777, 972],
-  'assets/fairly/fairly2.webp':  [910, 1138],
-  'assets/fairly/fairly3.webp':  [1020, 1275],
-  'assets/fairly/fairly5.webp':  [907, 1134],
-  'assets/fairly/fairly9.webp':  [942, 1178],
-  'assets/fairly/fairly10.webp': [1076, 1345],
-  'assets/fairly/fairly11.webp': [1189, 1486],
-  'assets/fairly/fairly12.webp': [818, 1022],
-  'assets/fairly/fairly13.webp': [844, 1055],
-  'assets/fairly/fairly16.webp': [1013, 1266],
-  'assets/fairly/fairly17.webp': [864, 1080],
-  'assets/fairly/fairly31.webp': [1370, 1827],
-  'assets/fairly/fairly32.webp': [1558, 2077],
-  'assets/fairly/fairly33.webp': [1247, 1663],
-  'assets/fairly/fairly34.webp': [737, 983],
-  'assets/fairly/fairly35.webp': [1198, 1597],
-  'assets/fairly/fairly36.webp': [1006, 1341],
-  'assets/fairly/fairly37.webp': [803, 1070],
-  'assets/fairly/fairly38.webp': [807, 1077],
-  'assets/fairly/fairly39.webp': [883, 1178],
-  'assets/fairly/fairly41.webp': [883, 1177],
-  'assets/fairly/fairly42.webp': [1005, 1341],
-  'assets/fairly/fairly43.webp': [919, 1224],
-  'assets/fairly/fairly18.mp4': [720, 720],
-  'assets/fairly/fairly19.mp4': [720, 720],
-  'assets/fairly/fairly20.mp4': [720, 720],
-  'assets/fairly/fairly21.mp4': [720, 720],
-  'assets/fairly/fairly22.mp4': [720, 720],
-  'assets/fairly/fairly23.mp4': [720, 720],
-  'assets/fairly/fairly24.mp4': [720, 720],
-  'assets/fairly/fairly25.mp4': [720, 720],
-  'assets/fairly/fairly26.mp4': [720, 720],
-  'assets/fairly/fairly27.mp4': [720, 1280],
-  'assets/fairly/fairly28.mp4': [720, 1280],
-  'assets/fairly/fairly30.mp4': [720, 1280],
-  'assets/fairly/Fairly Normal_H264-Scene-001.mp4': [1920, 1080],
-  'assets/fairly/Fairly Normal_H264-Scene-002.mp4': [1920, 1080],
-  'assets/fairly/Fairly Normal_H264-Scene-003.mp4': [1920, 1080],
-  'assets/fairly/Fairly Normal_H264-Scene-004.mp4': [1920, 1080],
-  'assets/fairly/Fairly Normal_H264-Scene-005.mp4': [1920, 1080],
-  'assets/fairly/Fairly Normal_H264-Scene-006.mp4': [1920, 1080],
-  'assets/fairly/Fairly Normal_H264-Scene-007.mp4': [1920, 1080],
-  'assets/fairly/Fairly Normal_H264-Scene-008.mp4': [1920, 1080],
-  'assets/fairly/Fairly Normal_H264-Scene-009.mp4': [1920, 1080],
-  'assets/fairly/Fairly Normal_H264-Scene-010.mp4': [1920, 1080],
-  'assets/mustique/mustique1.webp':  [1075, 1340],
-  'assets/mustique/mustique2.webp':  [1022, 1277],
-  'assets/mustique/mustique3.webp':  [1321, 1652],
-  'assets/mustique/mustique4.webp':  [812, 1014],
-  'assets/mustique/mustique5.webp':  [692, 865],
-  'assets/mustique/mustique7.webp':  [927, 1158],
-  'assets/mustique/mustique9.webp':  [967, 1208],
-  'assets/mustique/mustique13.webp': [1005, 1256],
-  'assets/mustique/mustique14.webp': [670, 892],
-  'assets/mustique/mustique15.webp': [749, 999],
-  'assets/mustique/mustique16.webp': [627, 836],
-  'assets/mustique/mustique17.webp': [627, 835],
-  'assets/mustique/mustique18.webp': [756, 1008],
-  'assets/mustique/mustique19.webp': [678, 905],
-  'assets/mustique/mustique20.webp': [723, 965],
-  'assets/mustique/mustique21.webp': [634, 845],
-  'assets/mustique/mustique22.webp': [750, 1000],
-  'assets/mustique/mustique23.webp': [688, 918],
-  'assets/mustique/mustique24.webp': [1032, 1375],
-  'assets/mustique/mustique27.webp': [840, 1120],
-  'assets/mustique/mustique28.webp': [876, 1168],
-  'assets/mustique/mustique29.webp': [812, 1083],
-  'assets/paez/paez1.webp':  [692, 864],
-  'assets/paez/paez2.webp':  [750, 937],
-  'assets/paez/paez3.webp':  [786, 983],
-  'assets/paez/paez4.webp':  [760, 950],
-  'assets/paez/paez5.webp':  [609, 760],
-  'assets/paez/paez8.webp':  [807, 1010],
-  'assets/paez/paez9.webp':  [749, 999],
-  'assets/paez/paez10.webp': [660, 878],
-  'assets/paez/paez11.webp': [721, 961],
-  'assets/paez/paez12.webp': [724, 965],
-  'assets/paez/paez13.webp': [751, 1002],
-  'assets/paez/paez14.webp': [571, 762],
-  'assets/paez/paez15.webp': [733, 978],
-  'assets/paez/paez16.webp': [755, 1006],
-  'assets/paez/paez17.webp': [667, 891],
-  'assets/paez/paez18.webp': [1089, 1452],
-  'assets/paez/paez19.webp': [610, 813],
-  'assets/paez/paez_video1.mp4': [960, 736],
-  'assets/paez/paez_video2.mp4': [960, 736],
-  'assets/paez/paez_video3.mp4': [960, 736],
-  'assets/paez/paez_video4.mp4': [960, 736],
-  'assets/paez/paez_video5.mp4': [960, 736],
-  'assets/paez/paez_video6.mp4': [960, 736],
-  'assets/peca/peca1.webp': [1024, 665],
-  'assets/peca/peca2.webp': [1024, 673],
-  'assets/peca/peca3.webp': [655, 418],
-  'assets/lapa-lofts/lapa_lofts.mp4': [1280, 720]
+  'assets/BANCO/banco1.webp': [1219, 813],
+  'assets/BANCO/banco2.webp': [1054, 1581],
+  'assets/BANCO/banco3.webp': [998, 1498],
+  'assets/FAIRLY NORMAL/fairly2.webp':  [910, 1138],
+  'assets/FAIRLY NORMAL/fairly3.webp':  [1020, 1275],
+  'assets/FAIRLY NORMAL/fairly5.webp':  [907, 1134],
+  'assets/FAIRLY NORMAL/fairly10.webp': [1076, 1345],
+  'assets/FAIRLY NORMAL/fairly11.webp': [1189, 1486],
+  'assets/FAIRLY NORMAL/fairly12.webp': [818, 1022],
+  'assets/FAIRLY NORMAL/fairly13.webp': [844, 1055],
+  'assets/FAIRLY NORMAL/fairly16.webp': [1013, 1266],
+  'assets/FAIRLY NORMAL/fairly17.webp': [864, 1080],
+  'assets/FAIRLY NORMAL/fairly27.mp4':  [720, 1280],
+  'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-001.mp4': [1920, 1080],
+  'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-002.mp4': [1920, 1080],
+  'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-003.mp4': [1920, 1080],
+  'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-004.mp4': [1920, 1080],
+  'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-005.mp4': [1920, 1080],
+  'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-006.mp4': [1920, 1080],
+  'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-007.mp4': [1920, 1080],
+  'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-008.mp4': [1920, 1080],
+  'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-009.mp4': [1920, 1080],
+  'assets/FAIRLY NORMAL/Fairly Normal_H264-Scene-010.mp4': [1920, 1080],
+  'assets/LAPA LOFTS/lapa.mp4': [1280, 720],
+  'assets/MUSTIQUE/MUSTIQUE1.webp':  [1075, 1340],
+  'assets/MUSTIQUE/MUSTIQUE2.webp':  [1022, 1277],
+  'assets/MUSTIQUE/MUSTIQUE3.webp':  [1321, 1652],
+  'assets/MUSTIQUE/MUSTIQUE4.webp':  [812, 1014],
+  'assets/MUSTIQUE/MUSTIQUE5.webp':  [692, 865],
+  'assets/MUSTIQUE/MUSTIQUE7.webp':  [927, 1158],
+  'assets/MUSTIQUE/MUSTIQUE9.webp':  [967, 1208],
+  'assets/MUSTIQUE/MUSTIQUE13.webp': [1005, 1256],
+  'assets/MUSTIQUE/MUSTIQUE14.webp': [670, 892],
+  'assets/MUSTIQUE/MUSTIQUE15.webp': [749, 999],
+  'assets/MUSTIQUE/MUSTIQUE16.webp': [627, 836],
+  'assets/MUSTIQUE/MUSTIQUE17.webp': [627, 835],
+  'assets/MUSTIQUE/MUSTIQUE18.webp': [756, 1008],
+  'assets/MUSTIQUE/MUSTIQUE19.webp': [678, 905],
+  'assets/MUSTIQUE/MUSTIQUE20.webp': [723, 965],
+  'assets/MUSTIQUE/MUSTIQUE21.webp': [634, 845],
+  'assets/MUSTIQUE/MUSTIQUE22.webp': [750, 1000],
+  'assets/MUSTIQUE/MUSTIQUE23.webp': [688, 918],
+  'assets/MUSTIQUE/MUSTIQUE24.webp': [1032, 1375],
+  'assets/MUSTIQUE/MUSTIQUE27.webp': [840, 1120],
+  'assets/MUSTIQUE/MUSTIQUE28.webp': [876, 1168],
+  'assets/PAEZ/PAEZ1.webp':  [692, 864],
+  'assets/PAEZ/PAEZ2.webp':  [750, 937],
+  'assets/PAEZ/PAEZ3.webp':  [786, 983],
+  'assets/PAEZ/PAEZ4.webp':  [760, 950],
+  'assets/PAEZ/PAEZ5.webp':  [609, 760],
+  'assets/PAEZ/PAEZ8.webp':  [807, 1010],
+  'assets/PAEZ/PAEZ9.webp':  [749, 999],
+  'assets/PAEZ/PAEZ10.webp': [660, 878],
+  'assets/PAEZ/PAEZ11.webp': [721, 961],
+  'assets/PAEZ/PAEZ12.webp': [724, 965],
+  'assets/PAEZ/PAEZ13.webp': [751, 1002],
+  'assets/PAEZ/PAEZ14.webp': [571, 762],
+  'assets/PAEZ/PAEZ15.webp': [733, 978],
+  'assets/PAEZ/PAEZ16.webp': [755, 1006],
+  'assets/PAEZ/PAEZ17.webp': [667, 891],
+  'assets/PAEZ/PAEZ18.webp': [1089, 1452],
+  'assets/PAEZ/PAEZ19.webp': [610, 813],
+  'assets/PAEZ/paez_video1.mp4': [960, 736],
+  'assets/PAEZ/paez_video2.mp4': [960, 736],
+  'assets/PAEZ/paez_video3.mp4': [960, 736],
+  'assets/PAEZ/paez_video4.mp4': [960, 736],
+  'assets/PAEZ/paez_video5.mp4': [960, 736],
+  'assets/PAEZ/paez_video6.mp4': [960, 736],
+  'assets/PEÇA/PEÇA1.jpg': [1024, 665],
+  'assets/PEÇA/PECA2.jpg': [1024, 673],
+  'assets/PEÇA/PEÇA3.jpg': [655, 418]
 };
 
 /* ── Helpers ──────────────────────────────────────────── */
@@ -253,17 +292,16 @@ var imageCache = [];
 
 function warmImageCache() {
   var seen = Object.create(null);
-  projects.forEach(function(project) {
-    project.media.forEach(function(item) {
-      if (item.type !== 'img') return;
-      if (seen[item.src]) return;
-      seen[item.src] = true;
-      var img = new Image();
-      img.decoding = 'async';
-      img.loading = 'eager';
-      img.src = item.src;
-      imageCache.push(img);
-    });
+  var allMedia = projects.reduce(function(acc, p) { return acc.concat(p.media); }, mixMedia.slice());
+  allMedia.forEach(function(item) {
+    if (item.type !== 'img') return;
+    if (seen[item.src]) return;
+    seen[item.src] = true;
+    var img = new Image();
+    img.decoding = 'async';
+    img.loading = 'eager';
+    img.src = item.src;
+    imageCache.push(img);
   });
 }
 
@@ -387,7 +425,6 @@ function buildGrid(projects, displayedMedia, COLS) {
   }
 
   // Flood-fill any remaining empty cells with the nearest project
-  // (at most COLS-1 cells can remain unfilled if total % COLS !== 0)
   var changed = true;
   while (changed) {
     changed = false;
@@ -412,13 +449,11 @@ function buildGrid(projects, displayedMedia, COLS) {
 /* ── Render ───────────────────────────────────────────── */
 
 // Shared IntersectionObserver for all video tiles across all grids.
-// Handles both lazy preloading (via rootMargin) and play/pause (via threshold).
 var vidObs = new IntersectionObserver(function(entries) {
   entries.forEach(function(e) {
     var v = e.target.querySelector('video');
     if (!v) return;
     if (e.isIntersecting) {
-      // Start preloading metadata when near viewport
       if (v.getAttribute('preload') === 'none') {
         v.setAttribute('preload', 'metadata');
         v.load();
@@ -432,14 +467,7 @@ var vidObs = new IntersectionObserver(function(entries) {
   });
 }, { threshold: [0, 0.15], rootMargin: '50% 0px' });
 
-/* ── First-grid layout constraints ───────────────────────────
-   Only applied to the very first grid (isFirst = true).
-   1. Pull every project's first appearance into the first N rows (round-robin).
-   2. Ensure at least one video cell sits in rows 0-1 (first viewport).
-      First checks if the random layout already has a video there — if yes,
-      does nothing. Only intervenes when needed, picking randomly among all
-      video-containing projects so the same project doesn't always show first.
-── */
+/* ── First-grid layout constraints ─────────────────────── */
 function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
   var N = projects.length;
 
@@ -447,7 +475,6 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
     var t = grid[r1][c1]; grid[r1][c1] = grid[r2][c2]; grid[r2][c2] = t;
   }
 
-  // ── 1. Round-robin: pull every project into the first N rows ──
   var fRow = new Array(N).fill(ROWS), fCol = new Array(N).fill(0);
   for (var r = 0; r < ROWS; r++)
     for (var c = 0; c < COLS; c++) {
@@ -477,8 +504,6 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
     fRow[pi] = dr; fCol[pi] = dc;
   }
 
-  // ── 2. Video in first frame ───────────────────────────────────
-  // Simulate scan order to check if rows 0-1 already contain a video cell.
   var imgIdx = new Array(N).fill(0);
   var hasVideo = false;
   for (var r = 0; r < 2; r++) {
@@ -489,19 +514,16 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
       imgIdx[pi]++;
     }
   }
-  if (hasVideo) return; // Random layout already has a video — nothing to do.
+  if (hasVideo) return;
 
-  // No video in first frame: collect all video-containing projects.
   var videoPis = [];
   for (var pi = 0; pi < N; pi++)
     for (var mi = 0; mi < displayedMedia[pi].length; mi++)
       if (displayedMedia[pi][mi].type === 'vid') { videoPis.push(pi); break; }
   if (!videoPis.length) return;
 
-  // Pick one at random (so it's never always the same project).
   var picked = shuffle(videoPis)[0];
 
-  // If picked isn't already in rows 0-1, swap it in.
   if (fRow[picked] >= 2) {
     var cnt2 = new Array(N).fill(0);
     for (var r = 0; r < 2; r++)
@@ -511,7 +533,7 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
     for (var pj = 0; pj < N; pj++)
       if (cnt2[pj] > best2 && pj !== picked) { best2 = cnt2[pj]; donor2 = pj; }
 
-    var sr = 0, sc = 0; // fallback
+    var sr = 0, sc = 0;
     if (donor2 >= 0) {
       search2: for (var r = 0; r < 2; r++)
         for (var c = 0; c < COLS; c++)
@@ -521,8 +543,6 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
     fRow[picked] = sr; fCol[picked] = sc;
   }
 
-  // The picked project's first scan encounter now shows displayedMedia[picked][0].
-  // If that item isn't a video, promote the first video in its list to position 0.
   if (displayedMedia[picked].length && displayedMedia[picked][0].type !== 'vid') {
     for (var mi = 1; mi < displayedMedia[picked].length; mi++) {
       if (displayedMedia[picked][mi].type === 'vid') {
@@ -533,10 +553,60 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
   }
 }
 
+/* ── MIX cell renderer ───────────────────────────────────
+   Renders a single MIX item as a mosaic cell.
+   No strip, no project label — just the media.
+── */
+function appendMixCell(item, container, aboveFold) {
+  var div = document.createElement('div');
+  div.className = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
+
+  if (item.type === 'vid') {
+    var video = document.createElement('video');
+    video.className = 'mosaic-media';
+    setIntrinsicDimensions(video, item.src);
+    video.muted = true;
+    video.loop  = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('preload', aboveFold ? 'metadata' : 'none');
+    video.addEventListener('loadeddata', function() {
+      markMediaLoaded(this.closest('.mosaic-cell'), this);
+    }, { once: true });
+    video.addEventListener('error', function() {
+      markMediaLoaded(this.closest('.mosaic-cell'), this);
+    }, { once: true });
+    var vsrc = document.createElement('source');
+    vsrc.src = item.src;
+    video.appendChild(vsrc);
+    div.appendChild(video);
+    vidObs.observe(div);
+  } else {
+    var img = document.createElement('img');
+    img.className = 'mosaic-media';
+    img.decoding = 'async';
+    setIntrinsicDimensions(img, item.src);
+    img.alt = '';
+    img.setAttribute('loading', aboveFold ? 'eager' : 'lazy');
+    img.setAttribute('fetchpriority', aboveFold ? 'high' : 'low');
+    img.addEventListener('load', function() {
+      markMediaLoaded(this.closest('.mosaic-cell'), this);
+    }, { once: true });
+    img.addEventListener('error', function() {
+      markMediaLoaded(this.closest('.mosaic-cell'), this);
+    }, { once: true });
+    img.src = item.src;
+    div.appendChild(img);
+  }
+
+  container.appendChild(div);
+}
+
 function buildMosaicLayout(container, isFirst) {
   var isMobile = window.innerWidth <= 600;
   var COLS = isMobile ? 2 : 3;
   var displayedMedia = projects.map(function(p) { return shuffle(p.media); });
+  var mixPool = shuffle(mixMedia.slice());
+  var mixPoolIdx = 0;
   var layout = buildGrid(projects, displayedMedia, COLS);
   var grid = layout.grid, ROWS = layout.rows;
 
@@ -568,11 +638,31 @@ function buildMosaicLayout(container, isFirst) {
      Mobile:  max 1. Wide cells (2-col) are exempt — wide + small is always fine. */
   var maxSmallPerRow = COLS - 1;
   var lastStripRow = -9;
+  var prevPi = -1;   // tracks project of last rendered cell — for MIX injection
+  var lastMixR = -3; // last row where a MIX cell was injected — for cooldown
 
   for (var r = 0; r < ROWS; r++) {
     for (var c = 0; c < COLS; c++) {
       var pi  = grid[r][c];
       var media = displayedMedia[pi];
+
+      /* === MIX injection at project boundaries ===
+         When the project changes, inject a MIX cell ~40% of the time,
+         with a cooldown of 2 rows so they don't cluster. */
+      if (prevPi >= 0 && pi !== prevPi && r - lastMixR >= 2 && mixPool.length > 0 && Math.random() < 0.4) {
+        var mixItem = mixPool[mixPoolIdx % mixPool.length];
+        mixPoolIdx++;
+        // MIX cells are always 1-col. Check visual row capacity.
+        if (visualCol + 1 > COLS) { visualCol = 0; smallCellsInRow = 0; }
+        if (smallCellsInRow < maxSmallPerRow) {
+          appendMixCell(mixItem, container, isFirst && r < 2);
+          smallCellsInRow++;
+          visualCol++;
+          if (visualCol >= COLS) { visualCol = 0; smallCellsInRow = 0; }
+          lastMixR = r;
+        }
+      }
+      prevPi = pi;
 
       var isWide = Math.random() < 0.22;
       var spans = isWide ? 2 : 1;
@@ -784,25 +874,19 @@ function appendGrid() {
 var gridRecycler = (function() {
   var savedGrids = new WeakMap();
 
-  // Margin: keep grids alive within 3× viewport above and below.
   var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
       var grid = entry.target;
       if (entry.isIntersecting) {
-        // Restore if previously recycled
         var saved = savedGrids.get(grid);
         if (!saved) return;
         savedGrids.delete(grid);
         grid.style.minHeight = '';
-        // Rebuild content into this grid
         buildMosaicLayout(grid);
       } else {
-        // Already recycled — skip
         if (savedGrids.has(grid)) return;
-        // Preserve height, remove children
         var h = grid.getBoundingClientRect().height;
         savedGrids.set(grid, true);
-        // Unobserve videos in this grid
         var vids = grid.querySelectorAll('.is-video');
         for (var i = 0; i < vids.length; i++) vidObs.unobserve(vids[i]);
         grid.innerHTML = '';
@@ -876,7 +960,6 @@ var ContactOverlay = (function() {
     panel.style.top = top + 'px';
 
     if (window.innerWidth <= 720) {
-      // Mobile: let CSS handle horizontal positioning for symmetric margins
       panel.style.left = '';
       panel.style.right = '';
     } else {
@@ -896,8 +979,6 @@ var ContactOverlay = (function() {
   function openOverlay() {
     if (open) return;
     open = true;
-    // Instantly collapse any previously open section before the overlay fades in,
-    // so the user never sees a section animating closed while the menu appears.
     var contents = Array.prototype.slice.call(panel.querySelectorAll('.contact-section-content'));
     contents.forEach(function(el) { el.style.transition = 'none'; });
     setOpenSection(-1);
@@ -919,7 +1000,6 @@ var ContactOverlay = (function() {
     overlay.classList.remove('is-open');
     syncA11y();
     trigger.focus();
-    // Remove will-change after transition ends to free GPU layer.
     overlay.addEventListener('transitionend', function cleanup() {
       overlay.removeEventListener('transitionend', cleanup);
       if (!open) overlay.style.willChange = '';
@@ -1115,7 +1195,6 @@ var FrameNavigator = (function() {
   function onClick(e) {
     if (ContactOverlay.isOpen()) return;
 
-    // Ignore synthetic click right after touch navigation.
     if (Date.now() - lastTouchNavTs < 420) return;
     if (e.button !== 0) return;
     if (e.defaultPrevented) return;
@@ -1139,7 +1218,6 @@ var FrameNavigator = (function() {
     var dy = e.touches[0].clientY - touchStartY;
     var dx = e.touches[0].clientX - touchStartX;
     if (Math.abs(dy) > 8 || Math.abs(dx) > 8) touchMoved = true;
-    // Block native continuous scroll to keep frame-based navigation.
     e.preventDefault();
   }
 
@@ -1154,7 +1232,6 @@ var FrameNavigator = (function() {
     var dy = e.changedTouches[0].clientY - touchStartY;
     var absDy = Math.abs(dy);
 
-    // Swipe/drag scrolling is disabled. Only a simple tap advances one frame.
     if (!touchMoved && absDy < 10) {
       if (skipFirstNav) { skipFirstNav = false; }
       else { goDown(); }
@@ -1239,13 +1316,13 @@ window.FrameNavigator = FrameNavigator;
     document.removeEventListener('click', revealClick, true);
     window.removeEventListener('touchstart', revealTouch, true);
     window.removeEventListener('wheel', revealWheel, true);
-    e.stopPropagation(); // prevent this click from navigating
+    e.stopPropagation();
   }
 
   function revealTouch() {
     if (revealed) return;
     revealed = true;
-    skipFirstNav = true; // prevent the subsequent touchend from navigating
+    skipFirstNav = true;
     trigger.style.opacity = '1';
     document.removeEventListener('click', revealClick, true);
     window.removeEventListener('touchstart', revealTouch, true);
