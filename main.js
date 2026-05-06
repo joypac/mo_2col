@@ -723,12 +723,24 @@ function buildMosaicLayout(container, isFirst) {
       }
     }
   }
-  // Randomly distribute ALL MIX photos across injection points.
-  // Each point gets 0-3 photos; total is guaranteed to equal mixMedia.length.
+  // Distribute ALL MIX photos with even spacing so they reliably appear
+  // across the whole layout. Photos are grouped into random bursts of 1-3,
+  // and bursts are placed at evenly-spaced injection points.
   var mixQueue = shuffle(mixMedia.slice());
-  if (mixInjKeys.length > 0) {
-    for (var m = 0; m < mixQueue.length; m++) {
-      mixPlanMap[mixInjKeys[Math.floor(Math.random() * mixInjKeys.length)]]++;
+  if (mixInjKeys.length > 0 && mixQueue.length > 0) {
+    // Build burst groups: random sizes 1-3 summing to mixQueue.length
+    var mixBursts = [];
+    var mixRem = mixQueue.length;
+    while (mixRem > 0) {
+      var bSize = Math.min(mixRem, Math.floor(Math.random() * 3) + 1);
+      mixBursts.push(bSize);
+      mixRem -= bSize;
+    }
+    // Spread bursts evenly across injection points
+    var mixSpacing = mixInjKeys.length / mixBursts.length;
+    for (var mb = 0; mb < mixBursts.length; mb++) {
+      var mk = mixInjKeys[Math.min(Math.floor(mb * mixSpacing + mixSpacing / 2), mixInjKeys.length - 1)];
+      mixPlanMap[mk] = (mixPlanMap[mk] || 0) + mixBursts[mb];
     }
   }
   var mixQueueIdx = 0;
@@ -786,6 +798,24 @@ function buildMosaicLayout(container, isFirst) {
 
       if (idx >= media.length) {
         container.appendChild(document.createElement('div'));
+        // Still honour any MIX injection assigned to this grid position.
+        var ovfKey = r + ',' + c;
+        var ovfCount = mixPlanMap[ovfKey] || 0;
+        for (var oi = 0; oi < ovfCount; oi++) {
+          var oxItem = mixQueue[mixQueueIdx++];
+          if (!oxItem) break;
+          if (visualCol >= COLS || smallCellsInRow >= maxSmallPerRow) {
+            while (visualCol < COLS) {
+              container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
+              visualCol++;
+            }
+            visualCol = 0; smallCellsInRow = 0;
+          }
+          appendMixCell(oxItem, container, isFirst && r < 2);
+          smallCellsInRow++;
+          visualCol++;
+          if (visualCol >= COLS) { visualCol = 0; smallCellsInRow = 0; }
+        }
         continue;
       }
 
