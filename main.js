@@ -314,7 +314,7 @@ var mediaDimensions = {
   'assets/paez/PAEZ33.webp':  [1920, 2560],
   'assets/paez/PAEZ34.webp':  [1920, 2560],
   'assets/paez/PAEZ37.webp':  [2560, 1920],
-  'assets/paez/PAEZ38.webp':  [2560, 1920],
+  'assets/paez/PAEZ38.webp':  [1920, 2560],
   'assets/paez/PAEZ39.webp':  [2560, 1920],
   'assets/paez/paez_video1.mp4': [960, 736],
   'assets/paez/paez_video2.mp4': [960, 736],
