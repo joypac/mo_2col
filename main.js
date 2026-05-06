@@ -674,8 +674,6 @@ function buildMosaicLayout(container, isFirst) {
   var isMobile = window.innerWidth <= 600;
   var COLS = isMobile ? 2 : 3;
   var displayedMedia = projects.map(function(p) { return shuffle(p.media); });
-  var mixPool = shuffle(mixMedia.slice());
-  var mixPoolIdx = 0;
   var layout = buildGrid(projects, displayedMedia, COLS);
   var grid = layout.grid, ROWS = layout.rows;
 
@@ -700,6 +698,28 @@ function buildMosaicLayout(container, isFirst) {
     return (s.min + s.max) / 2;
   });
 
+  // Pre-scan: count transition points (project changes in reading order = exterior of blob)
+  var mixTransitionCount = 0;
+  var mixScanPrev = -1;
+  for (var rr = 0; rr < ROWS; rr++) {
+    for (var cc = 0; cc < COLS; cc++) {
+      var pp = grid[rr][cc];
+      if (mixScanPrev >= 0 && pp !== mixScanPrev) mixTransitionCount++;
+      mixScanPrev = pp;
+    }
+  }
+  // Distribute ALL MIX photos across transition points (guaranteed all appear)
+  var mixQueue = shuffle(mixMedia.slice());
+  var mixPlan = [];
+  for (var t = 0; t < mixTransitionCount; t++) mixPlan.push(0);
+  if (mixTransitionCount > 0) {
+    for (var m = 0; m < mixQueue.length; m++) {
+      mixPlan[Math.floor(Math.random() * mixTransitionCount)]++;
+    }
+  }
+  var mixPlanIdx = 0;
+  var mixQueueIdx = 0;
+
   var imgIdx = projects.map(function() { return 0; });
   var visualCol = 0;
   var smallCellsInRow = 0;
@@ -707,41 +727,53 @@ function buildMosaicLayout(container, isFirst) {
      Mobile:  max 1. Wide cells (2-col) are exempt — wide + small is always fine. */
   var maxSmallPerRow = COLS - 1;
   var lastStripRow = -9;
-  var prevPi = -1;   // tracks project of last rendered cell — for MIX injection
-  var lastMixR = -3; // last row where a MIX cell was injected — for cooldown
+  var consecutiveWide = 0;  // track runs of wide cells to prevent long monotone sequences
+  var prevPi = -1;
 
   for (var r = 0; r < ROWS; r++) {
     for (var c = 0; c < COLS; c++) {
       var pi  = grid[r][c];
       var media = displayedMedia[pi];
 
-      /* === MIX injection at project boundaries ===
-         When the project changes, inject a MIX cell ~40% of the time,
-         with a cooldown of 2 rows so they don't cluster. */
-      if (prevPi >= 0 && pi !== prevPi && r - lastMixR >= 2 && mixPool.length > 0 && Math.random() < 0.4) {
-        var mixItem = mixPool[mixPoolIdx % mixPool.length];
-        mixPoolIdx++;
-        // MIX cells are always 1-col. Check visual row capacity.
-        if (visualCol + 1 > COLS) { visualCol = 0; smallCellsInRow = 0; }
-        if (smallCellsInRow < maxSmallPerRow) {
+      /* === MIX injection at project-boundary transitions (exterior of blob) ===
+         All MIX photos are guaranteed to appear. The distribution across
+         transition points is random (some get 0, some get 1-3). */
+      if (prevPi >= 0 && pi !== prevPi) {
+        var mixCount = mixPlan[mixPlanIdx++] || 0;
+        for (var mi = 0; mi < mixCount; mi++) {
+          var mixItem = mixQueue[mixQueueIdx++];
+          if (!mixItem) break;
+          if (visualCol >= COLS || smallCellsInRow >= maxSmallPerRow) {
+            while (visualCol < COLS) {
+              container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
+              visualCol++;
+            }
+            visualCol = 0; smallCellsInRow = 0;
+          }
           appendMixCell(mixItem, container, isFirst && r < 2);
           smallCellsInRow++;
           visualCol++;
           if (visualCol >= COLS) { visualCol = 0; smallCellsInRow = 0; }
-          lastMixR = r;
         }
       }
       prevPi = pi;
 
-      var isWide = Math.random() < 0.22;
+      /* Wide cell: 22% chance, but capped at 2 consecutive to avoid long
+         monotone columns of wide-only photos. After 2 in a row, force small. */
+      var isWide = Math.random() < 0.22 && consecutiveWide < 2;
+      consecutiveWide = isWide ? consecutiveWide + 1 : 0;
       var spans = isWide ? 2 : 1;
       if (visualCol + spans > COLS) {
         visualCol = 0;
         smallCellsInRow = 0;
       }
 
-      /* Random left/right: at the start of a new CSS grid row, randomly offset
-         small cells by 1 column so photos don't always land on the same side. */
+      /* Side variation: wide cells starting at col 0 randomly shift right (40%),
+         small cells starting a new row randomly shift right (50%). */
+      if (isWide && visualCol === 0 && Math.random() < 0.4) {
+        container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
+        visualCol = 1;
+      }
       if (!isWide && visualCol === 0 && smallCellsInRow === 0 && Math.random() < 0.5) {
         var leadCell = document.createElement('div');
         leadCell.className = 'mosaic-cell';
