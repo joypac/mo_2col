@@ -712,7 +712,7 @@ function buildMosaicLayout(container, isFirst) {
       // Inject a decorative wide-strip: max 1 per ~3 rows (≈1 viewport).
       // Image comes from the same project as the host cell.
       var strip = null;
-      if (r - lastStripRow >= 3 && Math.random() < 0.35) {
+      if (r - lastStripRow >= 3 && Math.random() < 0.35 && projects[pi].media.length > 3) {
         var projImgs = projects[pi].media
           .filter(function(m) { return m.type === 'img'; })
           .map(function(m) { return m.src; });
