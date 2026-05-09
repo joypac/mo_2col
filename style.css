@@ -190,7 +190,7 @@ body {
   inset: 0;
   z-index: 130;
   pointer-events: none;
-  background: #fff;
+  background: #f5f5f3;
   opacity: 0;
   transition: opacity 900ms cubic-bezier(0.25, 0, 0.2, 1);
 }
