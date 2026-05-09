@@ -626,6 +626,65 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
   }
 }
 
+/* ── Similar-photo avoidance ─────────────────────────────
+   pHash hamming distance ≤ 10 pairs, computed once from all assets.
+   areSimilar() used to desimilarize media arrays before rendering.
+── */
+var similarPairs = (function() {
+  var raw = [
+    ['assets/PEÇA/PEÇA1.jpg',                   'assets/PEÇA/PEÇA3.jpg'],
+    ['assets/MUSTIQUE/MUSTIQUE25.webp',          'assets/MUSTIQUE/mustique27.webp'],
+    ['assets/FAIRLY NORMAL/fairly23.webp',       'assets/PAEZ/PAEZ21.webp'],
+    ['assets/FAIRLY NORMAL/fairly24.webp',       'assets/MUSTIQUE/mustique1.webp'],
+    ['assets/MUSTIQUE/MUSTIQUE25.webp',          'assets/PAEZ/PAEZ23.webp'],
+    ['assets/MIX/MIX4.webp',                    'assets/MUSTIQUE/MUSTIQUE33.webp'],
+    ['assets/MUSTIQUE/MUSTIQUE33.webp',          'assets/PAEZ/PAEZ21.webp'],
+    ['assets/MUSTIQUE/MUSTIQUE33.webp',          'assets/PAEZ/PAEZ24.webp'],
+    ['assets/MUSTIQUE/mustique28.webp',          'assets/PAEZ/PAEZ21.webp'],
+    ['assets/FAIRLY NORMAL/fairly10.webp',       'assets/FAIRLY NORMAL/fairly16.webp'],
+    ['assets/FAIRLY NORMAL/fairly14.webp',       'assets/PAEZ/PAEZ21.webp'],
+    ['assets/FAIRLY NORMAL/fairly16.webp',       'assets/PAEZ/PAEZ24.webp'],
+    ['assets/FAIRLY NORMAL/fairly17.webp',       'assets/MUSTIQUE/mustique20.webp'],
+    ['assets/FAIRLY NORMAL/fairly24.webp',       'assets/PAEZ/PAEZ21.webp'],
+    ['assets/FAIRLY NORMAL/fairly26.webp',       'assets/MUSTIQUE/MUSTIQUE25.webp'],
+    ['assets/MIX/MIX13.webp',                   'assets/MIX/MIX8.webp'],
+    ['assets/MIX/MIX13.webp',                   'assets/PAEZ/paez9.webp'],
+    ['assets/MIX/MIX4.webp',                    'assets/MUSTIQUE/mustique23.webp'],
+    ['assets/MIX/MIX4.webp',                    'assets/PAEZ/PAEZ21.webp'],
+    ['assets/MIX/MIX9.webp',                    'assets/MUSTIQUE/MUSTIQUE32.webp'],
+    ['assets/MIX/MIX9.webp',                    'assets/PAEZ/PAEZ39.webp'],
+    ['assets/MIX/MIX9.webp',                    'assets/PAEZ/paez9.webp'],
+    ['assets/MUSTIQUE/MUSTIQUE32.webp',          'assets/PAEZ/paez9.webp'],
+    ['assets/MUSTIQUE/MUSTIQUE6.webp',           'assets/PAEZ/PAEZ29.webp'],
+    ['assets/MUSTIQUE/mustique1.webp',           'assets/PAEZ/PAEZ21.webp'],
+    ['assets/MUSTIQUE/mustique27.webp',          'assets/PAEZ/PAEZ23.webp'],
+  ];
+  var set = {};
+  raw.forEach(function(p) { set[[p[0],p[1]].sort().join('|')] = true; });
+  return set;
+})();
+
+function areSimilar(a, b) { return !!similarPairs[[a,b].sort().join('|')]; }
+
+function desimilarize(arr) {
+  var changed = true, passes = 0;
+  while (changed && passes++ < arr.length) {
+    changed = false;
+    for (var i = 0; i < arr.length - 1; i++) {
+      if (areSimilar(arr[i].src, arr[i+1].src)) {
+        for (var j = i + 2; j < arr.length; j++) {
+          if (!areSimilar(arr[i].src, arr[j].src)) {
+            var tmp = arr[i+1]; arr[i+1] = arr[j]; arr[j] = tmp;
+            changed = true;
+            break;
+          }
+        }
+      }
+    }
+  }
+  return arr;
+}
+
 /* ── MIX cell renderer ───────────────────────────────────
    Renders a single MIX item as a mosaic cell.
    No strip, no project label — just the media.
@@ -677,7 +736,26 @@ function appendMixCell(item, container, aboveFold) {
 function buildMosaicLayout(container, isFirst) {
   var isMobile = window.innerWidth <= 600;
   var COLS = isMobile ? 2 : 3;
-  var displayedMedia = projects.map(function(p) { return shuffle(p.media); });
+  var displayedMedia = projects.map(function(p) {
+    var arr = shuffle(p.media.slice());
+    // Spread multiple videos evenly through the array so they land
+    // in different viewport-heights rather than clustering together.
+    var vids = [], imgs = [];
+    arr.forEach(function(item) { (item.type === 'vid' ? vids : imgs).push(item); });
+    if (vids.length > 1) {
+      var n = arr.length, result = new Array(n).fill(null);
+      // Place each video at an evenly-spaced slot
+      vids.forEach(function(v, i) {
+        var pos = Math.round((i + 1) * n / (vids.length + 1)) - 1;
+        while (result[pos] !== null) pos = (pos + 1) % n;
+        result[pos] = v;
+      });
+      var imgI = 0;
+      result = result.map(function(x) { return x !== null ? x : imgs[imgI++]; });
+      return desimilarize(result);
+    }
+    return desimilarize(arr);
+  });
   var layout = buildGrid(projects, displayedMedia, COLS);
   var grid = layout.grid, ROWS = layout.rows;
 
@@ -730,7 +808,7 @@ function buildMosaicLayout(container, isFirst) {
   // Distribute ALL MIX photos with even spacing so they reliably appear
   // across the whole layout. Photos are grouped into random bursts of 1-3,
   // and bursts are placed at evenly-spaced injection points.
-  var mixQueue = shuffle(mixMedia.slice());
+  var mixQueue = desimilarize(shuffle(mixMedia.slice()));
   if (mixInjKeys.length > 0 && mixQueue.length > 0) {
     // Build burst groups: random sizes 1-3 summing to mixQueue.length
     var mixBursts = [];
