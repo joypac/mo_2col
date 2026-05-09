@@ -421,8 +421,16 @@ function buildGrid(projects, displayedMedia, COLS) {
     grid.push(row);
   }
 
-  // Use session-fixed project order so position is consistent across grids
-  var order   = sessionProjectOrder.slice();
+  // Use session-fixed project order so position is consistent across grids.
+  // Ensure a project with videos is seeded first so row 0 always has a video.
+  var order = sessionProjectOrder.slice();
+  var vIdx = -1;
+  for (var vi = 0; vi < order.length; vi++) {
+    if (projects[order[vi]].media.some(function(m) { return m.type === 'vid'; })) {
+      vIdx = vi; break;
+    }
+  }
+  if (vIdx > 0) order.unshift(order.splice(vIdx, 1)[0]);
   var step    = Math.max(1, Math.floor(ROWS / projects.length));
 
   order.forEach(function(pi, oi) {
@@ -542,85 +550,19 @@ var vidObs = new IntersectionObserver(function(entries) {
 
 /* ── First-grid layout constraints ─────────────────────── */
 function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
-  var N = projects.length;
-
-  function swapCells(r1, c1, r2, c2) {
-    var t = grid[r1][c1]; grid[r1][c1] = grid[r2][c2]; grid[r2][c2] = t;
-  }
-
-  var fRow = new Array(N).fill(ROWS), fCol = new Array(N).fill(0);
-  for (var r = 0; r < ROWS; r++)
-    for (var c = 0; c < COLS; c++) {
-      var pi = grid[r][c];
-      if (r < fRow[pi]) { fRow[pi] = r; fCol[pi] = c; }
-    }
-
-  for (var pi = 0; pi < N; pi++) {
-    if (fRow[pi] < N) continue;
-
-    var cnt = new Array(N).fill(0);
-    for (var r = 0; r < N; r++)
-      for (var c = 0; c < COLS; c++) cnt[grid[r][c]]++;
-
-    var donor = -1, best = 1;
-    for (var pj = 0; pj < N; pj++)
-      if (cnt[pj] > best) { best = cnt[pj]; donor = pj; }
-    if (donor < 0) continue;
-
-    var dr = -1, dc = -1;
-    search1: for (var r = N - 1; r >= 0; r--)
-      for (var c = 0; c < COLS; c++)
-        if (grid[r][c] === donor) { dr = r; dc = c; break search1; }
-    if (dr < 0) continue;
-
-    swapCells(dr, dc, fRow[pi], fCol[pi]);
-    fRow[pi] = dr; fCol[pi] = dc;
-  }
-
-  var imgIdx = new Array(N).fill(0);
-  var hasVideo = false;
-  for (var r = 0; r < 2; r++) {
-    for (var c = 0; c < COLS; c++) {
-      var pi = grid[r][c];
-      var item = displayedMedia[pi][imgIdx[pi]];
-      if (item && item.type === 'vid') hasVideo = true;
-      imgIdx[pi]++;
-    }
-  }
-  if (hasVideo) return;
-
-  var videoPis = [];
-  for (var pi = 0; pi < N; pi++)
-    for (var mi = 0; mi < displayedMedia[pi].length; mi++)
-      if (displayedMedia[pi][mi].type === 'vid') { videoPis.push(pi); break; }
-  if (!videoPis.length) return;
-
-  var picked = shuffle(videoPis)[0];
-
-  if (fRow[picked] >= 2) {
-    var cnt2 = new Array(N).fill(0);
-    for (var r = 0; r < 2; r++)
-      for (var c = 0; c < COLS; c++) cnt2[grid[r][c]]++;
-
-    var donor2 = -1, best2 = 1;
-    for (var pj = 0; pj < N; pj++)
-      if (cnt2[pj] > best2 && pj !== picked) { best2 = cnt2[pj]; donor2 = pj; }
-
-    var sr = 0, sc = 0;
-    if (donor2 >= 0) {
-      search2: for (var r = 0; r < 2; r++)
-        for (var c = 0; c < COLS; c++)
-          if (grid[r][c] === donor2) { sr = r; sc = c; break search2; }
-    }
-    swapCells(sr, sc, fRow[picked], fCol[picked]);
-    fRow[picked] = sr; fCol[picked] = sc;
-  }
-
-  if (displayedMedia[picked].length && displayedMedia[picked][0].type !== 'vid') {
-    for (var mi = 1; mi < displayedMedia[picked].length; mi++) {
-      if (displayedMedia[picked][mi].type === 'vid') {
-        displayedMedia[picked].unshift(displayedMedia[picked].splice(mi, 1)[0]);
-        break;
+  // No cell swaps — those break blobs for small projects.
+  // Just ensure the project(s) in row 0 show their video first.
+  var seen = {};
+  for (var c = 0; c < COLS; c++) {
+    var pi = grid[0][c];
+    if (seen[pi]) continue;
+    seen[pi] = true;
+    if (displayedMedia[pi][0] && displayedMedia[pi][0].type !== 'vid') {
+      for (var mi = 1; mi < displayedMedia[pi].length; mi++) {
+        if (displayedMedia[pi][mi].type === 'vid') {
+          displayedMedia[pi].unshift(displayedMedia[pi].splice(mi, 1)[0]);
+          break;
+        }
       }
     }
   }
@@ -799,7 +741,7 @@ function buildMosaicLayout(container, isFirst) {
       var ncc = cc + 1, nrr = rr;
       if (ncc >= COLS) { ncc = 0; nrr = rr + 1; }
       var beforeTransition = nrr < ROWS && grid[nrr][ncc] !== pp;
-      if (ext || beforeTransition) {
+      if (ext && beforeTransition) {
         var k = rr + ',' + cc;
         if (!mixPlanMap[k]) { mixPlanMap[k] = 0; mixInjKeys.push(k); }
       }
