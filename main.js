@@ -422,16 +422,8 @@ function buildGrid(projects, displayedMedia, COLS) {
   }
 
   // Use session-fixed project order so position is consistent across grids.
-  // Ensure a project with videos is seeded first so row 0 always has a video.
   var order = sessionProjectOrder.slice();
-  var vIdx = -1;
-  for (var vi = 0; vi < order.length; vi++) {
-    if (projects[order[vi]].media.some(function(m) { return m.type === 'vid'; })) {
-      vIdx = vi; break;
-    }
-  }
-  if (vIdx > 0) order.unshift(order.splice(vIdx, 1)[0]);
-  var step    = Math.max(1, Math.floor(ROWS / projects.length));
+  var step  = Math.max(1, Math.floor(ROWS / projects.length));
 
   order.forEach(function(pi, oi) {
     var r = Math.min(oi * step, ROWS - 1);
@@ -551,17 +543,20 @@ var vidObs = new IntersectionObserver(function(entries) {
 /* ── First-grid layout constraints ─────────────────────── */
 function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
   // No cell swaps — those break blobs for small projects.
-  // Just ensure the project(s) in row 0 show their video first.
+  // Scan the first 3 rows (≈ initial viewport). If any project there has a
+  // video that isn't already first in its media array, surface it.
   var seen = {};
-  for (var c = 0; c < COLS; c++) {
-    var pi = grid[0][c];
-    if (seen[pi]) continue;
-    seen[pi] = true;
-    if (displayedMedia[pi][0] && displayedMedia[pi][0].type !== 'vid') {
-      for (var mi = 1; mi < displayedMedia[pi].length; mi++) {
-        if (displayedMedia[pi][mi].type === 'vid') {
-          displayedMedia[pi].unshift(displayedMedia[pi].splice(mi, 1)[0]);
-          break;
+  for (var r = 0; r < Math.min(3, ROWS); r++) {
+    for (var c = 0; c < COLS; c++) {
+      var pi = grid[r][c];
+      if (seen[pi]) continue;
+      seen[pi] = true;
+      if (displayedMedia[pi][0] && displayedMedia[pi][0].type !== 'vid') {
+        for (var mi = 1; mi < displayedMedia[pi].length; mi++) {
+          if (displayedMedia[pi][mi].type === 'vid') {
+            displayedMedia[pi].unshift(displayedMedia[pi].splice(mi, 1)[0]);
+            break;
+          }
         }
       }
     }
