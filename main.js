@@ -356,6 +356,10 @@ function shuffle(arr) {
 
 var DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
 
+// Project order is fixed for the session (shuffled once on load) so that
+// the same project never appears first in one grid and last in the next.
+var sessionProjectOrder = shuffle(projects.map(function(_, i) { return i; }));
+
 var preloadedHeroImages = Object.create(null);
 var imageCache = [];
 
@@ -417,8 +421,8 @@ function buildGrid(projects, displayedMedia, COLS) {
     grid.push(row);
   }
 
-  // Shuffle project order and plant spaced-out seeds
-  var order   = shuffle(projects.map(function(_, i) { return i; }));
+  // Use session-fixed project order so position is consistent across grids
+  var order   = sessionProjectOrder.slice();
   var step    = Math.max(1, Math.floor(ROWS / projects.length));
 
   order.forEach(function(pi, oi) {
