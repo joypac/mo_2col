@@ -773,20 +773,7 @@ function buildMosaicLayout(container, isFirst) {
         smallCellsInRow = 0;
       }
 
-      /* Side variation: wide cells starting at col 0 randomly shift right (40%),
-         small cells starting a new row randomly shift right (50%). */
-      if (isWide && visualCol === 0 && Math.random() < 0.4) {
-        container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
-        visualCol = 1;
-      }
-      if (!isWide && visualCol === 0 && smallCellsInRow === 0 && Math.random() < 0.5) {
-        var leadCell = document.createElement('div');
-        leadCell.className = 'mosaic-cell';
-        container.appendChild(leadCell);
-        visualCol = 1;
-      }
-
-      /* Limit small cells per visual CSS grid row (img and vid).
+/* Limit small cells per visual CSS grid row (img and vid).
          Fill the remaining slot(s) with empty cells and start a new row,
          then fall through to render the current item there. */
       if (!isWide && smallCellsInRow >= maxSmallPerRow) {
