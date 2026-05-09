@@ -422,7 +422,14 @@ function buildGrid(projects, displayedMedia, COLS) {
   }
 
   // Use session-fixed project order so position is consistent across grids.
+  // Always seed a video project first → guarantees a video in the first viewport.
   var order = sessionProjectOrder.slice();
+  for (var vi = 0; vi < order.length; vi++) {
+    if (projects[order[vi]].media.some(function(m) { return m.type === 'vid'; })) {
+      if (vi > 0) order.unshift(order.splice(vi, 1)[0]);
+      break;
+    }
+  }
   var step  = Math.max(1, Math.floor(ROWS / projects.length));
 
   order.forEach(function(pi, oi) {
@@ -726,6 +733,7 @@ function buildMosaicLayout(container, isFirst) {
   var mixPlanMap = {};
   var mixInjKeys = [];
   for (var rr = 0; rr < ROWS; rr++) {
+    if (rr < 4) continue; // never inject MIX in the first viewport
     for (var cc = 0; cc < COLS; cc++) {
       var pp = grid[rr][cc];
       var ext = false;
