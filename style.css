@@ -82,9 +82,9 @@ body {
   background: #f5f5f3;
 }
 
+/* Visible immediately — per-image fade still uses .mosaic-media opacity */
 #mosaic {
-  opacity: 0;
-  transition: opacity 1600ms cubic-bezier(0.25, 0, 0.2, 1);
+  opacity: 1;
 }
 
 .mosaic-cell {
@@ -215,6 +215,12 @@ body {
   opacity: 0;
   outline: none;
   transition: opacity 700ms cubic-bezier(0.25, 0, 0.2, 1);
+}
+
+#contact-panel,
+#contact-panel * {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 #contact-overlay.is-open #contact-panel {

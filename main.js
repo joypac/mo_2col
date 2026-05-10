@@ -364,18 +364,43 @@ var preloadedHeroImages = Object.create(null);
 var imageCache = [];
 
 function warmImageCache() {
+  var maxTotal = 30;  // cap total warmed images per session
+  var batchSize = 6;  // warmed per idle slice
+  var delayMs = 1200; // start after first reveal settles
+
   var seen = Object.create(null);
+  var queue = [];
   var allMedia = projects.reduce(function(acc, p) { return acc.concat(p.media); }, mixMedia.slice());
   allMedia.forEach(function(item) {
     if (item.type !== 'img') return;
     if (seen[item.src]) return;
     seen[item.src] = true;
-    var img = new Image();
-    img.decoding = 'async';
-    img.loading = 'eager';
-    img.src = item.src;
-    imageCache.push(img);
+    queue.push(item.src);
   });
+
+  var warmed = 0;
+  function warmBatch() {
+    var n = 0;
+    while (queue.length && warmed < maxTotal && n++ < batchSize) {
+      var src = queue.shift();
+      var img = new Image();
+      img.decoding = 'async';
+      img.src = src;
+      imageCache.push(img);
+      warmed++;
+    }
+    if (queue.length && warmed < maxTotal) schedule();
+  }
+
+  function schedule() {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(warmBatch, { timeout: 1200 });
+    } else {
+      setTimeout(warmBatch, 180);
+    }
+  }
+
+  setTimeout(schedule, delayMs);
 }
 
 function setIntrinsicDimensions(el, src) {
@@ -411,18 +436,38 @@ function markMediaLoaded(cell, mediaEl) {
 
 function buildGrid(projects, displayedMedia, COLS) {
   var total = projects.reduce(function(s, p) { return s + p.media.length; }, 0);
-  var ROWS  = Math.ceil(total / COLS);
+  // Row-pattern planner
+  // Desktop (3 cols) patterns:
+  // - twoSmall + oneEmpty  (2 media)
+  // - oneWide + oneEmpty   (1 media; wide spans 2 cols)
+  // - oneWide + oneSmall   (2 media; wide spans 2 cols, small in remaining col)
+  // - oneSmall + twoEmpty  (1 media; photo at an edge, lots of whitespace)
+  //
+  // Mobile (2 cols) patterns (to feel like desktop, with breathing whitespace):
+  // - twoSmall             (2 media)
+  // - oneWide              (1 media; wide spans 2 cols)
+  // - oneSmall + oneEmpty  (1 media; photo at an edge)
+  //
+  // Wide consumes **1 media**, but occupies 2 columns.
+  var desktopProbWideEmpty = 0.22;
+  var desktopProbWideSmall = 0.18;
+  var desktopProbOneSmall = 0.16;
+  var desktopProbTwoSmall = 1 - desktopProbWideEmpty - desktopProbWideSmall - desktopProbOneSmall;
 
-  // grid[r][c] = project index, -1 = empty
-  var grid = [];
-  for (var r = 0; r < ROWS; r++) {
-    var row = [];
-    for (var c = 0; c < COLS; c++) row.push(-1);
-    grid.push(row);
-  }
+  var mobileProbWide = 0.20;
+  var mobileProbOneSmall = 0.34;
+  var mobileProbTwoSmall = 1 - mobileProbWide - mobileProbOneSmall;
+
+  var avgFilledPerRow = (COLS === 3)
+    ? (2 * desktopProbTwoSmall + 1 * desktopProbWideEmpty + 2 * desktopProbWideSmall + 1 * desktopProbOneSmall)
+    : (COLS === 2)
+      ? (2 * mobileProbTwoSmall + 1 * mobileProbWide + 1 * mobileProbOneSmall)
+      : COLS;
+
+  var ROWS  = Math.ceil(total / Math.max(1, avgFilledPerRow));
 
   // Use session-fixed project order so position is consistent across grids.
-  // Always seed a video project first → guarantees a video in the first viewport.
+  // Always put a video project first → we’ll seed it near the top.
   var order = sessionProjectOrder.slice();
   for (var vi = 0; vi < order.length; vi++) {
     if (projects[order[vi]].media.some(function(m) { return m.type === 'vid'; })) {
@@ -430,115 +475,150 @@ function buildGrid(projects, displayedMedia, COLS) {
       break;
     }
   }
-  var step  = Math.max(1, Math.floor(ROWS / projects.length));
 
-  order.forEach(function(pi, oi) {
-    var r = Math.min(oi * step, ROWS - 1);
-    var c = Math.floor(Math.random() * COLS);
-    for (var i = 0; i < ROWS * COLS; i++) {
-      if (grid[r][c] === -1) { grid[r][c] = pi; return; }
-      c = (c + 1) % COLS;
-      if (c === 0) r = (r + 1) % ROWS;
-    }
-  });
-
-  // Count placed seeds
-  var counts = projects.map(function(_, pi) {
-    var n = 0;
-    for (var r = 0; r < ROWS; r++)
-      for (var c = 0; c < COLS; c++)
-        if (grid[r][c] === pi) n++;
-    return n;
-  });
-
-  // Expand all projects round-robin until each hits its quota
-  var growing = true;
-  while (growing) {
-    growing = false;
-    order.forEach(function(pi) {
-      if (counts[pi] >= projects[pi].media.length) return;
-
-      // Build scored frontier (adjacent empty cells)
-      var frontier = [], seen = {};
-      for (var r = 0; r < ROWS; r++) {
-        for (var c = 0; c < COLS; c++) {
-          if (grid[r][c] !== pi) continue;
-          for (var di = 0; di < DIRS.length; di++) {
-            var nr = r + DIRS[di][0], nc = c + DIRS[di][1];
-            var key = nr + ',' + nc;
-            if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS) continue;
-            if (grid[nr][nc] !== -1 || seen[key]) continue;
-            seen[key] = true;
-            // Score = number of existing pi-neighbours (anti-snake: prefer pockets)
-            var score = 0;
-            for (var dj = 0; dj < DIRS.length; dj++) {
-              var ar = nr + DIRS[dj][0], ac = nc + DIRS[dj][1];
-              if (ar >= 0 && ar < ROWS && ac >= 0 && ac < COLS && grid[ar][ac] === pi) score++;
-            }
-            frontier.push([nr, nc, score]);
-          }
-        }
-      }
-
-      var pick;
-      if (frontier.length > 0) {
-        // Pick from cells with the highest score (most neighbours = blobby, not snake)
-        frontier.sort(function(a, b) { return b[2] - a[2]; });
-        var best = frontier[0][2];
-        var top  = [];
-        for (var i = 0; i < frontier.length && frontier[i][2] === best; i++) top.push(frontier[i]);
-        pick = top[Math.floor(Math.random() * top.length)];
-      } else {
-        // Completely surrounded — pick the empty cell closest (Manhattan) to
-        // any existing pi cell. Keeps "escaped" cells adjacent to the main
-        // blob instead of scattering them randomly across the grid.
-        var any = [], piCells = [];
-        for (var r = 0; r < ROWS; r++) {
-          for (var c = 0; c < COLS; c++) {
-            if (grid[r][c] === -1) any.push([r, c]);
-            else if (grid[r][c] === pi) piCells.push([r, c]);
-          }
-        }
-        if (any.length === 0) return;
-        var bestDist = Infinity, bestPicks = [];
-        for (var ai = 0; ai < any.length; ai++) {
-          var er = any[ai][0], ec = any[ai][1], minD = Infinity;
-          for (var pcI = 0; pcI < piCells.length; pcI++) {
-            var d = Math.abs(er - piCells[pcI][0]) + Math.abs(ec - piCells[pcI][1]);
-            if (d < minD) minD = d;
-          }
-          if (minD < bestDist) { bestDist = minD; bestPicks = [any[ai]]; }
-          else if (minD === bestDist) bestPicks.push(any[ai]);
-        }
-        pick = bestPicks[Math.floor(Math.random() * bestPicks.length)];
-      }
-
-      grid[pick[0]][pick[1]] = pi;
-      counts[pi]++;
-      growing = true;
-    });
-  }
-
-  // Flood-fill any remaining empty cells with the nearest project
-  var changed = true;
-  while (changed) {
-    changed = false;
+  function makeEmptyGrid() {
+    var g = [];
     for (var r = 0; r < ROWS; r++) {
-      for (var c = 0; c < COLS; c++) {
-        if (grid[r][c] !== -1) continue;
-        for (var di = 0; di < DIRS.length; di++) {
-          var nr = r + DIRS[di][0], nc = c + DIRS[di][1];
-          if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && grid[nr][nc] !== -1) {
-            grid[r][c] = grid[nr][nc];
-            changed = true;
-            break;
-          }
+      var row = [];
+      for (var c = 0; c < COLS; c++) row.push(-1); // -1 means whitespace cell
+      g.push(row);
+    }
+    return g;
+  }
+
+  var grid = makeEmptyGrid();
+  // Map of "wide start" positions: key "r,c" => true.
+  var wideStart = Object.create(null);
+  // Covered cell marker: -2 means "occupied by wide span", not a real cell to render.
+  var WIDE_COVER = -2;
+
+  // Build a guaranteed-connected "slot path" over filled cells only.
+  // On desktop (3 cols) we also need to ensure we generate enough rows for `total` media,
+  // since wide+empty rows only contribute 1 slot. If we underestimate, increase ROWS and rebuild.
+  function buildPathAndPlans() {
+    // reset grid and wideStart
+    grid = makeEmptyGrid();
+    wideStart = Object.create(null);
+    var path = [];
+
+    var emptySide = Math.random() < 0.5 ? 'left' : 'right';
+    var lastPattern = null;
+    var samePatternRun = 0;
+
+    for (var r = 0; r < ROWS; r++) {
+      // Randomize empty side, but avoid long runs.
+      if (Math.random() < 0.55) emptySide = (emptySide === 'left') ? 'right' : 'left';
+
+      // Guarantee capacity: ensure remaining rows can still fit remaining media slots.
+      var rowsLeft = ROWS - r;
+      var remainingSlots = total - path.length;
+
+      if (COLS === 3) {
+        // Pick pattern with anti-repetition.
+        // Each row contributes either 1 slot (wideEmpty/oneSmall) or 2 slots (twoSmall/wideSmall).
+        // If we *must* use 2-slot rows to fit remaining media, force it.
+        var mustBeTwoSlot = remainingSlots > rowsLeft * 1;
+        var pattern;
+        if (mustBeTwoSlot) {
+          pattern = Math.random() < 0.5 ? 'twoSmall' : 'wideSmall';
+        } else {
+          var roll = Math.random();
+          pattern = (roll < desktopProbWideEmpty) ? 'wideEmpty'
+            : (roll < desktopProbWideEmpty + desktopProbWideSmall) ? 'wideSmall'
+            : (roll < desktopProbWideEmpty + desktopProbWideSmall + desktopProbOneSmall) ? 'oneSmall'
+            : 'twoSmall';
         }
+        if (pattern === lastPattern) samePatternRun++; else samePatternRun = 0;
+        if (samePatternRun >= 2) pattern = (pattern === 'twoSmall') ? 'wideSmall' : 'twoSmall';
+        lastPattern = pattern;
+
+        if (pattern === 'twoSmall') {
+          var filledCols = (emptySide === 'left') ? [1, 2] : [0, 1];
+          var rowOrder = filledCols.slice();
+          if (Math.random() < 0.5) rowOrder.reverse();
+          for (var i = 0; i < rowOrder.length; i++) path.push([r, rowOrder[i]]);
+        } else if (pattern === 'oneSmall') {
+          var col = (emptySide === 'left') ? 2 : 0;
+          path.push([r, col]);
+        } else if (pattern === 'wideEmpty') {
+          var startCol = (emptySide === 'left') ? 1 : 0;
+          wideStart[r + ',' + startCol] = true;
+          grid[r][startCol + 1] = WIDE_COVER;
+          path.push([r, startCol]);
+        } else {
+          var startCol2 = Math.random() < 0.5 ? 0 : 1;
+          wideStart[r + ',' + startCol2] = true;
+          grid[r][startCol2 + 1] = WIDE_COVER;
+          var smallCol = (startCol2 === 0) ? 2 : 0;
+          if (Math.random() < 0.5) { path.push([r, startCol2]); path.push([r, smallCol]); }
+          else { path.push([r, smallCol]); path.push([r, startCol2]); }
+        }
+      } else if (COLS === 2) {
+        // Each row contributes either 1 slot (wide/oneSmall) or 2 slots (twoSmall).
+        // Ensure we can still fit remaining slots.
+        var mustBeTwo = remainingSlots > rowsLeft * 1;
+        var patternM;
+        if (mustBeTwo) {
+          patternM = 'twoSmall';
+        } else {
+          var rollM = Math.random();
+          patternM = (rollM < mobileProbWide) ? 'wide'
+            : (rollM < mobileProbWide + mobileProbOneSmall) ? 'oneSmall'
+            : 'twoSmall';
+        }
+        if (patternM === lastPattern) samePatternRun++; else samePatternRun = 0;
+        if (samePatternRun >= 2) patternM = (patternM === 'twoSmall') ? 'oneSmall' : 'twoSmall';
+        lastPattern = patternM;
+
+        if (patternM === 'twoSmall') {
+          // Both cols filled; randomize order for less pattern.
+          if (Math.random() < 0.5) { path.push([r, 0]); path.push([r, 1]); }
+          else { path.push([r, 1]); path.push([r, 0]); }
+        } else if (patternM === 'oneSmall') {
+          // One photo, one empty. Keep photo at an edge.
+          var colM = (emptySide === 'left') ? 1 : 0;
+          path.push([r, colM]);
+        } else {
+          // Wide full-width: always starts at col 0 and covers col 1.
+          wideStart[r + ',0'] = true;
+          grid[r][1] = WIDE_COVER;
+          path.push([r, 0]);
+        }
+      } else {
+        for (var c = 0; c < COLS; c++) path.push([r, c]);
+      }
+    }
+
+    return path;
+  }
+
+  var path = buildPathAndPlans();
+  // Never assign with a short path (would stall imgIdx / leave a broken grid).
+  var pathGuard = 0;
+  while (path.length < total && pathGuard++ < 150) {
+    ROWS++;
+    path = buildPathAndPlans();
+  }
+
+  // Assign each project to a contiguous segment on the path.
+  var quotas = projects.map(function(p) { return p.media.length; });
+  var cursor = 0;
+  for (var oi = 0; oi < order.length; oi++) {
+    var pi = order[oi];
+    var q = quotas[pi];
+    for (var k = 0; k < q && cursor < path.length; k++) {
+      var rc = path[cursor++];
+      grid[rc[0]][rc[1]] = pi;
+      // If this is a wide start, also paint the covered cell as the same project
+      // (does not consume media, but preserves connectivity).
+      if (wideStart[rc[0] + ',' + rc[1]]) {
+        if (COLS === 3) grid[rc[0]][rc[1] + 1] = pi;
+        if (COLS === 2 && rc[1] === 0) grid[rc[0]][1] = pi;
       }
     }
   }
 
-  return { grid: grid, rows: ROWS, cols: COLS };
+  return { grid: grid, rows: ROWS, cols: COLS, wideStart: wideStart };
 }
 
 /* ── Render ───────────────────────────────────────────── */
@@ -567,20 +647,26 @@ function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
   // No cell swaps — those break blobs for small projects.
   // Scan the first 3 rows (≈ initial viewport). If any project there has a
   // video that isn't already first in its media array, surface it.
+  // IMPORTANT: only do this once — too many surfaced videos in the first viewport
+  // causes a lot of MP4 requests and slows initial load.
   var seen = {};
+  var done = false;
   for (var r = 0; r < Math.min(3, ROWS); r++) {
     for (var c = 0; c < COLS; c++) {
       var pi = grid[r][c];
+      if (pi < 0 || pi >= displayedMedia.length) continue; // skip whitespace / invalid
       if (seen[pi]) continue;
       seen[pi] = true;
       if (displayedMedia[pi][0] && displayedMedia[pi][0].type !== 'vid') {
         for (var mi = 1; mi < displayedMedia[pi].length; mi++) {
           if (displayedMedia[pi][mi].type === 'vid') {
             displayedMedia[pi].unshift(displayedMedia[pi].splice(mi, 1)[0]);
+            done = true;
             break;
           }
         }
       }
+      if (done) return;
     }
   }
 }
@@ -711,12 +797,29 @@ function buildMosaicLayout(container, isFirst) {
       });
       var imgI = 0;
       result = result.map(function(x) { return x !== null ? x : imgs[imgI++]; });
-      return desimilarize(result);
+      // Additionally enforce a minimum gap so videos are less likely to land
+      // within the same viewport-height on tall screens.
+      var minGap = isMobile ? 3 : 5;
+      var out = desimilarize(result);
+      var lastVid = -9999;
+      for (var ri = 0; ri < out.length; ri++) {
+        if (out[ri] && out[ri].type === 'vid') {
+          if (ri - lastVid < minGap) {
+            // Find a later slot with a non-video and swap.
+            for (var sj = ri + minGap; sj < out.length; sj++) {
+              if (out[sj] && out[sj].type !== 'vid') { var tmp = out[ri]; out[ri] = out[sj]; out[sj] = tmp; break; }
+            }
+          }
+          lastVid = ri;
+        }
+      }
+      return out;
     }
     return desimilarize(arr);
   });
   var layout = buildGrid(projects, displayedMedia, COLS);
   var grid = layout.grid, ROWS = layout.rows;
+  var wideStartMap = layout.wideStart || null;
 
   if (isFirst) postProcessFirstGrid(grid, ROWS, COLS, displayedMedia);
 
@@ -774,7 +877,8 @@ function buildMosaicLayout(container, isFirst) {
     var mixBursts = [];
     var mixRem = mixQueue.length;
     while (mixRem > 0) {
-      var bSize = Math.min(mixRem, Math.floor(Math.random() * 3) + 1);
+      // Mobile: avoid MIX feeling like a "project" by keeping bursts single.
+      var bSize = isMobile ? 1 : Math.min(mixRem, Math.floor(Math.random() * 3) + 1);
       mixBursts.push(bSize);
       mixRem -= bSize;
     }
@@ -786,71 +890,68 @@ function buildMosaicLayout(container, isFirst) {
     }
   }
   var mixQueueIdx = 0;
+  var lastWasMix = false;
 
   var imgIdx = projects.map(function() { return 0; });
+  // Track the *visual* CSS grid row as we append DOM nodes, so we can enforce:
+  // Desktop (3 cols): never more than 2 media cells per row and empties only at edges.
   var visualCol = 0;
-  var smallCellsInRow = 0;
+  var mediaInRow = 0;
+
+  function appendEmptyCell() {
+    container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
+    visualCol++;
+    if (visualCol >= COLS) { visualCol = 0; mediaInRow = 0; }
+  }
+
+  function startNewRowIfNeededForMedia() {
+    if (COLS !== 3) return;
+    if (mediaInRow < 2) return;
+    while (visualCol < COLS) appendEmptyCell();
+  }
   /* Desktop: max 2 small (1-col) cells per CSS grid row — applies to img and vid.
      Mobile:  max 1. Wide cells (2-col) are exempt — wide + small is always fine. */
-  var maxSmallPerRow = COLS - 1;
   var lastStripRow = -9;
   var consecutiveWide = 0;  // track runs of wide cells to prevent long monotone sequences
+  // Cap the total number of real media items we should ever render in this grid.
+  // The generated grid may have extra cells (ROWS*COLS > total); those used to
+  // produce empty placeholders mid-row on desktop. We'll just skip overflow cells.
+  var totalMedia = projects.reduce(function(s, p) { return s + p.media.length; }, 0);
+  var renderedMedia = 0;
+  var aboveFoldVideoUsed = false;
 
   for (var r = 0; r < ROWS; r++) {
     for (var c = 0; c < COLS; c++) {
       var pi  = grid[r][c];
+      // If a wide cell starts at c-1 it spans into this column; don't emit a placeholder.
+      if (!isMobile && wideStartMap && c > 0 && wideStartMap[r + ',' + (c - 1)]) {
+        continue;
+      }
+      // Wide covered cell (used for connectivity/planning) should not render a node.
+      if (pi === -2) {
+        continue;
+      }
+      if (pi === -1) {
+        appendEmptyCell();
+        continue;
+      }
       var media = displayedMedia[pi];
 
-      /* Wide cell: 22% chance, but capped at 2 consecutive to avoid long
-         monotone columns of wide-only photos. After 2 in a row, force small. */
-      var isWide = Math.random() < 0.22 && consecutiveWide < 2;
+      /* Wide cell: controlled by rowPlan on desktop; random on mobile. */
+      var isWide = false;
+      // When wideStartMap is provided by buildGrid, it is the single source of truth
+      // for wide placement on this grid (desktop AND mobile).
+      if (wideStartMap && wideStartMap[r + ',' + c]) {
+        isWide = true;
+      }
+
       consecutiveWide = isWide ? consecutiveWide + 1 : 0;
-      var spans = isWide ? 2 : 1;
-      if (visualCol + spans > COLS) {
-        visualCol = 0;
-        smallCellsInRow = 0;
-      }
-
-/* Limit small cells per visual CSS grid row (img and vid).
-         Fill the remaining slot(s) with empty cells and start a new row,
-         then fall through to render the current item there. */
-      if (!isWide && smallCellsInRow >= maxSmallPerRow) {
-        while (visualCol < COLS) {
-          container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
-          visualCol++;
-        }
-        visualCol = 0;
-        smallCellsInRow = 0;
-      }
-
-      /* 50 % chance of a leading empty so rows don't always hug the left edge. */
-      if (visualCol === 0 && !isWide && Math.random() < 0.5) {
-        container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
-        visualCol++;
-      }
 
       var idx = imgIdx[pi]++;
 
       if (idx >= media.length) {
-        container.appendChild(document.createElement('div'));
-        // Still honour any MIX injection assigned to this grid position.
-        var ovfKey = r + ',' + c;
-        var ovfCount = mixPlanMap[ovfKey] || 0;
-        for (var oi = 0; oi < ovfCount; oi++) {
-          var oxItem = mixQueue[mixQueueIdx++];
-          if (!oxItem) break;
-          if (visualCol >= COLS || smallCellsInRow >= maxSmallPerRow) {
-            while (visualCol < COLS) {
-              container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
-              visualCol++;
-            }
-            visualCol = 0; smallCellsInRow = 0;
-          }
-          appendMixCell(oxItem, container, isFirst && r < 2);
-          smallCellsInRow++;
-          visualCol++;
-          if (visualCol >= COLS) { visualCol = 0; smallCellsInRow = 0; }
-        }
+        // Overflow grid cell (ROWS*COLS can exceed total media). Skip it entirely
+        // to avoid empty cells landing in the middle of a 3-col row on desktop.
         continue;
       }
 
@@ -860,10 +961,6 @@ function buildMosaicLayout(container, isFirst) {
       var classes = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
       if (isWide) classes += ' is-wide';
       div.className = classes;
-
-      if (!isWide) smallCellsInRow++;
-      visualCol += spans;
-      if (visualCol >= COLS) { visualCol = 0; smallCellsInRow = 0; }
 
       // Inject a decorative wide-strip: max 1 per ~3 rows (≈1 viewport).
       // Image comes from the same project as the host cell.
@@ -912,7 +1009,13 @@ function buildMosaicLayout(container, isFirst) {
         video.muted = true;
         video.loop  = true;
         video.setAttribute('playsinline', '');
-        video.setAttribute('preload', aboveFold ? 'metadata' : 'none');
+        // Only allow one above-the-fold video to preload metadata (fast initial load).
+        var preloadMode = 'none';
+        if (aboveFold && !aboveFoldVideoUsed) {
+          preloadMode = 'metadata';
+          aboveFoldVideoUsed = true;
+        }
+        video.setAttribute('preload', preloadMode);
         video.addEventListener('loadeddata', function() {
           markMediaLoaded(this.closest('.mosaic-cell'), this);
         }, { once: true });
@@ -957,24 +1060,30 @@ function buildMosaicLayout(container, isFirst) {
       div.appendChild(label);
 
       container.appendChild(div);
+      visualCol += (isWide ? 2 : 1);
+      mediaInRow++;
+      if (visualCol >= COLS) { visualCol = 0; mediaInRow = 0; }
+      renderedMedia++;
+      if (renderedMedia >= totalMedia) return;
 
       // Inject MIX photos after this cell if it is an injection point.
       var injCount = mixPlanMap[r + ',' + c] || 0;
+      if (isMobile && injCount > 1) injCount = 1;
       for (var mj = 0; mj < injCount; mj++) {
         var mxItem = mixQueue[mixQueueIdx++];
         if (!mxItem) break;
-        if (visualCol >= COLS || smallCellsInRow >= maxSmallPerRow) {
-          while (visualCol < COLS) {
-            container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
-            visualCol++;
-          }
-          visualCol = 0; smallCellsInRow = 0;
-        }
+        if (lastWasMix) break; // never allow consecutive MIX cells
+        // Desktop: never exceed 2 media per row (MIX counts as media).
+        startNewRowIfNeededForMedia();
+        var maxMixMediaPerRow = (COLS === 3) ? 2 : COLS;
+        if (mediaInRow >= maxMixMediaPerRow) break;
         appendMixCell(mxItem, container, isFirst && r < 2);
-        smallCellsInRow++;
+        lastWasMix = true;
         visualCol++;
-        if (visualCol >= COLS) { visualCol = 0; smallCellsInRow = 0; }
+        mediaInRow++;
+        if (visualCol >= COLS) { visualCol = 0; mediaInRow = 0; }
       }
+      if (injCount === 0) lastWasMix = false;
     }
   }
 }
@@ -983,46 +1092,8 @@ function buildMosaicLayout(container, isFirst) {
 var mosaicEl = document.getElementById('mosaic');
 buildMosaicLayout(mosaicEl, true);
 
-// Reveal mosaic once above-the-fold images load AND 1s has elapsed.
-// warmImageCache starts after reveal so it doesn't compete for connections.
-(function() {
-  var imgs = Array.prototype.slice.call(
-    mosaicEl.querySelectorAll('img[fetchpriority="high"]')
-  );
-  var total = imgs.length;
-  var imgsDone = !total;
-  var timeDone = false;
-  var revealed = false;
-
-  function tryReveal() {
-    if (!revealed && imgsDone && timeDone) {
-      revealed = true;
-      mosaicEl.style.opacity = '1';
-      warmImageCache();
-    }
-  }
-
-  setTimeout(function() { timeDone = true; tryReveal(); }, 1000);
-
-  if (!total) { warmImageCache(); return; }
-
-  var loaded = 0;
-  var fallback = setTimeout(function() { imgsDone = true; tryReveal(); }, 4000);
-
-  function onOne() {
-    if (imgsDone) return;
-    if (++loaded >= total) {
-      imgsDone = true;
-      clearTimeout(fallback);
-      tryReveal();
-    }
-  }
-  imgs.forEach(function(img) {
-    if (img.complete && img.naturalWidth > 0) { onOne(); return; }
-    img.addEventListener('load',  onOne, { once: true });
-    img.addEventListener('error', onOne, { once: true });
-  });
-})();
+// #mosaic is visible in CSS; defer warmImageCache so it doesn't fight first paint.
+setTimeout(function() { warmImageCache(); }, 1200);
 
 // Infinite scroll: append a new randomised grid when sentinel comes into view
 var sentinel = document.getElementById('scroll-sentinel');
@@ -1258,6 +1329,16 @@ var ContactOverlay = (function() {
 })();
 
 var skipFirstNav = false;
+var brandRevealed = false;
+var brandTriggerEl = document.getElementById('contact-trigger');
+
+function revealBrand() {
+  if (brandRevealed) return false;
+  brandRevealed = true;
+  skipFirstNav = true; // first interaction only reveals brand; no frame navigation
+  if (brandTriggerEl) brandTriggerEl.style.opacity = '1';
+  return true;
+}
 
 var FrameNavigator = (function() {
   var smooth = false;
@@ -1265,6 +1346,8 @@ var FrameNavigator = (function() {
   var lockTimer = 0;
   var lockMsSmooth = 1520;
   var lockMsInstant = 1500;
+  var wheelAcc = 0;
+  var lastWheelTs = 0;
   var touchStartY = 0;
   var touchStartX = 0;
   var touchMoved = false;
@@ -1362,8 +1445,31 @@ var FrameNavigator = (function() {
   }
 
   function onWheel(e) {
+    if (ContactOverlay.isOpen()) return;
+    if (isLocked()) { e.preventDefault(); return; }
+    if (isInteractiveTarget(e.target)) return;
+
+    if (revealBrand()) { e.preventDefault(); return; }
     e.preventDefault();
-    // Wheel scrolling is fully disabled by request.
+
+    var now = Date.now();
+    if (now - lastWheelTs > 260) wheelAcc = 0;
+    lastWheelTs = now;
+    var dy = e.deltaY;
+    // Normalize wheel delta: line/page mode → px-ish so thresholds behave.
+    if (e.deltaMode === 1) dy = dy * 16;           // lines
+    else if (e.deltaMode === 2) dy = dy * window.innerHeight; // pages
+    wheelAcc += dy;
+
+    // Lower threshold for trackpads / smaller deltas; still scaled by viewport.
+    var threshold = Math.max(45, window.innerHeight * 0.045);
+    if (wheelAcc > threshold) {
+      wheelAcc = 0;
+      goDown();
+    } else if (wheelAcc < -threshold) {
+      wheelAcc = 0;
+      goUp();
+    }
   }
 
   function onClick(e) {
@@ -1375,6 +1481,7 @@ var FrameNavigator = (function() {
 
     var target = targetToElement(e.target);
     if (target && target.closest && target.closest('a, button, input, textarea, select, label')) return;
+    if (revealBrand()) return;
     goDown();
   }
 
@@ -1407,6 +1514,7 @@ var FrameNavigator = (function() {
     var absDy = Math.abs(dy);
 
     if (!touchMoved && absDy < 10) {
+      if (!brandRevealed) { revealBrand(); lastTouchNavTs = Date.now(); return; }
       if (skipFirstNav) { skipFirstNav = false; }
       else { goDown(); }
     }
@@ -1476,46 +1584,6 @@ var FrameNavigator = (function() {
 FrameNavigator.init();
 window.ContactOverlay = ContactOverlay;
 window.FrameNavigator = FrameNavigator;
-
-// Reveal M. ORTIGÃO on first interaction.
-// First click/touch only reveals the name — does not advance a frame.
-(function() {
-  var trigger = document.getElementById('contact-trigger');
-  var revealed = false;
-
-  function revealClick(e) {
-    if (revealed) return;
-    revealed = true;
-    trigger.style.opacity = '1';
-    document.removeEventListener('click', revealClick, true);
-    window.removeEventListener('touchstart', revealTouch, true);
-    window.removeEventListener('wheel', revealWheel, true);
-    e.stopPropagation();
-  }
-
-  function revealTouch() {
-    if (revealed) return;
-    revealed = true;
-    skipFirstNav = true;
-    trigger.style.opacity = '1';
-    document.removeEventListener('click', revealClick, true);
-    window.removeEventListener('touchstart', revealTouch, true);
-    window.removeEventListener('wheel', revealWheel, true);
-  }
-
-  function revealWheel() {
-    if (revealed) return;
-    revealed = true;
-    trigger.style.opacity = '1';
-    document.removeEventListener('click', revealClick, true);
-    window.removeEventListener('touchstart', revealTouch, true);
-    window.removeEventListener('wheel', revealWheel, true);
-  }
-
-  document.addEventListener('click', revealClick, true);
-  window.addEventListener('touchstart', revealTouch, true);
-  window.addEventListener('wheel', revealWheel, true);
-})();
 
 // Prevent accidental drag/select highlight overlays on repeated taps/clicks.
 document.addEventListener('dragstart', function(e) {
