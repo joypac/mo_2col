@@ -478,7 +478,7 @@ function buildGrid(projects, displayedMedia, COLS) {
   var desktopProbTwoSmall = 1 - desktopProbWideEmpty - desktopProbWideSmall - desktopProbOneSmall;
 
   var mobileProbWide = 0.20;
-  var mobileProbOneSmall = 0.34;
+  var mobileProbOneSmall = 0.46;
   var mobileProbTwoSmall = 1 - mobileProbWide - mobileProbOneSmall;
 
   var avgFilledPerRow = (COLS === 3)
