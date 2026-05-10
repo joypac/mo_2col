@@ -1405,20 +1405,18 @@ var FrameNavigator = (function() {
 
     var step = viewportStep();
     var currentPos = window.scrollY;
-    var target = currentPos + (direction * step);
-    var maxY = maxScrollY();
-
-    if (target < 0) target = 0;
-    if (target > maxY) {
-      ensureContentAhead(window.innerHeight * 3);
-      maxY = maxScrollY();
-      target = Math.min(target, maxY);
-    }
 
     lockForTransition();
     frameFadeEl.style.transition = 'opacity 500ms ease-out';
     frameFadeEl.style.opacity = '1';
     setTimeout(function() {
+      // Re-evaluate target at scroll time so gridRecycler changes during the
+      // 500ms fade don't leave us scrolling to a position that no longer exists.
+      ensureContentAhead(window.innerHeight * 3);
+      var target = currentPos + (direction * step);
+      var maxY = maxScrollY();
+      if (target < 0) target = 0;
+      if (target > maxY) target = maxY;
       scrollToY(target);
       frameFadeEl.style.transition = 'opacity 900ms cubic-bezier(0.25, 0, 0.2, 1)';
       frameFadeEl.style.opacity = '0';
