@@ -489,13 +489,28 @@ function buildGrid(projects, displayedMedia, COLS) {
         for (var i = 0; i < frontier.length && frontier[i][2] === best; i++) top.push(frontier[i]);
         pick = top[Math.floor(Math.random() * top.length)];
       } else {
-        // Completely surrounded — pick any remaining empty cell (fallback)
-        var any = [];
-        for (var r = 0; r < ROWS; r++)
-          for (var c = 0; c < COLS; c++)
-            if (grid[r][c] === -1) any.push([r, c, 0]);
+        // Completely surrounded — pick the empty cell closest (Manhattan) to
+        // any existing pi cell. Keeps "escaped" cells adjacent to the main
+        // blob instead of scattering them randomly across the grid.
+        var any = [], piCells = [];
+        for (var r = 0; r < ROWS; r++) {
+          for (var c = 0; c < COLS; c++) {
+            if (grid[r][c] === -1) any.push([r, c]);
+            else if (grid[r][c] === pi) piCells.push([r, c]);
+          }
+        }
         if (any.length === 0) return;
-        pick = any[Math.floor(Math.random() * any.length)];
+        var bestDist = Infinity, bestPicks = [];
+        for (var ai = 0; ai < any.length; ai++) {
+          var er = any[ai][0], ec = any[ai][1], minD = Infinity;
+          for (var pcI = 0; pcI < piCells.length; pcI++) {
+            var d = Math.abs(er - piCells[pcI][0]) + Math.abs(ec - piCells[pcI][1]);
+            if (d < minD) minD = d;
+          }
+          if (minD < bestDist) { bestDist = minD; bestPicks = [any[ai]]; }
+          else if (minD === bestDist) bestPicks.push(any[ai]);
+        }
+        pick = bestPicks[Math.floor(Math.random() * bestPicks.length)];
       }
 
       grid[pick[0]][pick[1]] = pi;
