@@ -527,6 +527,8 @@ function buildGrid(projects, displayedMedia, COLS) {
     var emptySide = Math.random() < 0.5 ? 'left' : 'right';
     var lastPattern = null;
     var samePatternRun = 0;
+    var lastWideCol = -1;
+    var consecutiveSameSideWide = 0;
 
     for (var r = 0; r < ROWS; r++) {
       // Randomize empty side, but avoid long runs.
@@ -556,20 +558,28 @@ function buildGrid(projects, displayedMedia, COLS) {
         lastPattern = pattern;
 
         if (pattern === 'twoSmall') {
+          consecutiveSameSideWide = 0; lastWideCol = -1;
           var filledCols = (emptySide === 'left') ? [1, 2] : [0, 1];
           var rowOrder = filledCols.slice();
           if (Math.random() < 0.5) rowOrder.reverse();
           for (var i = 0; i < rowOrder.length; i++) path.push([r, rowOrder[i]]);
         } else if (pattern === 'oneSmall') {
+          consecutiveSameSideWide = 0; lastWideCol = -1;
           var col = (emptySide === 'left') ? 2 : 0;
           path.push([r, col]);
         } else if (pattern === 'wideEmpty') {
           var startCol = (emptySide === 'left') ? 1 : 0;
+          if (consecutiveSameSideWide >= 2 && startCol === lastWideCol) startCol = 1 - startCol;
+          consecutiveSameSideWide = (startCol === lastWideCol) ? consecutiveSameSideWide + 1 : 1;
+          lastWideCol = startCol;
           wideStart[r + ',' + startCol] = true;
           grid[r][startCol + 1] = WIDE_COVER;
           path.push([r, startCol]);
         } else {
           var startCol2 = Math.random() < 0.5 ? 0 : 1;
+          if (consecutiveSameSideWide >= 2 && startCol2 === lastWideCol) startCol2 = 1 - startCol2;
+          consecutiveSameSideWide = (startCol2 === lastWideCol) ? consecutiveSameSideWide + 1 : 1;
+          lastWideCol = startCol2;
           wideStart[r + ',' + startCol2] = true;
           grid[r][startCol2 + 1] = WIDE_COVER;
           var smallCol = (startCol2 === 0) ? 2 : 0;
@@ -963,14 +973,7 @@ function buildMosaicLayout(container, isFirst) {
       var media = displayedMedia[pi];
 
       /* Wide cell: controlled by rowPlan on desktop; random on mobile. */
-      var isWide = false;
-      // When wideStartMap is provided by buildGrid, it is the single source of truth
-      // for wide placement on this grid (desktop AND mobile).
-      if (wideStartMap && wideStartMap[r + ',' + c]) {
-        isWide = true;
-      }
-
-      consecutiveWide = isWide ? consecutiveWide + 1 : 0;
+      var isWide = !!(wideStartMap && wideStartMap[r + ',' + c]);
 
       var idx = imgIdx[pi]++;
 
@@ -982,6 +985,14 @@ function buildMosaicLayout(container, isFirst) {
 
       var item = media[idx];
       if (!item) continue;
+
+      // Portrait videos (height > width) must never be wide.
+      if (isWide && item.type === 'vid') {
+        var vdims = mediaDimensions[item.src];
+        if (vdims && vdims[1] > vdims[0]) isWide = false;
+      }
+
+      consecutiveWide = isWide ? consecutiveWide + 1 : 0;
       var div  = document.createElement('div');
 
       var classes = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
