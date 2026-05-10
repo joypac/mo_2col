@@ -907,7 +907,9 @@ function buildMosaicLayout(container, isFirst) {
   function startNewRowIfNeededForMedia() {
     if (COLS !== 3) return;
     if (mediaInRow < 2) return;
-    while (visualCol < COLS) appendEmptyCell();
+    // appendEmptyCell wraps visualCol back to 0 when it hits COLS — guard with > 0
+    // so we exit after filling to the end of the current row instead of looping forever.
+    while (visualCol > 0 && visualCol < COLS) appendEmptyCell();
   }
   /* Desktop: max 2 small (1-col) cells per CSS grid row — applies to img and vid.
      Mobile:  max 1. Wide cells (2-col) are exempt — wide + small is always fine. */
