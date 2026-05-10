@@ -238,7 +238,7 @@ body {
   font-family: 'Walter Neue Light', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-size: clamp(1.05rem, 1.85vw, 1.45rem);
+  font-size: clamp(1.1rem, 2.2vw, 1.7rem);
   line-height: 1.1;
   padding: 2px 0;
   cursor: pointer;
