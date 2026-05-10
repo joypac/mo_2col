@@ -823,6 +823,12 @@ function buildMosaicLayout(container, isFirst) {
         smallCellsInRow = 0;
       }
 
+      /* 50 % chance of a leading empty so rows don't always hug the left edge. */
+      if (visualCol === 0 && !isWide && Math.random() < 0.5) {
+        container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
+        visualCol++;
+      }
+
       var idx = imgIdx[pi]++;
 
       if (idx >= media.length) {
