@@ -377,8 +377,6 @@ function shuffle(arr) {
   return a;
 }
 
-var DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
-
 // Project order is fixed for the session (shuffled once on load) so that
 // the same project never appears first in one grid and last in the next.
 var sessionProjectOrder = shuffle(projects.map(function(_, i) { return i; }));
@@ -450,210 +448,6 @@ function markMediaLoaded(cell, mediaEl) {
   if (cell) cell.classList.add('has-loaded-media');
 }
 
-/* ── Compact grid builder ─────────────────────────────────
-   Fills a COLS×ROWS grid completely with project indices.
-   No empty cells. Uses multi-source BFS with an anti-snake
-   heuristic: prefer expanding into cells that already have
-   2+ project neighbours (makes blobs, not tendrils).
-── */
-
-function buildGrid(projects, displayedMedia, COLS) {
-  var total = projects.reduce(function(s, p) { return s + p.media.length; }, 0);
-  // Row-pattern planner
-  // Desktop (3 cols) patterns:
-  // - twoSmall + oneEmpty  (2 media)
-  // - oneWide + oneEmpty   (1 media; wide spans 2 cols)
-  // - oneWide + oneSmall   (2 media; wide spans 2 cols, small in remaining col)
-  // - oneSmall + twoEmpty  (1 media; photo at an edge, lots of whitespace)
-  //
-  // Mobile (2 cols) patterns (to feel like desktop, with breathing whitespace):
-  // - twoSmall             (2 media)
-  // - oneWide              (1 media; wide spans 2 cols)
-  // - oneSmall + oneEmpty  (1 media; photo at an edge)
-  //
-  // Wide consumes **1 media**, but occupies 2 columns.
-  var desktopProbWideEmpty = 0.22;
-  var desktopProbWideSmall = 0.18;
-  var desktopProbOneSmall = 0.16;
-  var desktopProbTwoSmall = 1 - desktopProbWideEmpty - desktopProbWideSmall - desktopProbOneSmall;
-
-  var mobileProbWide = 0.20;
-  var mobileProbOneSmall = 0.46;
-  var mobileProbTwoSmall = 1 - mobileProbWide - mobileProbOneSmall;
-
-  var avgFilledPerRow = (COLS === 3)
-    ? (2 * desktopProbTwoSmall + 1 * desktopProbWideEmpty + 2 * desktopProbWideSmall + 1 * desktopProbOneSmall)
-    : (COLS === 2)
-      ? (2 * mobileProbTwoSmall + 1 * mobileProbWide + 1 * mobileProbOneSmall)
-      : COLS;
-
-  var ROWS  = Math.ceil(total / Math.max(1, avgFilledPerRow));
-
-  // Use session-fixed project order so position is consistent across grids.
-  // Always put a video project first → we’ll seed it near the top.
-  var order = sessionProjectOrder.slice();
-  for (var vi = 0; vi < order.length; vi++) {
-    if (projects[order[vi]].media.some(function(m) { return m.type === 'vid'; })) {
-      if (vi > 0) order.unshift(order.splice(vi, 1)[0]);
-      break;
-    }
-  }
-
-  function makeEmptyGrid() {
-    var g = [];
-    for (var r = 0; r < ROWS; r++) {
-      var row = [];
-      for (var c = 0; c < COLS; c++) row.push(-1); // -1 means whitespace cell
-      g.push(row);
-    }
-    return g;
-  }
-
-  var grid = makeEmptyGrid();
-  // Map of "wide start" positions: key "r,c" => true.
-  var wideStart = Object.create(null);
-  // Covered cell marker: -2 means "occupied by wide span", not a real cell to render.
-  var WIDE_COVER = -2;
-
-  // Build a guaranteed-connected "slot path" over filled cells only.
-  // On desktop (3 cols) we also need to ensure we generate enough rows for `total` media,
-  // since wide+empty rows only contribute 1 slot. If we underestimate, increase ROWS and rebuild.
-  function buildPathAndPlans() {
-    // reset grid and wideStart
-    grid = makeEmptyGrid();
-    wideStart = Object.create(null);
-    var path = [];
-
-    var emptySide = Math.random() < 0.5 ? 'left' : 'right';
-    var lastPattern = null;
-    var samePatternRun = 0;
-    var lastWideCol = -1;
-    var consecutiveSameSideWide = 0;
-
-    for (var r = 0; r < ROWS; r++) {
-      // Randomize empty side, but avoid long runs.
-      if (Math.random() < 0.55) emptySide = (emptySide === 'left') ? 'right' : 'left';
-
-      // Guarantee capacity: ensure remaining rows can still fit remaining media slots.
-      var rowsLeft = ROWS - r;
-      var remainingSlots = total - path.length;
-
-      if (COLS === 3) {
-        // Pick pattern with anti-repetition.
-        // Each row contributes either 1 slot (wideEmpty/oneSmall) or 2 slots (twoSmall/wideSmall).
-        // If we *must* use 2-slot rows to fit remaining media, force it.
-        var mustBeTwoSlot = remainingSlots > rowsLeft * 1;
-        var pattern;
-        if (mustBeTwoSlot) {
-          pattern = Math.random() < 0.5 ? 'twoSmall' : 'wideSmall';
-        } else {
-          var roll = Math.random();
-          pattern = (roll < desktopProbWideEmpty) ? 'wideEmpty'
-            : (roll < desktopProbWideEmpty + desktopProbWideSmall) ? 'wideSmall'
-            : (roll < desktopProbWideEmpty + desktopProbWideSmall + desktopProbOneSmall) ? 'oneSmall'
-            : 'twoSmall';
-        }
-        if (pattern === lastPattern) samePatternRun++; else samePatternRun = 0;
-        if (samePatternRun >= 2) pattern = (pattern === 'twoSmall') ? 'wideSmall' : 'twoSmall';
-        lastPattern = pattern;
-
-        if (pattern === 'twoSmall') {
-          consecutiveSameSideWide = 0; lastWideCol = -1;
-          var filledCols = (emptySide === 'left') ? [1, 2] : [0, 1];
-          var rowOrder = filledCols.slice();
-          if (Math.random() < 0.5) rowOrder.reverse();
-          for (var i = 0; i < rowOrder.length; i++) path.push([r, rowOrder[i]]);
-        } else if (pattern === 'oneSmall') {
-          consecutiveSameSideWide = 0; lastWideCol = -1;
-          var col = (emptySide === 'left') ? 2 : 0;
-          path.push([r, col]);
-        } else if (pattern === 'wideEmpty') {
-          var startCol = (emptySide === 'left') ? 1 : 0;
-          if (consecutiveSameSideWide >= 2 && startCol === lastWideCol) startCol = 1 - startCol;
-          consecutiveSameSideWide = (startCol === lastWideCol) ? consecutiveSameSideWide + 1 : 1;
-          lastWideCol = startCol;
-          wideStart[r + ',' + startCol] = true;
-          grid[r][startCol + 1] = WIDE_COVER;
-          path.push([r, startCol]);
-        } else {
-          var startCol2 = Math.random() < 0.5 ? 0 : 1;
-          if (consecutiveSameSideWide >= 2 && startCol2 === lastWideCol) startCol2 = 1 - startCol2;
-          consecutiveSameSideWide = (startCol2 === lastWideCol) ? consecutiveSameSideWide + 1 : 1;
-          lastWideCol = startCol2;
-          wideStart[r + ',' + startCol2] = true;
-          grid[r][startCol2 + 1] = WIDE_COVER;
-          var smallCol = (startCol2 === 0) ? 2 : 0;
-          if (Math.random() < 0.5) { path.push([r, startCol2]); path.push([r, smallCol]); }
-          else { path.push([r, smallCol]); path.push([r, startCol2]); }
-        }
-      } else if (COLS === 2) {
-        // Each row contributes either 1 slot (wide/oneSmall) or 2 slots (twoSmall).
-        // Ensure we can still fit remaining slots.
-        var mustBeTwo = remainingSlots > rowsLeft * 1;
-        var patternM;
-        if (mustBeTwo) {
-          patternM = 'twoSmall';
-        } else {
-          var rollM = Math.random();
-          patternM = (rollM < mobileProbWide) ? 'wide'
-            : (rollM < mobileProbWide + mobileProbOneSmall) ? 'oneSmall'
-            : 'twoSmall';
-        }
-        if (patternM === lastPattern) samePatternRun++; else samePatternRun = 0;
-        if (samePatternRun >= 2) patternM = (patternM === 'twoSmall') ? 'oneSmall' : 'twoSmall';
-        lastPattern = patternM;
-
-        if (patternM === 'twoSmall') {
-          // Both cols filled; randomize order for less pattern.
-          if (Math.random() < 0.5) { path.push([r, 0]); path.push([r, 1]); }
-          else { path.push([r, 1]); path.push([r, 0]); }
-        } else if (patternM === 'oneSmall') {
-          // One photo, one empty. Keep photo at an edge.
-          var colM = (emptySide === 'left') ? 1 : 0;
-          path.push([r, colM]);
-        } else {
-          // Wide full-width: always starts at col 0 and covers col 1.
-          wideStart[r + ',0'] = true;
-          grid[r][1] = WIDE_COVER;
-          path.push([r, 0]);
-        }
-      } else {
-        for (var c = 0; c < COLS; c++) path.push([r, c]);
-      }
-    }
-
-    return path;
-  }
-
-  var path = buildPathAndPlans();
-  // Never assign with a short path (would stall imgIdx / leave a broken grid).
-  var pathGuard = 0;
-  while (path.length < total && pathGuard++ < 150) {
-    ROWS++;
-    path = buildPathAndPlans();
-  }
-
-  // Assign each project to a contiguous segment on the path.
-  var quotas = projects.map(function(p) { return p.media.length; });
-  var cursor = 0;
-  for (var oi = 0; oi < order.length; oi++) {
-    var pi = order[oi];
-    var q = quotas[pi];
-    for (var k = 0; k < q && cursor < path.length; k++) {
-      var rc = path[cursor++];
-      grid[rc[0]][rc[1]] = pi;
-      // If this is a wide start, also paint the covered cell as the same project
-      // (does not consume media, but preserves connectivity).
-      if (wideStart[rc[0] + ',' + rc[1]]) {
-        if (COLS === 3) grid[rc[0]][rc[1] + 1] = pi;
-        if (COLS === 2 && rc[1] === 0) grid[rc[0]][1] = pi;
-      }
-    }
-  }
-
-  return { grid: grid, rows: ROWS, cols: COLS, wideStart: wideStart };
-}
-
 /* ── Render ───────────────────────────────────────────── */
 
 // Shared IntersectionObserver for all video tiles across all grids.
@@ -674,35 +468,6 @@ var vidObs = new IntersectionObserver(function(entries) {
     }
   });
 }, { threshold: [0, 0.15], rootMargin: '50% 0px' });
-
-/* ── First-grid layout constraints ─────────────────────── */
-function postProcessFirstGrid(grid, ROWS, COLS, displayedMedia) {
-  // No cell swaps — those break blobs for small projects.
-  // Scan the first 3 rows (≈ initial viewport). If any project there has a
-  // video that isn't already first in its media array, surface it.
-  // IMPORTANT: only do this once — too many surfaced videos in the first viewport
-  // causes a lot of MP4 requests and slows initial load.
-  var seen = {};
-  var done = false;
-  for (var r = 0; r < Math.min(3, ROWS); r++) {
-    for (var c = 0; c < COLS; c++) {
-      var pi = grid[r][c];
-      if (pi < 0 || pi >= displayedMedia.length) continue; // skip whitespace / invalid
-      if (seen[pi]) continue;
-      seen[pi] = true;
-      if (displayedMedia[pi][0] && displayedMedia[pi][0].type !== 'vid') {
-        for (var mi = 1; mi < displayedMedia[pi].length; mi++) {
-          if (displayedMedia[pi][mi].type === 'vid') {
-            displayedMedia[pi].unshift(displayedMedia[pi].splice(mi, 1)[0]);
-            done = true;
-            break;
-          }
-        }
-      }
-      if (done) return;
-    }
-  }
-}
 
 /* ── Similar-photo avoidance ─────────────────────────────
    pHash hamming distance ≤ 10 pairs, computed once from all assets.
@@ -763,13 +528,173 @@ function desimilarize(arr) {
   return arr;
 }
 
-/* ── MIX cell renderer ───────────────────────────────────
-   Renders a single MIX item as a mosaic cell.
-   No strip, no project label — just the media.
+/* ── Blob mosaic engine ───────────────────────────────────
+   Each *project* is one contiguous block (shuffle inside the block only).
+   MIX only appears as its own blocks, slipped between project blocks.
+   Layout is row-planned (2 or 3 columns) with intentional empty cells + wides.
 ── */
-function appendMixCell(item, container, aboveFold) {
+
+function mosaicPortraitVideo(item) {
+  if (!item || item.type !== 'vid') return false;
+  var d = mediaDimensions[item.src];
+  return !!(d && d[1] > d[0]);
+}
+
+function surfaceHeroVideo(mediaArr) {
+  if (!mediaArr.length || mediaArr[0].type === 'vid') return;
+  for (var mi = 1; mi < mediaArr.length; mi++) {
+    if (mediaArr[mi].type === 'vid') {
+      mediaArr.unshift(mediaArr.splice(mi, 1)[0]);
+      return;
+    }
+  }
+}
+
+function ensureFirstIsVideo(mediaArr) {
+  if (!mediaArr || !mediaArr.length) return false;
+  if (mediaArr[0] && mediaArr[0].type === 'vid') return true;
+  for (var i = 1; i < mediaArr.length; i++) {
+    if (mediaArr[i] && mediaArr[i].type === 'vid') {
+      mediaArr.unshift(mediaArr.splice(i, 1)[0]);
+      return true;
+    }
+  }
+  return false;
+}
+
+function ensureVideoInFirstNMedia(mediaArr, maxMediaIndex) {
+  if (!mediaArr || mediaArr.length < 2) return false;
+  maxMediaIndex = Math.max(0, Math.min(maxMediaIndex || 0, mediaArr.length - 1));
+
+  // Already satisfied
+  for (var i = 0; i <= maxMediaIndex; i++) {
+    if (mediaArr[i] && mediaArr[i].type === 'vid') return true;
+  }
+
+  // Find first video later and move it into the first window (not necessarily index 0)
+  for (var j = maxMediaIndex + 1; j < mediaArr.length; j++) {
+    if (mediaArr[j] && mediaArr[j].type === 'vid') {
+      var insertAt = Math.min(maxMediaIndex, 1); // keep some air: prefer index 1 if possible
+      var v = mediaArr.splice(j, 1)[0];
+      mediaArr.splice(insertAt, 0, v);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function prepareMediaForProject(pi, isMobile) {
+  var arr = shuffle(projects[pi].media.slice());
+  var vids = [], imgs = [];
+  arr.forEach(function(item) { (item.type === 'vid' ? vids : imgs).push(item); });
+  if (vids.length > 1) {
+    var n = arr.length, result = new Array(n).fill(null);
+    vids.forEach(function(v, i) {
+      var pos = Math.round((i + 1) * n / (vids.length + 1)) - 1;
+      while (result[pos] !== null) pos = (pos + 1) % n;
+      result[pos] = v;
+    });
+    var imgI = 0;
+    arr = result.map(function(x) { return x !== null ? x : imgs[imgI++]; });
+    var minGap = isMobile ? 3 : 5;
+    var out = desimilarize(arr);
+    var lastVid = -9999;
+    for (var ri = 0; ri < out.length; ri++) {
+      if (out[ri] && out[ri].type === 'vid') {
+        if (ri - lastVid < minGap) {
+          for (var sj = ri + minGap; sj < out.length; sj++) {
+            if (out[sj] && out[sj].type !== 'vid') {
+              var tmp = out[ri]; out[ri] = out[sj]; out[sj] = tmp;
+              break;
+            }
+          }
+        }
+        lastVid = ri;
+      }
+    }
+    return out;
+  }
+  return desimilarize(arr);
+}
+
+/** @returns {Array<Array<{t:'m'|'e', item?: *, wide?: boolean}>>} */
+function planBlobRows(items, cols, isMixBlob) {
+  var rows = [];
+  var i = 0;
+  var streakWide = 0;
+  while (i < items.length) {
+    var left = items.length - i;
+    var u = Math.random();
+    if (cols === 3) {
+      if (left >= 2 && (left === 2 || u < 0.35)) {
+        rows.push([{ t: 'm', item: items[i++] }, { t: 'm', item: items[i++] }, { t: 'e' }]);
+        streakWide = 0;
+      } else if (left >= 2 && u < 0.35 + 0.30) {
+        var a = items[i++], b = items[i++];
+        var aw = !mosaicPortraitVideo(a) && streakWide < 2;
+        rows.push([{ t: 'm', item: a, wide: aw }, { t: 'm', item: b }]);
+        streakWide = aw ? streakWide + 1 : 0;
+      } else if (left >= 1 && u < 0.35 + 0.30 + 0.17 && streakWide < 2) {
+        var w = items[i++];
+        var ww = !mosaicPortraitVideo(w);
+        rows.push([{ t: 'm', item: w, wide: ww }, { t: 'e' }]);
+        streakWide = ww ? streakWide + 1 : 0;
+      } else if (left >= 1) {
+        var one = items[i++];
+        streakWide = 0;
+        if (Math.random() < 0.5) {
+          rows.push([{ t: 'm', item: one }, { t: 'e' }, { t: 'e' }]);
+        } else {
+          rows.push([{ t: 'e' }, { t: 'm', item: one }, { t: 'e' }]);
+        }
+      } else {
+        break;
+      }
+    } else {
+      if (left >= 2 && u < 0.33 && !(isMixBlob && left === 2 && Math.random() < 0.4)) {
+        rows.push([{ t: 'm', item: items[i++] }, { t: 'm', item: items[i++] }]);
+        streakWide = 0;
+      } else if (left >= 1 && u < 0.33 + 0.27 && streakWide < 2) {
+        var mw = items[i++];
+        var mww = !mosaicPortraitVideo(mw);
+        rows.push([{ t: 'm', item: mw, wide: mww }]);
+        streakWide = mww ? streakWide + 1 : 0;
+      } else if (left >= 1) {
+        var mo = items[i++];
+        streakWide = 0;
+        if (Math.random() < 0.5) {
+          rows.push([{ t: 'm', item: mo }, { t: 'e' }]);
+        } else {
+          rows.push([{ t: 'e' }, { t: 'm', item: mo }]);
+        }
+      } else {
+        break;
+      }
+    }
+  }
+  return rows;
+}
+
+function appendEmptyMosaicCell(parent) {
+  parent.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
+}
+
+function appendMosaicBreather(gridEl, isMobile) {
+  var b = document.createElement('div');
+  b.className = 'mosaic-breather';
+  b.setAttribute('aria-hidden', 'true');
+  b.style.minHeight = (isMobile
+    ? (5 + Math.random() * 12)
+    : (3.5 + Math.random() * 9)).toFixed(1) + 'vw';
+  gridEl.appendChild(b);
+}
+
+/* MIX cell — optional wide; never labelled as a project */
+function appendMixCell(item, parent, aboveFold, isWide) {
   var div = document.createElement('div');
-  div.className = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
+  div.className = 'mosaic-cell is-mix' + (item.type === 'vid' ? ' is-video' : '');
+  if (isWide) div.classList.add('is-wide');
 
   if (item.type === 'vid') {
     var video = document.createElement('video');
@@ -808,320 +733,197 @@ function appendMixCell(item, container, aboveFold) {
     div.appendChild(img);
   }
 
-  container.appendChild(div);
+  parent.appendChild(div);
 }
 
 function buildMosaicLayout(container, isFirst) {
   var isMobile = window.innerWidth <= 600;
   var COLS = isMobile ? 2 : 3;
-  var displayedMedia = projects.map(function(p) {
-    var arr = shuffle(p.media.slice());
-    // Spread multiple videos evenly through the array so they land
-    // in different viewport-heights rather than clustering together.
-    var vids = [], imgs = [];
-    arr.forEach(function(item) { (item.type === 'vid' ? vids : imgs).push(item); });
-    if (vids.length > 1) {
-      var n = arr.length, result = new Array(n).fill(null);
-      // Place each video at an evenly-spaced slot
-      vids.forEach(function(v, i) {
-        var pos = Math.round((i + 1) * n / (vids.length + 1)) - 1;
-        while (result[pos] !== null) pos = (pos + 1) % n;
-        result[pos] = v;
-      });
-      var imgI = 0;
-      result = result.map(function(x) { return x !== null ? x : imgs[imgI++]; });
-      // Additionally enforce a minimum gap so videos are less likely to land
-      // within the same viewport-height on tall screens.
-      var minGap = isMobile ? 3 : 5;
-      var out = desimilarize(result);
-      var lastVid = -9999;
-      for (var ri = 0; ri < out.length; ri++) {
-        if (out[ri] && out[ri].type === 'vid') {
-          if (ri - lastVid < minGap) {
-            // Find a later slot with a non-video and swap.
-            for (var sj = ri + minGap; sj < out.length; sj++) {
-              if (out[sj] && out[sj].type !== 'vid') { var tmp = out[ri]; out[ri] = out[sj]; out[sj] = tmp; break; }
+
+  container.innerHTML = '';
+  container.classList.add('mosaic-engine-blob');
+
+  var rhythmPhase = Math.random() < 0.5 ? 0 : 1;
+  function bumpRhythm() {
+    container.setAttribute('data-mosaic-rhythm', (rhythmPhase++ % 2 === 0) ? 'a' : 'b');
+  }
+
+  var order = sessionProjectOrder.slice();
+  // If there is any video project, always put one first (user preference).
+  // This is session-stable because `order` is session-stable.
+  for (var vi = 0; vi < order.length; vi++) {
+    if (projects[order[vi]].media.some(function(m) { return m.type === 'vid'; })) {
+      if (vi > 0) order.unshift(order.splice(vi, 1)[0]);
+      break;
+    }
+  }
+
+  var mixPool = desimilarize(shuffle(mixMedia.slice()));
+  var mixPos = 0;
+
+  function nextMixSlice() {
+    if (mixPos >= mixPool.length) return [];
+    var maxN = isMobile ? 2 : 3;
+    var n = 1 + Math.floor(Math.random() * maxN);
+    n = Math.min(n, mixPool.length - mixPos);
+    if (n < 1) n = 1;
+    var sl = mixPool.slice(mixPos, mixPos + n);
+    mixPos += sl.length;
+    return sl;
+  }
+
+  var mediaEmitted = 0;
+  var aboveFoldVideoUsed = false;
+  var lastStripIdx = -99;
+
+  function renderBlobChunk(items, pi, blobKind, forceHero) {
+    if (!items.length) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'mosaic-blob' + (blobKind === 'mix' ? ' is-mix-blob' : '');
+    wrap.setAttribute('data-blob', blobKind);
+    container.appendChild(wrap);
+    bumpRhythm();
+
+    var isMix = blobKind === 'mix';
+    var rows = planBlobRows(items, COLS, isMix);
+    var blobRow = 0;
+    for (var ri = 0; ri < rows.length; ri++) {
+      var row = rows[ri];
+      for (var ci = 0; ci < row.length; ci++) {
+        var cell = row[ci];
+        if (cell.t === 'e') {
+          appendEmptyMosaicCell(wrap);
+          continue;
+        }
+        var item = cell.item;
+        var wantWide = !!cell.wide && !mosaicPortraitVideo(item);
+        var aboveFold = isFirst && mediaEmitted < 4;
+
+        if (blobKind === 'mix') {
+          appendMixCell(item, wrap, aboveFold, wantWide);
+        } else {
+          var div = document.createElement('div');
+          div.className = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
+          if (wantWide) div.classList.add('is-wide');
+
+          var strip = null;
+          if (blobRow - lastStripIdx >= 2 && Math.random() < 0.32 && projects[pi].media.length > 3) {
+            var projImgs = projects[pi].media
+              .filter(function(m) { return m.type === 'img'; })
+              .map(function(m) { return m.src; });
+            if (projImgs.length) {
+              lastStripIdx = blobRow;
+              strip = document.createElement('div');
+              strip.className = 'wide-strip';
+              strip.style.height = (6 + Math.random() * 8).toFixed(2) + 'vw';
+              var stripImg = document.createElement('img');
+              var stripSrc = projImgs[Math.floor(Math.random() * projImgs.length)];
+              stripImg.className = 'mosaic-media is-strip-media';
+              stripImg.decoding = 'async';
+              stripImg.setAttribute('loading', 'lazy');
+              stripImg.setAttribute('fetchpriority', 'low');
+              setIntrinsicDimensions(stripImg, stripSrc);
+              stripImg.alt = '';
+              stripImg.addEventListener('load', function() {
+                markMediaLoaded(this.closest('.mosaic-cell'), this);
+              }, { once: true });
+              stripImg.addEventListener('error', function() {
+                markMediaLoaded(this.closest('.mosaic-cell'), this);
+              }, { once: true });
+              stripImg.src = stripSrc;
+              strip.appendChild(stripImg);
             }
           }
-          lastVid = ri;
+
+          var stripAbove = strip && Math.random() < 0.5;
+
+          if (item.type === 'vid') {
+            var video = document.createElement('video');
+            video.className = 'mosaic-media';
+            setIntrinsicDimensions(video, item.src);
+            video.muted = true;
+            video.loop  = true;
+            video.setAttribute('playsinline', '');
+            var preloadMode = 'none';
+            if (aboveFold && !aboveFoldVideoUsed) {
+              preloadMode = 'metadata';
+              aboveFoldVideoUsed = true;
+            }
+            video.setAttribute('preload', preloadMode);
+            video.addEventListener('loadeddata', function() {
+              markMediaLoaded(this.closest('.mosaic-cell'), this);
+            }, { once: true });
+            video.addEventListener('error', function() {
+              markMediaLoaded(this.closest('.mosaic-cell'), this);
+            }, { once: true });
+            var vsrc = document.createElement('source');
+            vsrc.src = item.src;
+            video.appendChild(vsrc);
+            if (stripAbove) div.appendChild(strip);
+            div.appendChild(video);
+            if (strip && !stripAbove) div.appendChild(strip);
+            vidObs.observe(div);
+          } else {
+            var img = document.createElement('img');
+            img.className = 'mosaic-media';
+            img.decoding = 'async';
+            setIntrinsicDimensions(img, item.src);
+            img.alt = projects[pi].name;
+            img.setAttribute('loading', aboveFold ? 'eager' : 'lazy');
+            if (aboveFold) {
+              img.setAttribute('fetchpriority', 'high');
+              preloadHeroImage(item.src);
+            } else {
+              img.setAttribute('fetchpriority', 'low');
+            }
+            img.addEventListener('load', function() {
+              markMediaLoaded(this.closest('.mosaic-cell'), this);
+            }, { once: true });
+            img.addEventListener('error', function() {
+              markMediaLoaded(this.closest('.mosaic-cell'), this);
+            }, { once: true });
+            img.src = item.src;
+            if (stripAbove) div.appendChild(strip);
+            div.appendChild(img);
+            if (strip && !stripAbove) div.appendChild(strip);
+          }
+
+          var label = document.createElement('span');
+          label.className = 'mosaic-label';
+          label.textContent = projects[pi].name;
+          div.appendChild(label);
+
+          wrap.appendChild(div);
         }
+        mediaEmitted++;
       }
-      return out;
-    }
-    return desimilarize(arr);
-  });
-  var layout = buildGrid(projects, displayedMedia, COLS);
-  var grid = layout.grid, ROWS = layout.rows;
-  var wideStartMap = layout.wideStart || null;
-
-  if (isFirst) postProcessFirstGrid(grid, ROWS, COLS, displayedMedia);
-
-  // Per project, compute vertical center of its blob in this generated layout.
-  var rowStats = projects.map(function() {
-    return { min: Infinity, max: -Infinity };
-  });
-
-  for (var rr = 0; rr < ROWS; rr++) {
-    for (var cc = 0; cc < COLS; cc++) {
-      var pidx = grid[rr][cc];
-      if (pidx < 0) continue;
-      if (rr < rowStats[pidx].min) rowStats[pidx].min = rr;
-      if (rr > rowStats[pidx].max) rowStats[pidx].max = rr;
+      blobRow++;
     }
   }
 
-  var projectCenterRow = rowStats.map(function(s) {
-    if (s.min === Infinity) return 0;
-    return (s.min + s.max) / 2;
-  });
+  for (var si = 0; si < order.length; si++) {
+    var pi = order[si];
+    var media = prepareMediaForProject(pi, isMobile);
+    // First grid: ensure there is *a* video in the first viewport, but not necessarily first tile.
+    if (isFirst && si === 0) ensureVideoInFirstNMedia(media, 3);
 
-  // Pre-scan: build MIX injection plan.
-  // A cell is an injection point if it is spatially exterior (has a 4-dir neighbour
-  // of a different project) OR is the last cell before a project change in reading
-  // order. MIX photos are injected AFTER such cells, so they appear at blob edges
-  // rather than trapped inside a single project's area.
-  var mixSdirs = [[-1,0],[1,0],[0,-1],[0,1]];
-  var mixPlanMap = {};
-  var mixInjKeys = [];
-  for (var rr = 0; rr < ROWS; rr++) {
-    if (rr < 4) continue; // never inject MIX in the first viewport
-    for (var cc = 0; cc < COLS; cc++) {
-      var pp = grid[rr][cc];
-      var ext = false;
-      for (var sd = 0; sd < mixSdirs.length; sd++) {
-        var snr = rr + mixSdirs[sd][0], snc = cc + mixSdirs[sd][1];
-        if (snr >= 0 && snr < ROWS && snc >= 0 && snc < COLS && grid[snr][snc] !== pp) { ext = true; break; }
-      }
-      var ncc = cc + 1, nrr = rr;
-      if (ncc >= COLS) { ncc = 0; nrr = rr + 1; }
-      var beforeTransition = nrr < ROWS && grid[nrr][ncc] !== pp;
-      if (ext && beforeTransition) {
-        var k = rr + ',' + cc;
-        if (!mixPlanMap[k]) { mixPlanMap[k] = 0; mixInjKeys.push(k); }
+    renderBlobChunk(media, pi, 'project', isFirst && si === 0);
+
+    if (si < order.length - 1) {
+      if (Math.random() < 0.62) appendMosaicBreather(container, isMobile);
+      var mixChunk = nextMixSlice();
+      if (mixChunk.length) {
+        renderBlobChunk(mixChunk, pi, 'mix', false);
+        if (Math.random() < 0.55) appendMosaicBreather(container, isMobile);
       }
     }
   }
-  // Distribute ALL MIX photos with even spacing so they reliably appear
-  // across the whole layout. Photos are grouped into random bursts of 1-3,
-  // and bursts are placed at evenly-spaced injection points.
-  var mixQueue = desimilarize(shuffle(mixMedia.slice()));
-  if (mixInjKeys.length > 0 && mixQueue.length > 0) {
-    // Build burst groups: random sizes 1-3 summing to mixQueue.length
-    var mixBursts = [];
-    var mixRem = mixQueue.length;
-    while (mixRem > 0) {
-      // Mobile: avoid MIX feeling like a "project" by keeping bursts single.
-      var bSize = isMobile ? 1 : Math.min(mixRem, Math.floor(Math.random() * 3) + 1);
-      mixBursts.push(bSize);
-      mixRem -= bSize;
-    }
-    // Spread bursts evenly across injection points
-    var mixSpacing = mixInjKeys.length / mixBursts.length;
-    for (var mb = 0; mb < mixBursts.length; mb++) {
-      var mk = mixInjKeys[Math.min(Math.floor(mb * mixSpacing + mixSpacing / 2), mixInjKeys.length - 1)];
-      mixPlanMap[mk] = (mixPlanMap[mk] || 0) + mixBursts[mb];
-    }
-  }
-  var mixQueueIdx = 0;
-  var lastWasMix = false;
 
-  var imgIdx = projects.map(function() { return 0; });
-  // Track the *visual* CSS grid row as we append DOM nodes, so we can enforce:
-  // Desktop (3 cols): never more than 2 media cells per row and empties only at edges.
-  var visualCol = 0;
-  var mediaInRow = 0;
-
-  function appendEmptyCell() {
-    container.appendChild(Object.assign(document.createElement('div'), { className: 'mosaic-cell' }));
-    visualCol++;
-    if (visualCol >= COLS) { visualCol = 0; mediaInRow = 0; }
-  }
-
-  function startNewRowIfNeededForMedia() {
-    if (COLS !== 3) return;
-    if (mediaInRow < 2) return;
-    // appendEmptyCell wraps visualCol back to 0 when it hits COLS — guard with > 0
-    // so we exit after filling to the end of the current row instead of looping forever.
-    while (visualCol > 0 && visualCol < COLS) appendEmptyCell();
-  }
-  /* Desktop: max 2 small (1-col) cells per CSS grid row — applies to img and vid.
-     Mobile:  max 1. Wide cells (2-col) are exempt — wide + small is always fine. */
-  var lastStripRow = -9;
-  var consecutiveWide = 0;  // track runs of wide cells to prevent long monotone sequences
-  // Cap the total number of real media items we should ever render in this grid.
-  // The generated grid may have extra cells (ROWS*COLS > total); those used to
-  // produce empty placeholders mid-row on desktop. We'll just skip overflow cells.
-  var totalMedia = projects.reduce(function(s, p) { return s + p.media.length; }, 0);
-  var renderedMedia = 0;
-  var aboveFoldVideoUsed = false;
-
-  for (var r = 0; r < ROWS; r++) {
-    for (var c = 0; c < COLS; c++) {
-      var pi  = grid[r][c];
-      // If a wide cell starts at c-1 it spans into this column; don't emit a placeholder.
-      if (!isMobile && wideStartMap && c > 0 && wideStartMap[r + ',' + (c - 1)]) {
-        continue;
-      }
-      // Wide covered cell (used for connectivity/planning) should not render a node.
-      if (pi === -2) {
-        continue;
-      }
-      if (pi === -1) {
-        appendEmptyCell();
-        continue;
-      }
-      var media = displayedMedia[pi];
-
-      /* Wide cell: controlled by rowPlan on desktop; random on mobile. */
-      var isWide = !!(wideStartMap && wideStartMap[r + ',' + c]);
-
-      var idx = imgIdx[pi]++;
-
-      if (idx >= media.length) {
-        // Overflow grid cell (ROWS*COLS can exceed total media). Skip it entirely
-        // to avoid empty cells landing in the middle of a 3-col row on desktop.
-        continue;
-      }
-
-      var item = media[idx];
-      if (!item) continue;
-
-      // Portrait videos (height > width) must never be wide.
-      if (isWide && item.type === 'vid') {
-        var vdims = mediaDimensions[item.src];
-        if (vdims && vdims[1] > vdims[0]) isWide = false;
-      }
-
-      consecutiveWide = isWide ? consecutiveWide + 1 : 0;
-      var div  = document.createElement('div');
-
-      var classes = 'mosaic-cell' + (item.type === 'vid' ? ' is-video' : '');
-      if (isWide) classes += ' is-wide';
-      div.className = classes;
-
-      // Inject a decorative wide-strip: max 1 per ~3 rows (≈1 viewport).
-      // Image comes from the same project as the host cell.
-      var strip = null;
-      if (r - lastStripRow >= 3 && Math.random() < 0.35 && projects[pi].media.length > 3) {
-        var projImgs = projects[pi].media
-          .filter(function(m) { return m.type === 'img'; })
-          .map(function(m) { return m.src; });
-        if (!projImgs.length) {
-          projects.forEach(function(p) {
-            p.media.forEach(function(m) { if (m.type === 'img') projImgs.push(m.src); });
-          });
-        }
-        if (projImgs.length) {
-          lastStripRow = r;
-          strip = document.createElement('div');
-          strip.className = 'wide-strip';
-          strip.style.height = (6 + Math.random() * 8).toFixed(2) + 'vw';
-
-          var stripImg = document.createElement('img');
-          var stripSrc = projImgs[Math.floor(Math.random() * projImgs.length)];
-          stripImg.className = 'mosaic-media is-strip-media';
-          stripImg.decoding = 'async';
-          stripImg.setAttribute('loading', 'lazy');
-          stripImg.setAttribute('fetchpriority', 'low');
-          setIntrinsicDimensions(stripImg, stripSrc);
-          stripImg.alt = '';
-          stripImg.addEventListener('load', function() {
-            markMediaLoaded(this.closest('.mosaic-cell'), this);
-          }, { once: true });
-          stripImg.addEventListener('error', function() {
-            markMediaLoaded(this.closest('.mosaic-cell'), this);
-          }, { once: true });
-          stripImg.src = stripSrc;
-          strip.appendChild(stripImg);
-        }
-      }
-
-      var stripAbove = strip && Math.random() < 0.5;
-      // First 2 rows (4 cells) are above-the-fold: high priority, no lazy load.
-      var aboveFold = isFirst && r < 2;
-      if (item.type === 'vid') {
-        var video = document.createElement('video');
-        video.className = 'mosaic-media';
-        setIntrinsicDimensions(video, item.src);
-        video.muted = true;
-        video.loop  = true;
-        video.setAttribute('playsinline', '');
-        // Only allow one above-the-fold video to preload metadata (fast initial load).
-        var preloadMode = 'none';
-        if (aboveFold && !aboveFoldVideoUsed) {
-          preloadMode = 'metadata';
-          aboveFoldVideoUsed = true;
-        }
-        video.setAttribute('preload', preloadMode);
-        video.addEventListener('loadeddata', function() {
-          markMediaLoaded(this.closest('.mosaic-cell'), this);
-        }, { once: true });
-        video.addEventListener('error', function() {
-          markMediaLoaded(this.closest('.mosaic-cell'), this);
-        }, { once: true });
-        var vsrc = document.createElement('source');
-        vsrc.src = item.src;
-        video.appendChild(vsrc);
-        if (stripAbove) div.appendChild(strip);
-        div.appendChild(video);
-        if (strip && !stripAbove) div.appendChild(strip);
-        vidObs.observe(div);
-      } else {
-        var img = document.createElement('img');
-        img.className = 'mosaic-media';
-        img.decoding = 'async';
-        setIntrinsicDimensions(img, item.src);
-        img.alt = projects[pi].name;
-        img.setAttribute('loading', aboveFold ? 'eager' : 'lazy');
-        if (aboveFold) {
-          img.setAttribute('fetchpriority', 'high');
-          preloadHeroImage(item.src);
-        } else {
-          img.setAttribute('fetchpriority', 'low');
-        }
-        img.addEventListener('load', function() {
-          markMediaLoaded(this.closest('.mosaic-cell'), this);
-        }, { once: true });
-        img.addEventListener('error', function() {
-          markMediaLoaded(this.closest('.mosaic-cell'), this);
-        }, { once: true });
-        img.src = item.src;
-        if (stripAbove) div.appendChild(strip);
-        div.appendChild(img);
-        if (strip && !stripAbove) div.appendChild(strip);
-      }
-
-      var label = document.createElement('span');
-      label.className   = 'mosaic-label';
-      label.textContent = projects[pi].name;
-      div.appendChild(label);
-
-      container.appendChild(div);
-      visualCol += (isWide ? 2 : 1);
-      mediaInRow++;
-      if (visualCol >= COLS) { visualCol = 0; mediaInRow = 0; }
-      renderedMedia++;
-      if (renderedMedia >= totalMedia) return;
-
-      // Inject MIX photos after this cell if it is an injection point.
-      var injCount = mixPlanMap[r + ',' + c] || 0;
-      if (isMobile && injCount > 1) injCount = 1;
-      for (var mj = 0; mj < injCount; mj++) {
-        var mxItem = mixQueue[mixQueueIdx++];
-        if (!mxItem) break;
-        if (lastWasMix) break; // never allow consecutive MIX cells
-        // Desktop: never exceed 2 media per row (MIX counts as media).
-        startNewRowIfNeededForMedia();
-        var maxMixMediaPerRow = (COLS === 3) ? 2 : COLS;
-        if (mediaInRow >= maxMixMediaPerRow) break;
-        appendMixCell(mxItem, container, isFirst && r < 2);
-        lastWasMix = true;
-        visualCol++;
-        mediaInRow++;
-        if (visualCol >= COLS) { visualCol = 0; mediaInRow = 0; }
-      }
-      if (injCount === 0) lastWasMix = false;
-    }
+  while (mixPos < mixPool.length) {
+    var rest = nextMixSlice();
+    if (!rest.length) break;
+    if (Math.random() < 0.5) appendMosaicBreather(container, isMobile);
+    renderBlobChunk(rest, -1, 'mix', false);
   }
 }
 

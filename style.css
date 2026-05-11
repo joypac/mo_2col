@@ -82,6 +82,19 @@ body {
   background: #f5f5f3;
 }
 
+/* Blob engine: wrappers are transparent to the grid; children tile like before */
+.mosaic-blob {
+  display: contents;
+}
+
+/* Full-width intentional pause between editorial blocks (projects / MIX) */
+.mosaic-breather {
+  grid-column: 1 / -1;
+  min-height: 4vw;
+  pointer-events: none;
+  background: #f5f5f3;
+}
+
 /* Visible immediately — per-image fade still uses .mosaic-media opacity */
 #mosaic {
   opacity: 1;
@@ -274,10 +287,33 @@ body {
 }
 
 
-/* Mobile: drop to 2 cols. is-wide cells become full-width heroes. */
+/* Mobile: 2 cols + alternating lane weights (blob rhythm toggles in JS). */
 @media (max-width: 600px) {
   #mosaic, .mosaic-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  #mosaic[data-mosaic-rhythm="a"],
+  .mosaic-grid[data-mosaic-rhythm="a"] {
+    grid-template-columns: 1.18fr 0.82fr;
+  }
+
+  #mosaic[data-mosaic-rhythm="b"],
+  .mosaic-grid[data-mosaic-rhythm="b"] {
+    grid-template-columns: 0.82fr 1.18fr;
+  }
+}
+
+/* Desktop / tablet: subtle lane bias so rhythm isn’t only “mobile tricks” */
+@media (min-width: 601px) and (max-width: 1100px) {
+  #mosaic[data-mosaic-rhythm="a"],
+  .mosaic-grid[data-mosaic-rhythm="a"] {
+    grid-template-columns: 1.04fr 0.96fr 0.96fr;
+  }
+
+  #mosaic[data-mosaic-rhythm="b"],
+  .mosaic-grid[data-mosaic-rhythm="b"] {
+    grid-template-columns: 0.96fr 1.04fr 0.96fr;
   }
 }
 
