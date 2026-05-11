@@ -60,6 +60,14 @@ body {
   font-weight: 300;
 }
 
+/* Shared edge alignment:
+   Mosaic media starts at 4vw (see .mosaic-cell > img/video margins).
+   Keep UI aligned to that same edge (with a sensible min/max). */
+:root {
+  /* Default (desktop/tablet): slight nudge vs mosaic edge */
+  --edge: calc(clamp(12px, 3.2vw, 52px) + 10px);
+}
+
 /* ── Mosaic ───────────────────────────────────────────── */
 
 /*
@@ -164,15 +172,17 @@ body {
 #contact-trigger {
   position: fixed;
   top: 14px;
-  left: 14px;
+  left: var(--edge);
+  transform: translateX(2px);
   z-index: 140;
   border: 0;
   background: transparent;
   color: #111;
+  overflow: visible;
   padding: 6px 0;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 1400ms cubic-bezier(0.25, 0, 0.2, 1);
+  transition: opacity 1120ms cubic-bezier(0.25, 0, 0.2, 1);
 }
 
 #contact-trigger img {
@@ -214,20 +224,25 @@ body {
 }
 
 #contact-panel {
+  --menu-gap: 6px;
+  /* Moves only the menu titles closer to the viewport edge (logo stays put). */
+  --menu-shift: 0px;
   position: absolute;
   top: 60px;
-  left: 14px;
-  width: calc(100% - 28px);
+  left: var(--edge);
+  width: calc(100% - (2 * var(--edge)));
   max-width: 760px;
   max-height: calc(100dvh - 20px);
   overflow-y: hidden;
-  padding: clamp(4px, 0.8vw, 8px) 0 clamp(20px, 3vh, 28px) 0;
+  overflow-x: visible;
+  /* top padding matches menu title spacing (see .contact-accordion gap) */
+  padding: var(--menu-gap) 0 clamp(20px, 3vh, 28px) 0;
   color: #111;
   font-family: 'Walter Neue Light', sans-serif;
   text-transform: uppercase;
   opacity: 0;
   outline: none;
-  transition: opacity 700ms cubic-bezier(0.25, 0, 0.2, 1);
+  transition: opacity 560ms cubic-bezier(0.25, 0, 0.2, 1);
 }
 
 #contact-panel,
@@ -242,11 +257,11 @@ body {
 
 .contact-accordion {
   display: grid;
-  gap: 4px;
+  gap: var(--menu-gap);
 }
 
 .contact-section {
-  padding-top: 3px;
+  padding-top: 0;
 }
 
 .contact-section-toggle {
@@ -289,6 +304,16 @@ body {
 
 /* Mobile: 2 cols + alternating lane weights (blob rhythm toggles in JS). */
 @media (max-width: 600px) {
+  :root {
+    /* Mobile: keep original alignment (match mosaic 4vw edge feel) */
+    --edge: calc(clamp(10px, 3.2vw, 44px) + 1px);
+  }
+
+  /* Mobile: bring menu titles a bit closer to the edge (logo stays put) */
+  #contact-panel {
+    --menu-shift: 0px;
+  }
+
   #mosaic, .mosaic-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -319,7 +344,7 @@ body {
 
 .contact-section-content p,
 .contact-section-content a {
-  font-family: 'Walter Neue Light', sans-serif;
+  font-family: 'Walter Neue', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.01em;
   font-size: clamp(1rem, 1.5vw, 1.2rem);

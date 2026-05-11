@@ -1151,19 +1151,18 @@ var ContactOverlay = (function() {
 
   function positionPanelBelowTrigger() {
     var rect = trigger.getBoundingClientRect();
-    var top = Math.round(rect.bottom - 5);
+    var gap = 6;
+    try {
+      var rawGap = window.getComputedStyle(panel).getPropertyValue('--menu-gap');
+      var parsed = parseFloat(rawGap);
+      if (isFinite(parsed)) gap = parsed;
+    } catch (e) {}
+    var top = Math.round(rect.bottom + gap);
     panel.style.top = top + 'px';
-
-    if (window.innerWidth <= 720) {
-      panel.style.left = '';
-      panel.style.right = '';
-    } else {
-      var triggerStyles = window.getComputedStyle(trigger);
-      var textStartX = rect.left + parseFloat(triggerStyles.paddingLeft || '0');
-      var left = Math.max(8, Math.round(textStartX));
-      panel.style.left = left + 'px';
-      panel.style.right = '';
-    }
+    // Keep horizontal alignment fully CSS-driven (consistent mobile/desktop).
+    // `#contact-panel { left: var(--edge); }` defines the edge alignment.
+    panel.style.left = '';
+    panel.style.right = '';
   }
 
   function syncA11y() {
@@ -1233,22 +1232,22 @@ var ContactOverlay = (function() {
   function switchSection(nextIndex) {
     if (switching) return;
     switching = true;
-    panel.style.transition = 'opacity 500ms ease-out';
+    panel.style.transition = 'opacity 400ms ease-out';
     panel.style.opacity = '0';
     setTimeout(function() {
       setOpenSection(nextIndex);
       requestAnimationFrame(function() {
         requestAnimationFrame(function() {
-          panel.style.transition = 'opacity 900ms cubic-bezier(0.25, 0, 0.2, 1)';
+          panel.style.transition = 'opacity 720ms cubic-bezier(0.25, 0, 0.2, 1)';
           panel.style.opacity = '1';
           setTimeout(function() {
             panel.style.transition = '';
             panel.style.opacity = '';
             switching = false;
-          }, 900);
+          }, 720);
         });
       });
-    }, 500);
+    }, 400);
   }
 
   toggles.forEach(function(toggle, idx) {
@@ -1278,14 +1277,12 @@ var ContactOverlay = (function() {
   };
 })();
 
-var skipFirstNav = false;
 var brandRevealed = false;
 var brandTriggerEl = document.getElementById('contact-trigger');
 
 function revealBrand() {
   if (brandRevealed) return false;
   brandRevealed = true;
-  skipFirstNav = true; // first interaction only reveals brand; no frame navigation
   if (brandTriggerEl) brandTriggerEl.style.opacity = '1';
   return true;
 }
@@ -1397,7 +1394,7 @@ var FrameNavigator = (function() {
     if (isLocked()) { e.preventDefault(); return; }
     if (isInteractiveTarget(e.target)) return;
 
-    if (revealBrand()) { e.preventDefault(); return; }
+    if (revealBrand()) { e.preventDefault(); lockForTransition(); return; }
     e.preventDefault();
 
     var now = Date.now();
@@ -1439,6 +1436,11 @@ var FrameNavigator = (function() {
     touchStartY = e.touches[0].clientY;
     touchStartX = e.touches[0].clientX;
     touchStartedOnInteractive = isInteractiveTarget(e.target);
+    // Prevent browser from committing to native scroll before we handle touch.
+    // Must happen at touchstart — touchmove preventDefault is too late on iOS Safari.
+    if (!touchStartedOnInteractive && !ContactOverlay.isOpen()) {
+      e.preventDefault();
+    }
   }
 
   function onTouchMove(e) {
@@ -1461,10 +1463,16 @@ var FrameNavigator = (function() {
     var dy = e.changedTouches[0].clientY - touchStartY;
     var absDy = Math.abs(dy);
 
+    var justRevealed = revealBrand();
+    if (justRevealed) { lockForTransition(); lastTouchNavTs = Date.now(); return; }
+
+    var swipeThreshold = Math.max(30, window.innerHeight * 0.05);
+
     if (!touchMoved && absDy < 10) {
-      if (!brandRevealed) { revealBrand(); lastTouchNavTs = Date.now(); return; }
-      if (skipFirstNav) { skipFirstNav = false; }
-      else { goDown(); }
+      goDown();
+    } else if (touchMoved && absDy >= swipeThreshold) {
+      if (dy < 0) goDown();
+      else goUp();
     }
 
     lastTouchNavTs = Date.now();
@@ -1479,16 +1487,20 @@ var FrameNavigator = (function() {
 
     if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
       e.preventDefault();
+      if (revealBrand()) return;
       goDown();
     } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
       e.preventDefault();
+      if (revealBrand()) return;
       goUp();
     } else if (e.key === 'Home') {
       e.preventDefault();
+      revealBrand();
       lockForTransition();
       scrollToY(0);
     } else if (e.key === 'End') {
       e.preventDefault();
+      revealBrand();
       ensureContentAhead(window.innerHeight * 3);
       lockForTransition();
       scrollToY(maxScrollY());
@@ -1508,7 +1520,7 @@ var FrameNavigator = (function() {
     ensureContentAhead(window.innerHeight * 2.5);
     window.addEventListener('wheel', onWheel, { passive: false });
     document.addEventListener('click', onClick, { passive: true });
-    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchstart', onTouchStart, { passive: false });
     window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('touchend', onTouchEnd, { passive: true });
     window.addEventListener('keydown', onKeydown);
