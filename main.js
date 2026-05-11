@@ -628,6 +628,11 @@ function prepareMediaForProject(pi, isMobile) {
   return desimilarize(arr);
 }
 
+// Mobile breathing knob: when the blob engine would place two small photos
+// side-by-side, this is the probability of breaking them apart into two
+// isolated single rows (one cell empty) instead. Higher = more whitespace.
+var MOBILE_ISOLATE_PROB = 0.65;
+
 /** @returns {Array<Array<{t:'m'|'e', item?: *, wide?: boolean}>>} */
 function planBlobRows(items, cols, isMixBlob) {
   var rows = [];
@@ -705,13 +710,19 @@ function planBlobRows(items, cols, isMixBlob) {
         continue;
       }
 
-      // Try a 2-media row
+      // Try a 2-media row — but break it apart (MOBILE_ISOLATE_PROB) into
+      // two isolated single rows for breathing room.
       if (left >= 2 && u < 0.36 && !(isMixBlob && left === 2 && Math.random() < 0.4)) {
-        rows.push([{ t: 'm', item: items[i++] }, { t: 'm', item: items[i++] }]);
-        mobileConsecSingleRows = 0;
-        mobileConsecWideRows = 0;
-        streakWide = 0;
-        continue;
+        if (Math.random() < MOBILE_ISOLATE_PROB) {
+          // Don't consume items here — fall through to single-row logic so
+          // the existing lane-alternation rules place each item separately.
+        } else {
+          rows.push([{ t: 'm', item: items[i++] }, { t: 'm', item: items[i++] }]);
+          mobileConsecSingleRows = 0;
+          mobileConsecWideRows = 0;
+          streakWide = 0;
+          continue;
+        }
       }
 
       // Try a wide row (full-width on mobile), but never more than 2 in a row.
