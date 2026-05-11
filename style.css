@@ -344,7 +344,7 @@ body {
 
 .contact-section-content p,
 .contact-section-content a {
-  font-family: 'Walter Neue', sans-serif;
+  font-family: 'Walter Neue Light', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.01em;
   font-size: clamp(1rem, 1.5vw, 1.2rem);
