@@ -584,6 +584,16 @@ function ensureVideoInFirstNMedia(mediaArr, maxMediaIndex) {
   return false;
 }
 
+function extractFirstVideo(arr) {
+  if (!arr || !arr.length) return null;
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i] && arr[i].type === 'vid') {
+      return arr.splice(i, 1)[0];
+    }
+  }
+  return null;
+}
+
 function prepareMediaForProject(pi, isMobile) {
   var arr = shuffle(projects[pi].media.slice());
   var vids = [], imgs = [];
@@ -623,6 +633,14 @@ function planBlobRows(items, cols, isMixBlob) {
   var rows = [];
   var i = 0;
   var streakWide = 0;
+  // Mobile: strict alternation of single-tile rows (left/right) per blob.
+  // `mobileSingleStart` randomizes which side starts first so the whole page isn't biased.
+  var mobileSingleStart = Math.random() < 0.5 ? 0 : 1; // 0 => left, 1 => right
+  var afterWide = false;
+  var lastSingleLane = mobileSingleStart;
+  var mobileConsecWideRows = 0;
+  var mobileConsecSingleRows = 0;
+  var mobileSingleIndex = 0;
   while (i < items.length) {
     var left = items.length - i;
     var u = Math.random();
@@ -633,44 +651,97 @@ function planBlobRows(items, cols, isMixBlob) {
       } else if (left >= 2 && u < 0.35 + 0.30) {
         var a = items[i++], b = items[i++];
         var aw = !mosaicPortraitVideo(a) && streakWide < 2;
-        rows.push([{ t: 'm', item: a, wide: aw }, { t: 'm', item: b }]);
+        // wideSmall: sometimes place the wide on the right side (empty/weight shifts)
+        if (aw && Math.random() < 0.5) {
+          // small in col 1, wide starts in col 2 (spans col 2-3)
+          rows.push([{ t: 'm', item: b }, { t: 'm', item: a, wide: true }]);
+        } else {
+          // wide starts in col 1 (spans col 1-2), small in col 3
+          rows.push([{ t: 'm', item: a, wide: aw }, { t: 'm', item: b }]);
+        }
         streakWide = aw ? streakWide + 1 : 0;
       } else if (left >= 1 && u < 0.35 + 0.30 + 0.17 && streakWide < 2) {
         var w = items[i++];
         var ww = !mosaicPortraitVideo(w);
-        rows.push([{ t: 'm', item: w, wide: ww }, { t: 'e' }]);
+        // wideEmpty: balance which side is visually heavier
+        if (ww && Math.random() < 0.5) {
+          // empty col 1, wide starts in col 2 (spans col 2-3)
+          rows.push([{ t: 'e' }, { t: 'm', item: w, wide: true }]);
+        } else {
+          // wide starts in col 1 (spans col 1-2), empty col 3
+          rows.push([{ t: 'm', item: w, wide: ww }, { t: 'e' }]);
+        }
         streakWide = ww ? streakWide + 1 : 0;
       } else if (left >= 1) {
         var one = items[i++];
         streakWide = 0;
-        if (Math.random() < 0.5) {
-          rows.push([{ t: 'm', item: one }, { t: 'e' }, { t: 'e' }]);
-        } else {
-          rows.push([{ t: 'e' }, { t: 'm', item: one }, { t: 'e' }]);
-        }
+        // oneSmall: allow right column too, otherwise the grid biases left.
+        var r = Math.random();
+        if (r < 0.34) rows.push([{ t: 'm', item: one }, { t: 'e' }, { t: 'e' }]);          // col 1
+        else if (r < 0.67) rows.push([{ t: 'e' }, { t: 'm', item: one }, { t: 'e' }]);     // col 2
+        else rows.push([{ t: 'e' }, { t: 'e' }, { t: 'm', item: one }]);                   // col 3
       } else {
         break;
       }
     } else {
-      if (left >= 2 && u < 0.33 && !(isMixBlob && left === 2 && Math.random() < 0.4)) {
+      // Mobile: keep rhythm lively and avoid "one-side column" artifacts.
+      // Rules:
+      // - never >2 wide rows in a row
+      // - never allow many consecutive (empty + small) rows; prefer 2-media rows to re-balance
+      // - after any wide row, force the next single to flip sides (visible dynamism)
+      var mustFlipAfterWide = afterWide;
+
+      // If we just placed a wide, force a single row next (if possible) and flip side.
+      if (mustFlipAfterWide && left >= 1) {
+        afterWide = false;
+        var postWide = items[i++];
+        var useLanePW = 1 - lastSingleLane; // guaranteed side flip
+        if (useLanePW === 0) rows.push([{ t: 'm', item: postWide }, { t: 'e' }]);
+        else rows.push([{ t: 'e' }, { t: 'm', item: postWide }]);
+        lastSingleLane = useLanePW;
+        mobileConsecSingleRows = 1;
+        mobileConsecWideRows = 0;
+        mobileSingleIndex++;
+        continue;
+      }
+
+      // Try a 2-media row
+      if (left >= 2 && u < 0.36 && !(isMixBlob && left === 2 && Math.random() < 0.4)) {
         rows.push([{ t: 'm', item: items[i++] }, { t: 'm', item: items[i++] }]);
+        mobileConsecSingleRows = 0;
+        mobileConsecWideRows = 0;
         streakWide = 0;
-      } else if (left >= 1 && u < 0.33 + 0.27 && streakWide < 2) {
+        continue;
+      }
+
+      // Try a wide row (full-width on mobile), but never more than 2 in a row.
+      if (left >= 1 && u < 0.36 + 0.28 && streakWide < 2 && mobileConsecWideRows < 2) {
         var mw = items[i++];
         var mww = !mosaicPortraitVideo(mw);
         rows.push([{ t: 'm', item: mw, wide: mww }]);
         streakWide = mww ? streakWide + 1 : 0;
-      } else if (left >= 1) {
+        mobileConsecWideRows = mww ? (mobileConsecWideRows + 1) : 0;
+        mobileConsecSingleRows = 0;
+        if (mww) afterWide = true;
+        continue;
+      }
+
+      // Otherwise do a single row, alternating sides deterministically.
+      if (left >= 1) {
         var mo = items[i++];
         streakWide = 0;
-        if (Math.random() < 0.5) {
-          rows.push([{ t: 'm', item: mo }, { t: 'e' }]);
-        } else {
-          rows.push([{ t: 'e' }, { t: 'm', item: mo }]);
-        }
-      } else {
-        break;
+        // Deterministic alternation across the whole blob.
+        var useLane = ((mobileSingleStart + mobileSingleIndex) % 2);
+        if (useLane === 0) rows.push([{ t: 'm', item: mo }, { t: 'e' }]);
+        else rows.push([{ t: 'e' }, { t: 'm', item: mo }]);
+        lastSingleLane = useLane;
+        mobileConsecSingleRows = mobileConsecSingleRows + 1;
+        mobileConsecWideRows = 0;
+        mobileSingleIndex++;
+        continue;
       }
+
+      break;
     }
   }
   return rows;
@@ -785,7 +856,32 @@ function buildMosaicLayout(container, isFirst) {
     bumpRhythm();
 
     var isMix = blobKind === 'mix';
-    var rows = planBlobRows(items, COLS, isMix);
+    var rows = [];
+    // Guarantee (deterministic): on the first grid, the first project blob begins with a row that
+    // contains a video (if that project has one). This avoids the "sometimes no video" refresh issue.
+    // We do NOT force the video to be the very first cell; we place it off-center with empties.
+    if (forceHero && !isMix) {
+      var heroVid = extractFirstVideo(items);
+      if (heroVid) {
+        if (COLS === 3) {
+          var withCompanion = items.length ? items.shift() : null;
+          if (withCompanion) {
+            // video in col 2; companion alternates left/right
+            if (Math.random() < 0.5) rows.push([{ t: 'm', item: withCompanion }, { t: 'm', item: heroVid }, { t: 'e' }]);
+            else rows.push([{ t: 'e' }, { t: 'm', item: heroVid }, { t: 'm', item: withCompanion }]);
+          } else {
+            rows.push([{ t: 'e' }, { t: 'm', item: heroVid }, { t: 'e' }]);
+          }
+        } else {
+          // 2 cols: place video on left or right (alternating feel with empties)
+          if (Math.random() < 0.5) rows.push([{ t: 'e' }, { t: 'm', item: heroVid }]);
+          else rows.push([{ t: 'm', item: heroVid }, { t: 'e' }]);
+        }
+      }
+    }
+
+    // Plan the remainder. (Important: plan AFTER any hero extraction so we don't keep stale rows.)
+    rows = rows.concat(planBlobRows(items, COLS, isMix));
     var blobRow = 0;
     for (var ri = 0; ri < rows.length; ri++) {
       var row = rows[ri];
@@ -904,8 +1000,7 @@ function buildMosaicLayout(container, isFirst) {
   for (var si = 0; si < order.length; si++) {
     var pi = order[si];
     var media = prepareMediaForProject(pi, isMobile);
-    // First grid: ensure there is *a* video in the first viewport, but not necessarily first tile.
-    if (isFirst && si === 0) ensureVideoInFirstNMedia(media, 3);
+    // First grid: the blob renderer will enforce a video row in the first viewport (if any exists).
 
     renderBlobChunk(media, pi, 'project', isFirst && si === 0);
 
