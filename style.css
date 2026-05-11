@@ -60,12 +60,10 @@ body {
   font-weight: 300;
 }
 
-/* Shared edge alignment:
-   Mosaic media starts at 4vw (see .mosaic-cell > img/video margins).
-   Keep UI aligned to that same edge (with a sensible min/max). */
+/* Shared edge alignment: logo, menu panel, and mosaic media all use --edge.
+   Single source of truth — change here to move everything together. */
 :root {
-  /* Default (desktop/tablet): slight nudge vs mosaic edge */
-  --edge: calc(clamp(12px, 3.2vw, 52px) + 10px);
+  --edge: calc(clamp(12px, 3.2vw, 52px) + 12px);
 }
 
 /* ── Mosaic ───────────────────────────────────────────── */
@@ -119,14 +117,13 @@ body {
   grid-column: span 2;
 }
 
-/* Viewport-relative margins — 4vw from each cell edge, consistent
-   across single-col and wide (2-col) cells. */
+/* Edge margins use --edge so logo, menu, and media share the same alignment. */
 .mosaic-cell > img,
 .mosaic-cell > video {
   display: block;
-  width: calc(100% - 8vw);
-  margin-left: 4vw;
-  margin-right: 4vw;
+  width: calc(100% - 2 * var(--edge));
+  margin-left: var(--edge);
+  margin-right: var(--edge);
   margin-top: clamp(9px, 1.35vw, 23px);
   margin-bottom: clamp(9px, 1.35vw, 23px);
   height: auto;
@@ -144,9 +141,9 @@ body {
 /* Wide/cinematic strip — decorative extra element inside a cell. */
 .wide-strip {
   display: block;
-  width: calc(100% - 8vw);
-  margin-left: 4vw;
-  margin-right: 4vw;
+  width: calc(100% - 2 * var(--edge));
+  margin-left: var(--edge);
+  margin-right: var(--edge);
   margin-top: clamp(18px, 2.7vw, 46px);
   margin-bottom: clamp(18px, 2.7vw, 46px);
   overflow: hidden;
@@ -173,7 +170,6 @@ body {
   position: fixed;
   top: 14px;
   left: var(--edge);
-  transform: translateX(2px);
   z-index: 140;
   border: 0;
   background: transparent;
@@ -305,8 +301,7 @@ body {
 /* Mobile: 2 cols + alternating lane weights (blob rhythm toggles in JS). */
 @media (max-width: 600px) {
   :root {
-    /* Mobile: keep original alignment (match mosaic 4vw edge feel) */
-    --edge: calc(clamp(10px, 3.2vw, 44px) + 1px);
+    --edge: calc(clamp(10px, 3.2vw, 44px) + 3px);
   }
 
   /* Mobile: bring menu titles a bit closer to the edge (logo stays put) */
