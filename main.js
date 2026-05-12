@@ -927,6 +927,34 @@ function buildMosaicLayout(container, isFirst) {
     if (forceHero && !isMix) {
       var heroVid = extractFirstVideo(items);
       if (heroVid) {
+        // Randomize which row of the first viewport gets the hero (0, 1 or 2).
+        // Keeps the hero in the first viewport but varies its position session-to-session.
+        var heroRowOffset = Math.floor(Math.random() * 3);
+
+        // Generate simple single-photo pre-rows so the hero isn't always row 0.
+        // Use non-video items only — keeps videos clustered around the hero.
+        function shiftNonVideo() {
+          for (var k = 0; k < items.length; k++) {
+            if (items[k].type !== 'vid') return items.splice(k, 1)[0];
+          }
+          return null;
+        }
+        for (var pr = 0; pr < heroRowOffset; pr++) {
+          var preItem = shiftNonVideo();
+          if (!preItem) break;
+          if (COLS === 3) {
+            // 3-col desktop pre-row: photo offset to one side, rest empty
+            var sideR = Math.random();
+            if (sideR < 0.34) rows.push([{ t: 'm', item: preItem }, { t: 'e' }, { t: 'e' }]);
+            else if (sideR < 0.67) rows.push([{ t: 'e' }, { t: 'm', item: preItem }, { t: 'e' }]);
+            else rows.push([{ t: 'e' }, { t: 'e' }, { t: 'm', item: preItem }]);
+          } else {
+            // 2-col mobile pre-row: photo on left or right, other cell empty
+            if (Math.random() < 0.5) rows.push([{ t: 'm', item: preItem }, { t: 'e' }]);
+            else rows.push([{ t: 'e' }, { t: 'm', item: preItem }]);
+          }
+        }
+
         if (COLS === 3) {
           var withCompanion = items.length ? items.shift() : null;
           if (withCompanion) {
