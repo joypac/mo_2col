@@ -7,64 +7,74 @@ var projects = [
   {
     name: 'banco',
     media: [
-      { src: 'assets/banco/banco1.webp', type: 'img' },
-      { src: 'assets/banco/banco2.webp', type: 'img' },
-      { src: 'assets/banco/banco3.webp', type: 'img' },
-      { src: 'assets/banco/banco4.webp', type: 'img' },
-      { src: 'assets/banco/banco5.webp', type: 'img' },
-      { src: 'assets/banco/banco6.webp', type: 'img' },
-      { src: 'assets/banco/banco7.webp', type: 'img' },
-      { src: 'assets/banco/banco8.webp', type: 'img' },
-      { src: 'assets/banco/banco9.webp', type: 'img' }
+      { src: 'assets/banco/banco2.webp',  type: 'img' },
+      { src: 'assets/banco/banco3.webp',  type: 'img' },
+      { src: 'assets/banco/banco4.webp',  type: 'img' },
+      { src: 'assets/banco/banco5.webp',  type: 'img' },
+      { src: 'assets/banco/banco6.webp',  type: 'img' },
+      { src: 'assets/banco/banco7.webp',  type: 'img' },
+      { src: 'assets/banco/banco8.webp',  type: 'img' },
+      { src: 'assets/banco/banco9.webp',  type: 'img' },
+      { src: 'assets/banco/banco10.webp', type: 'img' }
     ]
   },
   {
-    name: 'fairly normal',
+    name: 'fairly normal 1',
     media: [
-      { src: 'assets/fairly-normal/fairly1.mp4',  type: 'vid' },
-      { src: 'assets/fairly-normal/fairly2.webp',  type: 'img' },
-      { src: 'assets/fairly-normal/fairly3.webp',  type: 'img' },
-      { src: 'assets/fairly-normal/fairly4.webp',  type: 'img' },
-      { src: 'assets/fairly-normal/fairly5.webp',  type: 'img' },
-      { src: 'assets/fairly-normal/fairly6.webp',  type: 'img' },
-      { src: 'assets/fairly-normal/fairly7.webp',  type: 'img' },
-      { src: 'assets/fairly-normal/fairly8.webp',  type: 'img' },
-      { src: 'assets/fairly-normal/fairly10.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly11.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly12.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly13.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly14.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly15.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly16.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly17.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly18.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly20.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly21.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly22.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly23.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly24.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly25.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly26.webp', type: 'img' },
-      { src: 'assets/fairly-normal/fairly27.mp4',  type: 'vid' },
-      { src: 'assets/fairly-normal/fairly29.mp4',  type: 'vid' },
-      { src: 'assets/fairly-normal/fairly31.mp4',  type: 'vid' },
-      { src: 'assets/fairly-normal/fairly32.mp4',  type: 'vid' },
-      { src: 'assets/fairly-normal/fairly33.mp4',  type: 'vid' },
-      { src: 'assets/fairly-normal/fairly34.mp4',  type: 'vid' },
-      { src: 'assets/fairly-normal/fairly35.mp4',  type: 'vid' },
-      { src: 'assets/fairly-normal/fairly36.mp4',  type: 'vid' },
-      { src: 'assets/fairly-normal/fairly37.mp4',  type: 'vid' },
-      { src: 'assets/fairly-normal/fairly38.mp4',  type: 'vid' },
-      { src: 'assets/fairly-normal/Fairly Normal_H264-Scene-001.mp4', type: 'vid' },
-      { src: 'assets/fairly-normal/Fairly Normal_H264-Scene-002.mp4', type: 'vid' },
-      { src: 'assets/fairly-normal/Fairly Normal_H264-Scene-003.mp4', type: 'vid' },
-      { src: 'assets/fairly-normal/Fairly Normal_H264-Scene-004.mp4', type: 'vid' },
-      { src: 'assets/fairly-normal/Fairly Normal_H264-Scene-005.mp4', type: 'vid' },
-      { src: 'assets/fairly-normal/Fairly Normal_H264-Scene-006.mp4', type: 'vid' },
-      { src: 'assets/fairly-normal/Fairly Normal_H264-Scene-007.mp4', type: 'vid' },
-      { src: 'assets/fairly-normal/Fairly Normal_H264-Scene-008.mp4', type: 'vid' },
-      { src: 'assets/fairly-normal/Fairly Normal_H264-Scene-009.mp4', type: 'vid' },
-      { src: 'assets/fairly-normal/Fairly Normal_H264-Scene-010.mp4', type: 'vid' }
+      { src: 'assets/fairly-normal/fairly1/fairly1.mp4',           type: 'vid' },
+      { src: 'assets/fairly-normal/fairly1/fairly3.webp',          type: 'img' },
+      { src: 'assets/fairly-normal/fairly1/fairly6.webp',          type: 'img' },
+      { src: 'assets/fairly-normal/fairly1/fairly11.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly1/fairly14.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly1/fairly17.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly1/fairly22.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly1/fairly25.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly1/fairly26.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly1/fairly29.mp4',          type: 'vid' },
+      { src: 'assets/fairly-normal/fairly1/fairly32.mp4',          type: 'vid' },
+      { src: 'assets/fairly-normal/fairly1/fairly36.mp4',          type: 'vid' },
+      { src: 'assets/fairly-normal/fairly1/fairly38.mp4',          type: 'vid' },
+      { src: 'assets/fairly-normal/fairly1/fairly-scene-002.mp4',  type: 'vid' },
+      { src: 'assets/fairly-normal/fairly1/fairly-scene-009.mp4',  type: 'vid' }
+    ]
+  },
+  {
+    name: 'fairly normal 2',
+    media: [
+      { src: 'assets/fairly-normal/fairly2/fairly7.webp',          type: 'img' },
+      { src: 'assets/fairly-normal/fairly2/fairly10.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly2/fairly12.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly2/fairly15.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly2/fairly18.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly2/fairly21.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly2/fairly24.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly2/fairly27.mp4',          type: 'vid' },
+      { src: 'assets/fairly-normal/fairly2/fairly33.mp4',          type: 'vid' },
+      { src: 'assets/fairly-normal/fairly2/fairly-scene-004.mp4',  type: 'vid' },
+      { src: 'assets/fairly-normal/fairly2/fairly-scene-005.mp4',  type: 'vid' },
+      { src: 'assets/fairly-normal/fairly2/fairly-scene-006.mp4',  type: 'vid' },
+      { src: 'assets/fairly-normal/fairly2/fairly-scene-008.mp4',  type: 'vid' },
+      { src: 'assets/fairly-normal/fairly2/fairly-scene-010.mp4',  type: 'vid' }
+    ]
+  },
+  {
+    name: 'fairly normal 3',
+    media: [
+      { src: 'assets/fairly-normal/fairly3/fairly2.webp',          type: 'img' },
+      { src: 'assets/fairly-normal/fairly3/fairly4.webp',          type: 'img' },
+      { src: 'assets/fairly-normal/fairly3/fairly5.webp',          type: 'img' },
+      { src: 'assets/fairly-normal/fairly3/fairly8.webp',          type: 'img' },
+      { src: 'assets/fairly-normal/fairly3/fairly13.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly3/fairly16.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly3/fairly20.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly3/fairly23.webp',         type: 'img' },
+      { src: 'assets/fairly-normal/fairly3/fairly31.mp4',          type: 'vid' },
+      { src: 'assets/fairly-normal/fairly3/fairly34.mp4',          type: 'vid' },
+      { src: 'assets/fairly-normal/fairly3/fairly35.mp4',          type: 'vid' },
+      { src: 'assets/fairly-normal/fairly3/fairly37.mp4',          type: 'vid' },
+      { src: 'assets/fairly-normal/fairly3/fairly-scene-001.mp4',  type: 'vid' },
+      { src: 'assets/fairly-normal/fairly3/fairly-scene-003.mp4',  type: 'vid' },
+      { src: 'assets/fairly-normal/fairly3/fairly-scene-007.mp4',  type: 'vid' }
     ]
   },
   {
@@ -81,90 +91,110 @@ var projects = [
     ]
   },
   {
-    name: 'mustique',
+    name: 'mustique 1',
     media: [
-      { src: 'assets/mustique/mustique1.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique2.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique3.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique4.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique5.webp',  type: 'img' },
-      { src: 'assets/mustique/MUSTIQUE6.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique7.webp',  type: 'img' },
-      { src: 'assets/mustique/MUSTIQUE8.webp',  type: 'img' },
-      { src: 'assets/mustique/mustique9.webp',  type: 'img' },
-      { src: 'assets/mustique/MUSTIQUE10.webp', type: 'img' },
-      { src: 'assets/mustique/MUSTIQUE11.webp', type: 'img' },
-      { src: 'assets/mustique/MUSTIQUE12.webp', type: 'img' },
-      { src: 'assets/mustique/mustique13.webp', type: 'img' },
-      { src: 'assets/mustique/mustique14.webp', type: 'img' },
-      { src: 'assets/mustique/mustique15.webp', type: 'img' },
-      { src: 'assets/mustique/mustique16.webp', type: 'img' },
-      { src: 'assets/mustique/mustique17.webp', type: 'img' },
-      { src: 'assets/mustique/mustique18.webp', type: 'img' },
-      { src: 'assets/mustique/mustique19.webp', type: 'img' },
-      { src: 'assets/mustique/mustique20.webp', type: 'img' },
-      { src: 'assets/mustique/mustique21.webp', type: 'img' },
-      { src: 'assets/mustique/mustique22.webp', type: 'img' },
-      { src: 'assets/mustique/mustique23.webp', type: 'img' },
-      { src: 'assets/mustique/mustique24.webp', type: 'img' },
-      { src: 'assets/mustique/MUSTIQUE25.webp', type: 'img' },
-      { src: 'assets/mustique/MUSTIQUE26.webp', type: 'img' },
-      { src: 'assets/mustique/mustique27.webp', type: 'img' },
-      { src: 'assets/mustique/mustique28.webp', type: 'img' },
-      { src: 'assets/mustique/MUSTIQUE30.webp', type: 'img' },
-      { src: 'assets/mustique/MUSTIQUE31.webp', type: 'img' },
-      { src: 'assets/mustique/MUSTIQUE32.webp', type: 'img' },
-      { src: 'assets/mustique/MUSTIQUE33.webp', type: 'img' }
+      { src: 'assets/mustique/mustique1/mustique2.webp',  type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique5.webp',  type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique7.webp',  type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique9.webp',  type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique11.webp', type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique17.webp', type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique18.webp', type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique21.webp', type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique23.webp', type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique25.webp', type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique33.webp', type: 'img' }
     ]
   },
   {
-    name: 'paez',
+    name: 'mustique 2',
     media: [
-      { src: 'assets/paez/paez1.webp',   type: 'img' },
-      { src: 'assets/paez/paez2.webp',   type: 'img' },
-      { src: 'assets/paez/paez3.webp',   type: 'img' },
-      { src: 'assets/paez/paez4.webp',   type: 'img' },
-      { src: 'assets/paez/paez5.webp',   type: 'img' },
-      { src: 'assets/paez/PAEZ6.webp',   type: 'img' },
-      { src: 'assets/paez/PAEZ7.webp',   type: 'img' },
-      { src: 'assets/paez/paez8.webp',   type: 'img' },
-      { src: 'assets/paez/paez9.webp',   type: 'img' },
-      { src: 'assets/paez/paez10.webp',  type: 'img' },
-      { src: 'assets/paez/paez11.webp',  type: 'img' },
-      { src: 'assets/paez/paez12.webp',  type: 'img' },
-      { src: 'assets/paez/paez13.webp',  type: 'img' },
-      { src: 'assets/paez/paez14.webp',  type: 'img' },
-      { src: 'assets/paez/paez15.webp',  type: 'img' },
-      { src: 'assets/paez/paez16.webp',  type: 'img' },
-      { src: 'assets/paez/paez17.webp',  type: 'img' },
-      { src: 'assets/paez/paez18.webp',  type: 'img' },
-      { src: 'assets/paez/paez19.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ20.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ21.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ22.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ23.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ24.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ25.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ26.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ27.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ28.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ29.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ30.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ31.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ32.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ33.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ34.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ37.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ38.webp',  type: 'img' },
-      { src: 'assets/paez/PAEZ39.webp',  type: 'img' },
-      { src: 'assets/paez/IMG_5969.mp4',    type: 'vid' },
-      { src: 'assets/paez/IMG_5971.mp4',    type: 'vid' },
-      { src: 'assets/paez/paez_video1.mp4', type: 'vid' },
-      { src: 'assets/paez/paez_video2.mp4', type: 'vid' },
-      { src: 'assets/paez/paez_video3.mp4', type: 'vid' },
-      { src: 'assets/paez/paez_video4.mp4', type: 'vid' },
-      { src: 'assets/paez/paez_video5.mp4', type: 'vid' },
-      { src: 'assets/paez/paez_video6.mp4', type: 'vid' }
+      { src: 'assets/mustique/mustique2/mustique3.webp',  type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique6.webp',  type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique8.webp',  type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique10.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique15.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique16.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique19.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique22.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique24.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique27.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique31.webp', type: 'img' }
+    ]
+  },
+  {
+    name: 'mustique 3',
+    media: [
+      { src: 'assets/mustique/mustique3/mustique1.webp',  type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique4.webp',  type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique12.webp', type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique13.webp', type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique14.webp', type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique20.webp', type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique26.webp', type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique28.webp', type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique30.webp', type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique32.webp', type: 'img' }
+    ]
+  },
+  {
+    name: 'paez 1',
+    media: [
+      { src: 'assets/paez/paez1/paez1.webp',        type: 'img' },
+      { src: 'assets/paez/paez1/paez2.webp',        type: 'img' },
+      { src: 'assets/paez/paez1/paez4.webp',        type: 'img' },
+      { src: 'assets/paez/paez1/paez9.webp',        type: 'img' },
+      { src: 'assets/paez/paez1/paez11.webp',       type: 'img' },
+      { src: 'assets/paez/paez1/paez13.webp',       type: 'img' },
+      { src: 'assets/paez/paez1/paez17.webp',       type: 'img' },
+      { src: 'assets/paez/paez1/paez20.webp',       type: 'img' },
+      { src: 'assets/paez/paez1/paez24.webp',       type: 'img' },
+      { src: 'assets/paez/paez1/paez25.webp',       type: 'img' },
+      { src: 'assets/paez/paez1/paez27.webp',       type: 'img' },
+      { src: 'assets/paez/paez1/paez31.webp',       type: 'img' },
+      { src: 'assets/paez/paez1/paez32.webp',       type: 'img' },
+      { src: 'assets/paez/paez1/paez_video3.mp4',   type: 'vid' },
+      { src: 'assets/paez/paez1/paez_video6.mp4',   type: 'vid' }
+    ]
+  },
+  {
+    name: 'paez 2',
+    media: [
+      { src: 'assets/paez/paez2/paez3.webp',        type: 'img' },
+      { src: 'assets/paez/paez2/paez8.webp',        type: 'img' },
+      { src: 'assets/paez/paez2/paez12.webp',       type: 'img' },
+      { src: 'assets/paez/paez2/paez14.webp',       type: 'img' },
+      { src: 'assets/paez/paez2/paez15.webp',       type: 'img' },
+      { src: 'assets/paez/paez2/paez16.webp',       type: 'img' },
+      { src: 'assets/paez/paez2/paez23.webp',       type: 'img' },
+      { src: 'assets/paez/paez2/paez26.webp',       type: 'img' },
+      { src: 'assets/paez/paez2/paez28.webp',       type: 'img' },
+      { src: 'assets/paez/paez2/paez33.webp',       type: 'img' },
+      { src: 'assets/paez/paez2/paez37.webp',       type: 'img' },
+      { src: 'assets/paez/paez2/paez39.webp',       type: 'img' },
+      { src: 'assets/paez/paez2/paez_video1.mp4',   type: 'vid' },
+      { src: 'assets/paez/paez2/paez_video7.mp4',   type: 'vid' },
+      { src: 'assets/paez/paez2/paez_video8.mp4',   type: 'vid' }
+    ]
+  },
+  {
+    name: 'paez 3',
+    media: [
+      { src: 'assets/paez/paez3/paez5.webp',        type: 'img' },
+      { src: 'assets/paez/paez3/paez6.webp',        type: 'img' },
+      { src: 'assets/paez/paez3/paez7.webp',        type: 'img' },
+      { src: 'assets/paez/paez3/paez10.webp',       type: 'img' },
+      { src: 'assets/paez/paez3/paez18.webp',       type: 'img' },
+      { src: 'assets/paez/paez3/paez19.webp',       type: 'img' },
+      { src: 'assets/paez/paez3/paez21.webp',       type: 'img' },
+      { src: 'assets/paez/paez3/paez22.webp',       type: 'img' },
+      { src: 'assets/paez/paez3/paez29.webp',       type: 'img' },
+      { src: 'assets/paez/paez3/paez30.webp',       type: 'img' },
+      { src: 'assets/paez/paez3/paez34.webp',       type: 'img' },
+      { src: 'assets/paez/paez3/paez38.webp',       type: 'img' },
+      { src: 'assets/paez/paez3/paez_video2.mp4',   type: 'vid' },
+      { src: 'assets/paez/paez3/paez_video4.mp4',   type: 'vid' },
+      { src: 'assets/paez/paez3/paez_video5.mp4',   type: 'vid' }
     ]
   },
   {
@@ -179,181 +209,193 @@ var projects = [
 
 /* MIX: loose photos/videos that appear between projects, never mid-project. */
 var mixMedia = [
-  { src: 'assets/mix/MIX1.webp',  type: 'img' },
-  { src: 'assets/mix/MIX2.webp',  type: 'img' },
-  { src: 'assets/mix/MIX3.webp',  type: 'img' },
-  { src: 'assets/mix/MIX4.webp',  type: 'img' },
-  { src: 'assets/mix/MIX5.webp',  type: 'img' },
-  { src: 'assets/mix/MIX6.mp4',   type: 'vid' },
-  { src: 'assets/mix/MIX7.webp',  type: 'img' },
-  { src: 'assets/mix/MIX8.webp',  type: 'img' },
-  { src: 'assets/mix/MIX9.webp',  type: 'img' },
-  { src: 'assets/mix/MIX10.webp', type: 'img' },
-  { src: 'assets/mix/MIX11.webp', type: 'img' },
-  { src: 'assets/mix/MIX12.webp', type: 'img' },
-  { src: 'assets/mix/MIX13.webp', type: 'img' },
-  { src: 'assets/mix/MIX14.webp', type: 'img' },
-  { src: 'assets/mix/MIX15.webp', type: 'img' },
-  { src: 'assets/mix/MIX16.webp', type: 'img' },
-  { src: 'assets/mix/MIX17.webp', type: 'img' }
+  { src: 'assets/mix/mix1.webp',  type: 'img' },
+  { src: 'assets/mix/mix2.webp',  type: 'img' },
+  { src: 'assets/mix/mix3.webp',  type: 'img' },
+  { src: 'assets/mix/mix4.webp',  type: 'img' },
+  { src: 'assets/mix/mix5.webp',  type: 'img' },
+  { src: 'assets/mix/mix6.mp4',   type: 'vid' },
+  { src: 'assets/mix/mix7.webp',  type: 'img' },
+  { src: 'assets/mix/mix8.webp',  type: 'img' },
+  { src: 'assets/mix/mix9.webp',  type: 'img' },
+  { src: 'assets/mix/mix10.webp', type: 'img' },
+  { src: 'assets/mix/mix11.webp', type: 'img' },
+  { src: 'assets/mix/mix12.webp', type: 'img' },
+  { src: 'assets/mix/mix13.webp', type: 'img' },
+  { src: 'assets/mix/mix14.webp', type: 'img' },
+  { src: 'assets/mix/mix15.webp', type: 'img' },
+  { src: 'assets/mix/mix16.webp', type: 'img' },
+  { src: 'assets/mix/mix17.webp', type: 'img' }
 ];
 
 /* Intrinsic dimensions per asset → reserves layout space before load,
    eliminating CLS (cumulative layout shift) when images pop in. */
 var mediaDimensions = {
-  'assets/banco/banco1.webp': [1920, 1280],
-  'assets/banco/banco2.webp': [1920, 887],
-  'assets/banco/banco3.webp': [1920, 887],
-  'assets/banco/banco4.webp': [1920, 887],
-  'assets/banco/banco5.webp': [887, 1920],
-  'assets/banco/banco6.webp': [1920, 887],
-  'assets/banco/banco7.webp': [1920, 887],
-  'assets/banco/banco8.webp': [1280, 1920],
-  'assets/banco/banco9.webp': [1280, 1920],
-  'assets/fairly-normal/fairly2.webp':  [1536, 1920],
-  'assets/fairly-normal/fairly3.webp':  [1536, 1920],
-  'assets/fairly-normal/fairly4.webp':  [1536, 1920],
-  'assets/fairly-normal/fairly5.webp':  [1536, 1920],
-  'assets/fairly-normal/fairly6.webp':  [1536, 1920],
-  'assets/fairly-normal/fairly7.webp':  [1536, 1920],
-  'assets/fairly-normal/fairly8.webp':  [1536, 1920],
-  'assets/fairly-normal/fairly10.webp': [1536, 1920],
-  'assets/fairly-normal/fairly11.webp': [1536, 1920],
-  'assets/fairly-normal/fairly12.webp': [1536, 1920],
-  'assets/fairly-normal/fairly13.webp': [1536, 1920],
-  'assets/fairly-normal/fairly14.webp': [1536, 1920],
-  'assets/fairly-normal/fairly15.webp': [1536, 1920],
-  'assets/fairly-normal/fairly16.webp': [1536, 1920],
-  'assets/fairly-normal/fairly17.webp': [1920, 1280],
-  'assets/fairly-normal/fairly18.webp': [1536, 1920],
-  'assets/fairly-normal/fairly20.webp': [1536, 1920],
-  'assets/fairly-normal/fairly21.webp': [1536, 1920],
-  'assets/fairly-normal/fairly22.webp': [1536, 1920],
-  'assets/fairly-normal/fairly23.webp': [1536, 1920],
-  'assets/fairly-normal/fairly24.webp': [1536, 1920],
-  'assets/fairly-normal/fairly25.webp': [1536, 1920],
-  'assets/fairly-normal/fairly26.webp': [1536, 1920],
-  'assets/fairly-normal/fairly27.mp4':  [1080, 1920],
-  'assets/fairly-normal/Fairly Normal_H264-Scene-001.mp4': [1920, 1080],
-  'assets/fairly-normal/Fairly Normal_H264-Scene-002.mp4': [1920, 1080],
-  'assets/fairly-normal/Fairly Normal_H264-Scene-003.mp4': [1920, 1080],
-  'assets/fairly-normal/Fairly Normal_H264-Scene-004.mp4': [1920, 1080],
-  'assets/fairly-normal/Fairly Normal_H264-Scene-005.mp4': [1920, 1080],
-  'assets/fairly-normal/Fairly Normal_H264-Scene-006.mp4': [1920, 1080],
-  'assets/fairly-normal/Fairly Normal_H264-Scene-007.mp4': [1920, 1080],
-  'assets/fairly-normal/Fairly Normal_H264-Scene-008.mp4': [1920, 1080],
-  'assets/fairly-normal/Fairly Normal_H264-Scene-009.mp4': [1920, 1080],
-  'assets/fairly-normal/Fairly Normal_H264-Scene-010.mp4': [1920, 1080],
-  'assets/lapa-lofts/lapa.mp4': [1920, 1080],
+  'assets/banco/banco2.webp':  [1920, 887],
+  'assets/banco/banco3.webp':  [1920, 887],
+  'assets/banco/banco4.webp':  [1920, 887],
+  'assets/banco/banco5.webp':  [887, 1920],
+  'assets/banco/banco6.webp':  [1920, 887],
+  'assets/banco/banco7.webp':  [1920, 887],
+  'assets/banco/banco8.webp':  [1280, 1920],
+  'assets/banco/banco9.webp':  [1280, 1920],
+  'assets/banco/banco10.webp': [1920, 1280],
+  // fairly normal 1
+  'assets/fairly-normal/fairly1/fairly1.mp4':           [1080, 1080],
+  'assets/fairly-normal/fairly1/fairly3.webp':          [1536, 1920],
+  'assets/fairly-normal/fairly1/fairly6.webp':          [1536, 1920],
+  'assets/fairly-normal/fairly1/fairly11.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly1/fairly14.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly1/fairly17.webp':         [1920, 1280],
+  'assets/fairly-normal/fairly1/fairly22.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly1/fairly25.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly1/fairly26.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly1/fairly29.mp4':          [1080, 1920],
+  'assets/fairly-normal/fairly1/fairly32.mp4':          [1080, 1080],
+  'assets/fairly-normal/fairly1/fairly36.mp4':          [1080, 1080],
+  'assets/fairly-normal/fairly1/fairly38.mp4':          [1080, 1080],
+  'assets/fairly-normal/fairly1/fairly-scene-002.mp4':  [1920, 1080],
+  'assets/fairly-normal/fairly1/fairly-scene-009.mp4':  [1920, 1080],
+  // fairly normal 2
+  'assets/fairly-normal/fairly2/fairly7.webp':          [1536, 1920],
+  'assets/fairly-normal/fairly2/fairly10.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly2/fairly12.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly2/fairly15.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly2/fairly18.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly2/fairly21.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly2/fairly24.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly2/fairly27.mp4':          [1080, 1920],
+  'assets/fairly-normal/fairly2/fairly33.mp4':          [1080, 1080],
+  'assets/fairly-normal/fairly2/fairly-scene-004.mp4':  [1920, 1080],
+  'assets/fairly-normal/fairly2/fairly-scene-005.mp4':  [1920, 1080],
+  'assets/fairly-normal/fairly2/fairly-scene-006.mp4':  [1920, 1080],
+  'assets/fairly-normal/fairly2/fairly-scene-008.mp4':  [1920, 1080],
+  'assets/fairly-normal/fairly2/fairly-scene-010.mp4':  [1920, 1080],
+  // fairly normal 3
+  'assets/fairly-normal/fairly3/fairly2.webp':          [1536, 1920],
+  'assets/fairly-normal/fairly3/fairly4.webp':          [1536, 1920],
+  'assets/fairly-normal/fairly3/fairly5.webp':          [1536, 1920],
+  'assets/fairly-normal/fairly3/fairly8.webp':          [1536, 1920],
+  'assets/fairly-normal/fairly3/fairly13.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly3/fairly16.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly3/fairly20.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly3/fairly23.webp':         [1536, 1920],
+  'assets/fairly-normal/fairly3/fairly31.mp4':          [1080, 1080],
+  'assets/fairly-normal/fairly3/fairly34.mp4':          [1080, 1080],
+  'assets/fairly-normal/fairly3/fairly35.mp4':          [1080, 1080],
+  'assets/fairly-normal/fairly3/fairly37.mp4':          [1080, 1080],
+  'assets/fairly-normal/fairly3/fairly-scene-001.mp4':  [1920, 1080],
+  'assets/fairly-normal/fairly3/fairly-scene-003.mp4':  [1920, 1080],
+  'assets/fairly-normal/fairly3/fairly-scene-007.mp4':  [1920, 1080],
+  // others
+  'assets/lapa-lofts/lapa.mp4':   [1920, 1080],
   'assets/lareira/lareira1.webp': [1440, 1920],
   'assets/lareira/lareira2.webp': [1440, 1920],
-  'assets/mustique/mustique1.webp':  [1540, 1920],
-  'assets/mustique/mustique2.webp':  [1536, 1920],
-  'assets/mustique/mustique3.webp':  [1536, 1920],
-  'assets/mustique/mustique4.webp':  [1536, 1920],
-  'assets/mustique/mustique5.webp':  [1536, 1920],
-  'assets/mustique/MUSTIQUE6.webp':  [1536, 1920],
-  'assets/mustique/mustique7.webp':  [1536, 1920],
-  'assets/mustique/MUSTIQUE8.webp':  [1536, 1920],
-  'assets/mustique/mustique9.webp':  [1440, 1920],
-  'assets/mustique/MUSTIQUE10.webp': [1440, 1920],
-  'assets/mustique/MUSTIQUE11.webp': [1440, 1920],
-  'assets/mustique/MUSTIQUE12.webp': [1440, 1920],
-  'assets/mustique/mustique13.webp': [1440, 1920],
-  'assets/mustique/mustique14.webp': [1440, 1920],
-  'assets/mustique/mustique15.webp': [1440, 1920],
-  'assets/mustique/mustique16.webp': [1440, 1920],
-  'assets/mustique/mustique17.webp': [1440, 1920],
-  'assets/mustique/mustique18.webp': [1440, 1920],
-  'assets/mustique/mustique19.webp': [1440, 1920],
-  'assets/mustique/mustique20.webp': [1440, 1920],
-  'assets/mustique/mustique21.webp': [1440, 1920],
-  'assets/mustique/mustique22.webp': [1440, 1920],
-  'assets/mustique/mustique23.webp': [1440, 1920],
-  'assets/mustique/mustique24.webp': [1440, 1920],
-  'assets/mustique/MUSTIQUE25.webp': [1440, 1920],
-  'assets/mustique/MUSTIQUE26.webp': [1440, 1920],
-  'assets/mustique/mustique27.webp': [1440, 1920],
-  'assets/mustique/mustique28.webp': [1440, 1920],
-  'assets/mustique/MUSTIQUE30.webp': [1440, 1920],
-  'assets/mustique/MUSTIQUE31.webp': [1440, 1920],
-  'assets/mustique/MUSTIQUE32.webp': [1440, 1920],
-  'assets/mustique/MUSTIQUE33.webp': [1440, 1920],
-  'assets/paez/paez1.webp':   [1536, 1920],
-  'assets/paez/paez2.webp':   [1536, 1920],
-  'assets/paez/paez3.webp':   [1536, 1920],
-  'assets/paez/paez4.webp':   [1536, 1920],
-  'assets/paez/paez5.webp':   [1536, 1920],
-  'assets/paez/PAEZ6.webp':   [1536, 1920],
-  'assets/paez/PAEZ7.webp':   [1536, 1920],
-  'assets/paez/paez8.webp':   [1536, 1920],
-  'assets/paez/paez9.webp':   [1536, 1920],
-  'assets/paez/paez10.webp':  [1536, 1920],
-  'assets/paez/paez11.webp':  [1536, 1920],
-  'assets/paez/paez12.webp':  [1536, 1920],
-  'assets/paez/paez13.webp':  [1536, 1920],
-  'assets/paez/paez14.webp':  [1536, 1920],
-  'assets/paez/paez15.webp':  [1536, 1920],
-  'assets/paez/paez16.webp':  [1536, 1920],
-  'assets/paez/paez17.webp':  [1536, 1920],
-  'assets/paez/paez18.webp':  [1920, 1280],
-  'assets/paez/paez19.webp':  [1536, 1920],
-  'assets/paez/PAEZ20.webp':  [1536, 1920],
-  'assets/paez/PAEZ21.webp':  [1440, 1920],
-  'assets/paez/PAEZ22.webp':  [1440, 1920],
-  'assets/paez/PAEZ23.webp':  [1440, 1920],
-  'assets/paez/PAEZ24.webp':  [1440, 1920],
-  'assets/paez/PAEZ25.webp':  [1440, 1920],
-  'assets/paez/PAEZ26.webp':  [1440, 1920],
-  'assets/paez/PAEZ27.webp':  [1440, 1920],
-  'assets/paez/PAEZ28.webp':  [1440, 1920],
-  'assets/paez/PAEZ29.webp':  [1440, 1920],
-  'assets/paez/PAEZ30.webp':  [1440, 1920],
-  'assets/paez/PAEZ31.webp':  [1440, 1920],
-  'assets/paez/PAEZ32.webp':  [1440, 1920],
-  'assets/paez/PAEZ33.webp':  [1440, 1920],
-  'assets/paez/PAEZ34.webp':  [1440, 1920],
-  'assets/paez/PAEZ37.webp':  [1920, 1440],
-  'assets/paez/PAEZ38.webp':  [1440, 1920],
-  'assets/paez/PAEZ39.webp':  [1920, 1440],
-  'assets/paez/paez_video1.mp4': [960, 736],
-  'assets/paez/paez_video2.mp4': [960, 736],
-  'assets/paez/paez_video3.mp4': [960, 736],
-  'assets/paez/paez_video4.mp4': [960, 736],
-  'assets/paez/paez_video5.mp4': [960, 736],
-  'assets/paez/paez_video6.mp4': [960, 736],
+  // mustique 1
+  'assets/mustique/mustique1/mustique2.webp':  [1536, 1920],
+  'assets/mustique/mustique1/mustique5.webp':  [1536, 1920],
+  'assets/mustique/mustique1/mustique7.webp':  [1536, 1920],
+  'assets/mustique/mustique1/mustique9.webp':  [1440, 1920],
+  'assets/mustique/mustique1/mustique11.webp': [1440, 1920],
+  'assets/mustique/mustique1/mustique17.webp': [1440, 1920],
+  'assets/mustique/mustique1/mustique18.webp': [1440, 1920],
+  'assets/mustique/mustique1/mustique21.webp': [1440, 1920],
+  'assets/mustique/mustique1/mustique23.webp': [1440, 1920],
+  'assets/mustique/mustique1/mustique25.webp': [1440, 1920],
+  'assets/mustique/mustique1/mustique33.webp': [1440, 1920],
+  // mustique 2
+  'assets/mustique/mustique2/mustique3.webp':  [1536, 1920],
+  'assets/mustique/mustique2/mustique6.webp':  [1536, 1920],
+  'assets/mustique/mustique2/mustique8.webp':  [1536, 1920],
+  'assets/mustique/mustique2/mustique10.webp': [1440, 1920],
+  'assets/mustique/mustique2/mustique15.webp': [1440, 1920],
+  'assets/mustique/mustique2/mustique16.webp': [1440, 1920],
+  'assets/mustique/mustique2/mustique19.webp': [1440, 1920],
+  'assets/mustique/mustique2/mustique22.webp': [1440, 1920],
+  'assets/mustique/mustique2/mustique24.webp': [1440, 1920],
+  'assets/mustique/mustique2/mustique27.webp': [1440, 1920],
+  'assets/mustique/mustique2/mustique31.webp': [1440, 1920],
+  // mustique 3
+  'assets/mustique/mustique3/mustique1.webp':  [1540, 1920],
+  'assets/mustique/mustique3/mustique4.webp':  [1536, 1920],
+  'assets/mustique/mustique3/mustique12.webp': [1440, 1920],
+  'assets/mustique/mustique3/mustique13.webp': [1440, 1920],
+  'assets/mustique/mustique3/mustique14.webp': [1440, 1920],
+  'assets/mustique/mustique3/mustique20.webp': [1440, 1920],
+  'assets/mustique/mustique3/mustique26.webp': [1440, 1920],
+  'assets/mustique/mustique3/mustique28.webp': [1440, 1920],
+  'assets/mustique/mustique3/mustique30.webp': [1440, 1920],
+  'assets/mustique/mustique3/mustique32.webp': [1440, 1920],
+  // paez 1
+  'assets/paez/paez1/paez1.webp':       [1536, 1920],
+  'assets/paez/paez1/paez2.webp':       [1536, 1920],
+  'assets/paez/paez1/paez4.webp':       [1536, 1920],
+  'assets/paez/paez1/paez9.webp':       [1536, 1920],
+  'assets/paez/paez1/paez11.webp':      [1536, 1920],
+  'assets/paez/paez1/paez13.webp':      [1536, 1920],
+  'assets/paez/paez1/paez17.webp':      [1536, 1920],
+  'assets/paez/paez1/paez20.webp':      [1536, 1920],
+  'assets/paez/paez1/paez24.webp':      [1440, 1920],
+  'assets/paez/paez1/paez25.webp':      [1440, 1920],
+  'assets/paez/paez1/paez27.webp':      [1440, 1920],
+  'assets/paez/paez1/paez31.webp':      [1440, 1920],
+  'assets/paez/paez1/paez32.webp':      [1440, 1920],
+  'assets/paez/paez1/paez_video3.mp4':  [960, 736],
+  'assets/paez/paez1/paez_video6.mp4':  [960, 736],
+  // paez 2
+  'assets/paez/paez2/paez3.webp':       [1536, 1920],
+  'assets/paez/paez2/paez8.webp':       [1536, 1920],
+  'assets/paez/paez2/paez12.webp':      [1536, 1920],
+  'assets/paez/paez2/paez14.webp':      [1536, 1920],
+  'assets/paez/paez2/paez15.webp':      [1536, 1920],
+  'assets/paez/paez2/paez16.webp':      [1536, 1920],
+  'assets/paez/paez2/paez23.webp':      [1440, 1920],
+  'assets/paez/paez2/paez26.webp':      [1440, 1920],
+  'assets/paez/paez2/paez28.webp':      [1440, 1920],
+  'assets/paez/paez2/paez33.webp':      [1440, 1920],
+  'assets/paez/paez2/paez37.webp':      [1920, 1440],
+  'assets/paez/paez2/paez39.webp':      [1920, 1440],
+  'assets/paez/paez2/paez_video1.mp4':  [960, 736],
+  'assets/paez/paez2/paez_video7.mp4':  [1080, 1920],
+  'assets/paez/paez2/paez_video8.mp4':  [1080, 1920],
+  // paez 3
+  'assets/paez/paez3/paez5.webp':       [1536, 1920],
+  'assets/paez/paez3/paez6.webp':       [1536, 1920],
+  'assets/paez/paez3/paez7.webp':       [1536, 1920],
+  'assets/paez/paez3/paez10.webp':      [1536, 1920],
+  'assets/paez/paez3/paez18.webp':      [1920, 1280],
+  'assets/paez/paez3/paez19.webp':      [1536, 1920],
+  'assets/paez/paez3/paez21.webp':      [1440, 1920],
+  'assets/paez/paez3/paez22.webp':      [1440, 1920],
+  'assets/paez/paez3/paez29.webp':      [1440, 1920],
+  'assets/paez/paez3/paez30.webp':      [1440, 1920],
+  'assets/paez/paez3/paez34.webp':      [1440, 1920],
+  'assets/paez/paez3/paez38.webp':      [1440, 1920],
+  'assets/paez/paez3/paez_video2.mp4':  [960, 736],
+  'assets/paez/paez3/paez_video4.mp4':  [960, 736],
+  'assets/paez/paez3/paez_video5.mp4':  [960, 736],
+  // peca
   'assets/peca/peca1.jpg': [1024, 665],
   'assets/peca/peca2.jpg': [1024, 673],
   'assets/peca/peca3.jpg': [655, 418],
-  'assets/mix/MIX1.webp':  [1440, 1920],
-  'assets/mix/MIX2.webp':  [1440, 1920],
-  'assets/mix/MIX3.webp':  [1440, 1920],
-  'assets/mix/MIX4.webp':  [1440, 1920],
-  'assets/mix/MIX5.webp':  [1440, 1920],
-  'assets/mix/MIX7.webp':  [1440, 1920],
-  'assets/mix/MIX8.webp':  [1080, 1920],
-  'assets/mix/MIX9.webp':  [1080, 1920],
-  'assets/mix/MIX10.webp': [1440, 1920],
-  'assets/mix/MIX11.webp': [1920, 1440],
-  'assets/mix/MIX12.webp': [1440, 1920],
-  'assets/mix/MIX13.webp': [1920, 1440],
-  'assets/mix/MIX14.webp': [1440, 1920],
-  'assets/mix/MIX15.webp': [1440, 1920],
-  'assets/mix/MIX16.webp': [1440, 1920],
-  'assets/mix/MIX17.webp': [1080, 1920],
-  'assets/mix/MIX6.mp4':  [1080, 1920],
-  'assets/fairly-normal/fairly1.mp4':  [1080, 1920],
-  'assets/fairly-normal/fairly29.mp4': [1080, 1920],
-  'assets/fairly-normal/fairly31.mp4': [1080, 1080],
-  'assets/fairly-normal/fairly32.mp4': [1080, 1080],
-  'assets/fairly-normal/fairly33.mp4': [1080, 1080],
-  'assets/fairly-normal/fairly34.mp4': [1080, 1080],
-  'assets/fairly-normal/fairly35.mp4': [1080, 1080],
-  'assets/fairly-normal/fairly36.mp4': [1080, 1080],
-  'assets/fairly-normal/fairly37.mp4': [1080, 1080],
-  'assets/fairly-normal/fairly38.mp4': [1080, 1080],
-  'assets/paez/IMG_5969.mp4': [1080, 1920],
-  'assets/paez/IMG_5971.mp4': [1080, 1920]
+  // mix
+  'assets/mix/mix1.webp':  [1440, 1920],
+  'assets/mix/mix2.webp':  [1440, 1920],
+  'assets/mix/mix3.webp':  [1440, 1920],
+  'assets/mix/mix4.webp':  [1440, 1920],
+  'assets/mix/mix5.webp':  [1440, 1920],
+  'assets/mix/mix6.mp4':   [1080, 1920],
+  'assets/mix/mix7.webp':  [1440, 1920],
+  'assets/mix/mix8.webp':  [1080, 1920],
+  'assets/mix/mix9.webp':  [1080, 1920],
+  'assets/mix/mix10.webp': [1440, 1920],
+  'assets/mix/mix11.webp': [1920, 1440],
+  'assets/mix/mix12.webp': [1440, 1920],
+  'assets/mix/mix13.webp': [1920, 1440],
+  'assets/mix/mix14.webp': [1440, 1920],
+  'assets/mix/mix15.webp': [1440, 1920],
+  'assets/mix/mix16.webp': [1440, 1920],
+  'assets/mix/mix17.webp': [1080, 1920]
 };
 
 /* ── Runtime validation ───────────────────────────────── */
@@ -379,7 +421,18 @@ function shuffle(arr) {
 
 // Project order is fixed for the session (shuffled once on load) so that
 // the same project never appears first in one grid and last in the next.
-var sessionProjectOrder = shuffle(projects.map(function(_, i) { return i; }));
+// `fairly normal 1` is always pinned at position 0 — explicit editorial choice.
+var sessionProjectOrder = (function() {
+  var pinName = 'fairly normal 1';
+  var pinIdx = -1;
+  for (var i = 0; i < projects.length; i++) {
+    if (projects[i].name === pinName) { pinIdx = i; break; }
+  }
+  var rest = projects.map(function(_, i) { return i; }).filter(function(i) { return i !== pinIdx; });
+  var shuffled = shuffle(rest);
+  if (pinIdx !== -1) shuffled.unshift(pinIdx);
+  return shuffled;
+})();
 
 var preloadedHeroImages = Object.create(null);
 var imageCache = [];
@@ -631,7 +684,7 @@ function prepareMediaForProject(pi, isMobile) {
 // Mobile breathing knob: when the blob engine would place two small photos
 // side-by-side, this is the probability of breaking them apart into two
 // isolated single rows (one cell empty) instead. Higher = more whitespace.
-var MOBILE_ISOLATE_PROB = 0.65;
+var MOBILE_ISOLATE_PROB = 0.85;
 
 /** @returns {Array<Array<{t:'m'|'e', item?: *, wide?: boolean}>>} */
 function planBlobRows(items, cols, isMixBlob) {
@@ -845,8 +898,8 @@ function buildMosaicLayout(container, isFirst) {
 
   function nextMixSlice() {
     if (mixPos >= mixPool.length) return [];
-    var maxN = isMobile ? 2 : 3;
-    var n = 1 + Math.floor(Math.random() * maxN);
+    // Max 2 mix items consecutive (mobile + desktop) — editorial constraint.
+    var n = 1 + Math.floor(Math.random() * 2);
     n = Math.min(n, mixPool.length - mixPos);
     if (n < 1) n = 1;
     var sl = mixPool.slice(mixPos, mixPos + n);
@@ -1008,12 +1061,38 @@ function buildMosaicLayout(container, isFirst) {
     }
   }
 
+  // Probability of interrupting a project mid-way with a mix slice.
+  // Mix only interrupts if the project has enough media to make a split meaningful.
+  var MIX_INSIDE_PROJECT_PROB = 0.45;
+
+  function renderProjectMaybeInterrupted(media, pi, forceHero) {
+    // Short projects render as-is; not enough room for a meaningful split.
+    if (media.length < 5 || Math.random() >= MIX_INSIDE_PROJECT_PROB) {
+      renderBlobChunk(media, pi, 'project', forceHero);
+      return;
+    }
+
+    // Pick a split point that leaves at least 2 items on each side.
+    var splitAt = 2 + Math.floor(Math.random() * (media.length - 3));
+    var firstChunk = media.slice(0, splitAt);
+    var secondChunk = media.slice(splitAt);
+
+    renderBlobChunk(firstChunk, pi, 'project', forceHero);
+
+    var interruptMix = nextMixSlice();
+    if (interruptMix.length) {
+      renderBlobChunk(interruptMix, pi, 'mix', false);
+    }
+
+    renderBlobChunk(secondChunk, pi, 'project', false);
+  }
+
   for (var si = 0; si < order.length; si++) {
     var pi = order[si];
     var media = prepareMediaForProject(pi, isMobile);
     // First grid: the blob renderer will enforce a video row in the first viewport (if any exists).
 
-    renderBlobChunk(media, pi, 'project', isFirst && si === 0);
+    renderProjectMaybeInterrupted(media, pi, isFirst && si === 0);
 
     if (si < order.length - 1) {
       if (Math.random() < 0.62) appendMosaicBreather(container, isMobile);
