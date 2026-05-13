@@ -103,7 +103,9 @@ var projects = [
       { src: 'assets/mustique/mustique1/mustique21.webp', type: 'img' },
       { src: 'assets/mustique/mustique1/mustique23.webp', type: 'img' },
       { src: 'assets/mustique/mustique1/mustique25.webp', type: 'img' },
-      { src: 'assets/mustique/mustique1/mustique33.webp', type: 'img' }
+      { src: 'assets/mustique/mustique1/mustique33.webp', type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique34.webp', type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique35.webp', type: 'img' }
     ]
   },
   {
@@ -119,7 +121,12 @@ var projects = [
       { src: 'assets/mustique/mustique2/mustique22.webp', type: 'img' },
       { src: 'assets/mustique/mustique2/mustique24.webp', type: 'img' },
       { src: 'assets/mustique/mustique2/mustique27.webp', type: 'img' },
-      { src: 'assets/mustique/mustique2/mustique31.webp', type: 'img' }
+      { src: 'assets/mustique/mustique2/mustique31.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique36.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique37.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique38.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique39.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique40.webp', type: 'img' }
     ]
   },
   {
@@ -134,7 +141,11 @@ var projects = [
       { src: 'assets/mustique/mustique3/mustique26.webp', type: 'img' },
       { src: 'assets/mustique/mustique3/mustique28.webp', type: 'img' },
       { src: 'assets/mustique/mustique3/mustique30.webp', type: 'img' },
-      { src: 'assets/mustique/mustique3/mustique32.webp', type: 'img' }
+      { src: 'assets/mustique/mustique3/mustique32.webp', type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique41.webp', type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique42.webp', type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique43.webp', type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique44.webp', type: 'img' }
     ]
   },
   {
@@ -225,7 +236,11 @@ var mixMedia = [
   { src: 'assets/mix/mix14.webp', type: 'img' },
   { src: 'assets/mix/mix15.webp', type: 'img' },
   { src: 'assets/mix/mix16.webp', type: 'img' },
-  { src: 'assets/mix/mix17.webp', type: 'img' }
+  { src: 'assets/mix/mix17.webp', type: 'img' },
+  { src: 'assets/mix/mix18.mp4',  type: 'vid' },
+  { src: 'assets/mix/mix19.mp4',  type: 'vid' },
+  { src: 'assets/mix/mix20.mp4',  type: 'vid' },
+  { src: 'assets/mix/mix21.mp4',  type: 'vid' }
 ];
 
 /* Intrinsic dimensions per asset → reserves layout space before load,
@@ -303,6 +318,8 @@ var mediaDimensions = {
   'assets/mustique/mustique1/mustique23.webp': [1440, 1920],
   'assets/mustique/mustique1/mustique25.webp': [1440, 1920],
   'assets/mustique/mustique1/mustique33.webp': [1440, 1920],
+  'assets/mustique/mustique1/mustique34.webp': [1440, 1920],
+  'assets/mustique/mustique1/mustique35.webp': [1440, 2560],
   // mustique 2
   'assets/mustique/mustique2/mustique3.webp':  [1536, 1920],
   'assets/mustique/mustique2/mustique6.webp':  [1536, 1920],
@@ -315,6 +332,11 @@ var mediaDimensions = {
   'assets/mustique/mustique2/mustique24.webp': [1440, 1920],
   'assets/mustique/mustique2/mustique27.webp': [1440, 1920],
   'assets/mustique/mustique2/mustique31.webp': [1440, 1920],
+  'assets/mustique/mustique2/mustique36.webp': [1440, 1920],
+  'assets/mustique/mustique2/mustique37.webp': [1440, 1920],
+  'assets/mustique/mustique2/mustique38.webp': [1440, 1920],
+  'assets/mustique/mustique2/mustique39.webp': [1440, 1920],
+  'assets/mustique/mustique2/mustique40.webp': [1440, 2560],
   // mustique 3
   'assets/mustique/mustique3/mustique1.webp':  [1540, 1920],
   'assets/mustique/mustique3/mustique4.webp':  [1536, 1920],
@@ -326,6 +348,10 @@ var mediaDimensions = {
   'assets/mustique/mustique3/mustique28.webp': [1440, 1920],
   'assets/mustique/mustique3/mustique30.webp': [1440, 1920],
   'assets/mustique/mustique3/mustique32.webp': [1440, 1920],
+  'assets/mustique/mustique3/mustique41.webp': [1920, 1440],
+  'assets/mustique/mustique3/mustique42.webp': [1440, 1920],
+  'assets/mustique/mustique3/mustique43.webp': [1440, 1920],
+  'assets/mustique/mustique3/mustique44.webp': [1440, 2560],
   // paez 1
   'assets/paez/paez1/paez1.webp':       [1536, 1920],
   'assets/paez/paez1/paez2.webp':       [1536, 1920],
@@ -395,7 +421,11 @@ var mediaDimensions = {
   'assets/mix/mix14.webp': [1440, 1920],
   'assets/mix/mix15.webp': [1440, 1920],
   'assets/mix/mix16.webp': [1440, 1920],
-  'assets/mix/mix17.webp': [1080, 1920]
+  'assets/mix/mix17.webp': [1080, 1920],
+  'assets/mix/mix18.mp4':  [390, 694],
+  'assets/mix/mix19.mp4':  [1080, 1920],
+  'assets/mix/mix20.mp4':  [1080, 1920],
+  'assets/mix/mix21.mp4':  [720, 1280]
 };
 
 /* ── Runtime validation ───────────────────────────────── */
@@ -422,16 +452,38 @@ function shuffle(arr) {
 // Project order is fixed for the session (shuffled once on load) so that
 // the same project never appears first in one grid and last in the next.
 // `fairly normal 1` is always pinned at position 0 — explicit editorial choice.
+// Sub-projects of the same parent (e.g., fairly normal 1/2/3) are never placed
+// consecutively — they get spread across the round.
+function projectPrefix(p) {
+  return p.name.replace(/\s+\d+$/, '');
+}
+
 var sessionProjectOrder = (function() {
   var pinName = 'fairly normal 1';
   var pinIdx = -1;
   for (var i = 0; i < projects.length; i++) {
     if (projects[i].name === pinName) { pinIdx = i; break; }
   }
+
   var rest = projects.map(function(_, i) { return i; }).filter(function(i) { return i !== pinIdx; });
-  var shuffled = shuffle(rest);
-  if (pinIdx !== -1) shuffled.unshift(pinIdx);
-  return shuffled;
+
+  // Constrained shuffle: avoid consecutive same-prefix projects.
+  var result = [];
+  var lastPrefix = pinIdx !== -1 ? projectPrefix(projects[pinIdx]) : null;
+  while (rest.length) {
+    var candidates = rest.filter(function(i) {
+      return projectPrefix(projects[i]) !== lastPrefix;
+    });
+    // Fallback if all remaining share the previous prefix (shouldn't happen in practice).
+    if (!candidates.length) candidates = rest;
+    var pick = candidates[Math.floor(Math.random() * candidates.length)];
+    result.push(pick);
+    rest.splice(rest.indexOf(pick), 1);
+    lastPrefix = projectPrefix(projects[pick]);
+  }
+
+  if (pinIdx !== -1) result.unshift(pinIdx);
+  return result;
 })();
 
 var preloadedHeroImages = Object.create(null);
@@ -684,7 +736,8 @@ function prepareMediaForProject(pi, isMobile) {
 // Mobile breathing knob: when the blob engine would place two small photos
 // side-by-side, this is the probability of breaking them apart into two
 // isolated single rows (one cell empty) instead. Higher = more whitespace.
-var MOBILE_ISOLATE_PROB = 0.85;
+var MOBILE_ISOLATE_PROB = 0.95;
+var DESKTOP_ISOLATE_PROB = 0.45;
 
 /** @returns {Array<Array<{t:'m'|'e', item?: *, wide?: boolean}>>} */
 function planBlobRows(items, cols, isMixBlob) {
@@ -704,8 +757,17 @@ function planBlobRows(items, cols, isMixBlob) {
     var u = Math.random();
     if (cols === 3) {
       if (left >= 2 && (left === 2 || u < 0.35)) {
-        rows.push([{ t: 'm', item: items[i++] }, { t: 'm', item: items[i++] }, { t: 'e' }]);
-        streakWide = 0;
+        if (Math.random() < DESKTOP_ISOLATE_PROB) {
+          var dOne = items[i++];
+          streakWide = 0;
+          var dr = Math.random();
+          if (dr < 0.34) rows.push([{ t: 'm', item: dOne }, { t: 'e' }, { t: 'e' }]);
+          else if (dr < 0.67) rows.push([{ t: 'e' }, { t: 'm', item: dOne }, { t: 'e' }]);
+          else rows.push([{ t: 'e' }, { t: 'e' }, { t: 'm', item: dOne }]);
+        } else {
+          rows.push([{ t: 'm', item: items[i++] }, { t: 'm', item: items[i++] }, { t: 'e' }]);
+          streakWide = 0;
+        }
       } else if (left >= 2 && u < 0.35 + 0.30) {
         var a = items[i++], b = items[i++];
         var aw = !mosaicPortraitVideo(a) && streakWide < 2;
@@ -715,7 +777,12 @@ function planBlobRows(items, cols, isMixBlob) {
           rows.push([{ t: 'm', item: b }, { t: 'm', item: a, wide: true }]);
         } else {
           // wide starts in col 1 (spans col 1-2), small in col 3
-          rows.push([{ t: 'm', item: a, wide: aw }, { t: 'm', item: b }]);
+          // When aw=false (portrait video), item is 1-col — must pad to 3 slots.
+          if (aw) {
+            rows.push([{ t: 'm', item: a, wide: true }, { t: 'm', item: b }]);
+          } else {
+            rows.push([{ t: 'm', item: a }, { t: 'm', item: b }, { t: 'e' }]);
+          }
         }
         streakWide = aw ? streakWide + 1 : 0;
       } else if (left >= 1 && u < 0.35 + 0.30 + 0.17 && streakWide < 2) {
@@ -725,9 +792,12 @@ function planBlobRows(items, cols, isMixBlob) {
         if (ww && Math.random() < 0.5) {
           // empty col 1, wide starts in col 2 (spans col 2-3)
           rows.push([{ t: 'e' }, { t: 'm', item: w, wide: true }]);
-        } else {
+        } else if (ww) {
           // wide starts in col 1 (spans col 1-2), empty col 3
-          rows.push([{ t: 'm', item: w, wide: ww }, { t: 'e' }]);
+          rows.push([{ t: 'm', item: w, wide: true }, { t: 'e' }]);
+        } else {
+          // portrait video: 1-col item — pad to 3 slots so grid stays aligned
+          rows.push([{ t: 'm', item: w }, { t: 'e' }, { t: 'e' }]);
         }
         streakWide = ww ? streakWide + 1 : 0;
       } else if (left >= 1) {
@@ -898,8 +968,9 @@ function buildMosaicLayout(container, isFirst) {
 
   function nextMixSlice() {
     if (mixPos >= mixPool.length) return [];
-    // Max 2 mix items consecutive (mobile + desktop) — editorial constraint.
-    var n = 1 + Math.floor(Math.random() * 2);
+    // Bias to 1 item ("quase sempre") with occasional 2 ("muitas vezes").
+    // Max 2 consecutive — editorial constraint.
+    var n = Math.random() < 0.25 ? 2 : 1;
     n = Math.min(n, mixPool.length - mixPos);
     if (n < 1) n = 1;
     var sl = mixPool.slice(mixPos, mixPos + n);
@@ -1094,8 +1165,9 @@ function buildMosaicLayout(container, isFirst) {
   var MIX_INSIDE_PROJECT_PROB = 0.45;
 
   function renderProjectMaybeInterrupted(media, pi, forceHero) {
-    // Short projects render as-is; not enough room for a meaningful split.
-    if (media.length < 5 || Math.random() >= MIX_INSIDE_PROJECT_PROB) {
+    // First project (hero) renders whole — keep the opening clean, no mix in
+    // the first viewport. Short projects also render whole (no room to split).
+    if (forceHero || media.length < 5 || Math.random() >= MIX_INSIDE_PROJECT_PROB) {
       renderBlobChunk(media, pi, 'project', forceHero);
       return;
     }
