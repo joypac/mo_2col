@@ -211,9 +211,10 @@ var projects = [
   {
     name: 'peça',
     media: [
-      { src: 'assets/peca/peca1.jpg', type: 'img' },
-      { src: 'assets/peca/peca2.jpg', type: 'img' },
-      { src: 'assets/peca/peca3.jpg', type: 'img' }
+      { src: 'assets/peca/peca1.webp', type: 'img' },
+      { src: 'assets/peca/peca2.webp', type: 'img' },
+      { src: 'assets/peca/peca3.webp', type: 'img' },
+      { src: 'assets/peca/peca4.webp', type: 'img' }
     ]
   }
 ];
@@ -237,10 +238,20 @@ var mixMedia = [
   { src: 'assets/mix/mix15.webp', type: 'img' },
   { src: 'assets/mix/mix16.webp', type: 'img' },
   { src: 'assets/mix/mix17.webp', type: 'img' },
-  { src: 'assets/mix/mix18.mp4',  type: 'vid' },
-  { src: 'assets/mix/mix19.mp4',  type: 'vid' },
-  { src: 'assets/mix/mix20.mp4',  type: 'vid' },
-  { src: 'assets/mix/mix21.mp4',  type: 'vid' }
+  { src: 'assets/mix/mix18.mp4',   type: 'vid' },
+  { src: 'assets/mix/mix19.mp4',   type: 'vid' },
+  { src: 'assets/mix/mix20.mp4',   type: 'vid' },
+  { src: 'assets/mix/mix21.mp4',   type: 'vid' },
+  { src: 'assets/mix/mix22.webp',  type: 'img' },
+  { src: 'assets/mix/mix22_t.webp', type: 'img' },
+  { src: 'assets/mix/mix23.webp',  type: 'img' },
+  { src: 'assets/mix/mix23_t.webp', type: 'img' },
+  { src: 'assets/mix/mix24.webp',  type: 'img' },
+  { src: 'assets/mix/mix24_t.webp', type: 'img' },
+  { src: 'assets/mix/mix25.webp',  type: 'img' },
+  { src: 'assets/mix/mix25_t.webp', type: 'img' },
+  { src: 'assets/mix/mix26.webp',  type: 'img' },
+  { src: 'assets/mix/mix26_t.webp', type: 'img' }
 ];
 
 /* Intrinsic dimensions per asset → reserves layout space before load,
@@ -401,9 +412,10 @@ var mediaDimensions = {
   'assets/paez/paez3/paez_video4.mp4':  [960, 736],
   'assets/paez/paez3/paez_video5.mp4':  [960, 736],
   // peca
-  'assets/peca/peca1.jpg': [1024, 665],
-  'assets/peca/peca2.jpg': [1024, 673],
-  'assets/peca/peca3.jpg': [655, 418],
+  'assets/peca/peca1.webp': [1024, 665],
+  'assets/peca/peca2.webp': [1024, 655],
+  'assets/peca/peca3.webp': [1024, 673],
+  'assets/peca/peca4.webp': [1024, 671],
   // mix
   'assets/mix/mix1.webp':  [1440, 1920],
   'assets/mix/mix2.webp':  [1440, 1920],
@@ -422,10 +434,20 @@ var mediaDimensions = {
   'assets/mix/mix15.webp': [1440, 1920],
   'assets/mix/mix16.webp': [1440, 1920],
   'assets/mix/mix17.webp': [1080, 1920],
-  'assets/mix/mix18.mp4':  [390, 694],
-  'assets/mix/mix19.mp4':  [1080, 1920],
-  'assets/mix/mix20.mp4':  [1080, 1920],
-  'assets/mix/mix21.mp4':  [720, 1280]
+  'assets/mix/mix18.mp4':   [390, 694],
+  'assets/mix/mix19.mp4':   [1080, 1920],
+  'assets/mix/mix20.mp4':   [1080, 1920],
+  'assets/mix/mix21.mp4':   [720, 1280],
+  'assets/mix/mix22.webp':  [1221, 1012],
+  'assets/mix/mix22_t.webp':[1221, 1012],
+  'assets/mix/mix23.webp':  [819, 853],
+  'assets/mix/mix23_t.webp':[819, 853],
+  'assets/mix/mix24.webp':  [749, 896],
+  'assets/mix/mix24_t.webp':[749, 896],
+  'assets/mix/mix25.webp':  [1125, 778],
+  'assets/mix/mix25_t.webp':[1125, 778],
+  'assets/mix/mix26.webp':  [1044, 825],
+  'assets/mix/mix26_t.webp':[1044, 825]
 };
 
 /* ── Runtime validation ───────────────────────────────── */
@@ -819,11 +841,12 @@ function planBlobRows(items, cols, isMixBlob) {
       // - after any wide row, force the next single to flip sides (visible dynamism)
       var mustFlipAfterWide = afterWide;
 
-      // If we just placed a wide, force a single row next (if possible) and flip side.
+      // If we just placed a wide, force a single row next (if possible). 70% flip side, 30% stay
+      // (breaks strict zigzag — client preference).
       if (mustFlipAfterWide && left >= 1) {
         afterWide = false;
         var postWide = items[i++];
-        var useLanePW = 1 - lastSingleLane; // guaranteed side flip
+        var useLanePW = (Math.random() < 0.70) ? (1 - lastSingleLane) : lastSingleLane;
         if (useLanePW === 0) rows.push([{ t: 'm', item: postWide }, { t: 'e' }]);
         else rows.push([{ t: 'e' }, { t: 'm', item: postWide }]);
         lastSingleLane = useLanePW;
@@ -860,12 +883,17 @@ function planBlobRows(items, cols, isMixBlob) {
         continue;
       }
 
-      // Otherwise do a single row, alternating sides deterministically.
+      // Otherwise do a single row. 70% flip side from previous, 30% stay
+      // (breaks strict zigzag — client preference).
       if (left >= 1) {
         var mo = items[i++];
         streakWide = 0;
-        // Deterministic alternation across the whole blob.
-        var useLane = ((mobileSingleStart + mobileSingleIndex) % 2);
+        var useLane;
+        if (mobileSingleIndex === 0) {
+          useLane = mobileSingleStart;
+        } else {
+          useLane = (Math.random() < 0.70) ? (1 - lastSingleLane) : lastSingleLane;
+        }
         if (useLane === 0) rows.push([{ t: 'm', item: mo }, { t: 'e' }]);
         else rows.push([{ t: 'e' }, { t: 'm', item: mo }]);
         lastSingleLane = useLane;
