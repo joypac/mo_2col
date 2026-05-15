@@ -241,17 +241,7 @@ var mixMedia = [
   { src: 'assets/mix/mix18.mp4',   type: 'vid' },
   { src: 'assets/mix/mix19.mp4',   type: 'vid' },
   { src: 'assets/mix/mix20.mp4',   type: 'vid' },
-  { src: 'assets/mix/mix21.mp4',   type: 'vid' },
-  { src: 'assets/mix/mix22.webp',  type: 'img' },
-  { src: 'assets/mix/mix22_t.webp', type: 'img' },
-  { src: 'assets/mix/mix23.webp',  type: 'img' },
-  { src: 'assets/mix/mix23_t.webp', type: 'img' },
-  { src: 'assets/mix/mix24.webp',  type: 'img' },
-  { src: 'assets/mix/mix24_t.webp', type: 'img' },
-  { src: 'assets/mix/mix25.webp',  type: 'img' },
-  { src: 'assets/mix/mix25_t.webp', type: 'img' },
-  { src: 'assets/mix/mix26.webp',  type: 'img' },
-  { src: 'assets/mix/mix26_t.webp', type: 'img' }
+  { src: 'assets/mix/mix21.mp4',   type: 'vid' }
 ];
 
 /* Intrinsic dimensions per asset → reserves layout space before load,
@@ -437,17 +427,7 @@ var mediaDimensions = {
   'assets/mix/mix18.mp4':   [390, 694],
   'assets/mix/mix19.mp4':   [1080, 1920],
   'assets/mix/mix20.mp4':   [1080, 1920],
-  'assets/mix/mix21.mp4':   [720, 1280],
-  'assets/mix/mix22.webp':  [1221, 1012],
-  'assets/mix/mix22_t.webp':[1221, 1012],
-  'assets/mix/mix23.webp':  [819, 853],
-  'assets/mix/mix23_t.webp':[819, 853],
-  'assets/mix/mix24.webp':  [749, 896],
-  'assets/mix/mix24_t.webp':[749, 896],
-  'assets/mix/mix25.webp':  [1125, 778],
-  'assets/mix/mix25_t.webp':[1125, 778],
-  'assets/mix/mix26.webp':  [1044, 825],
-  'assets/mix/mix26_t.webp':[1044, 825]
+  'assets/mix/mix21.mp4':   [720, 1280]
 };
 
 /* ── Runtime validation ───────────────────────────────── */
