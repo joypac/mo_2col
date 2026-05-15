@@ -575,6 +575,52 @@ function markMediaLoaded(cell, mediaEl) {
   if (cell) cell.classList.add('has-loaded-media');
 }
 
+// Wires the load + error (and for video, loadeddata) events to markMediaLoaded.
+// Centralised so all media elements behave the same and we don't repeat 3+ identical blocks.
+function bindLoadOrError(mediaEl) {
+  function done() {
+    markMediaLoaded(mediaEl.closest && mediaEl.closest('.mosaic-cell'), mediaEl);
+  }
+  if (mediaEl.tagName === 'VIDEO') {
+    mediaEl.addEventListener('loadeddata', done, { once: true });
+  } else {
+    mediaEl.addEventListener('load', done, { once: true });
+  }
+  mediaEl.addEventListener('error', done, { once: true });
+}
+
+// Factory for <img>/<video> mosaic media. Centralises the setup (dimensions,
+// async decoding, preload mode, load listeners) so callers only specify what
+// differs (alt, loading, fetchpriority, preload).
+function createMosaicMediaElement(item, opts) {
+  opts = opts || {};
+  var className = opts.className || 'mosaic-media';
+  if (item.type === 'vid') {
+    var video = document.createElement('video');
+    video.className = className;
+    setIntrinsicDimensions(video, item.src);
+    video.muted = true;
+    video.loop = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('preload', opts.preload || 'none');
+    bindLoadOrError(video);
+    var src = document.createElement('source');
+    src.src = item.src;
+    video.appendChild(src);
+    return video;
+  }
+  var img = document.createElement('img');
+  img.className = className;
+  img.decoding = 'async';
+  setIntrinsicDimensions(img, item.src);
+  img.alt = opts.alt || '';
+  img.setAttribute('loading', opts.loading || 'lazy');
+  img.setAttribute('fetchpriority', opts.fetchpriority || 'low');
+  bindLoadOrError(img);
+  img.src = item.src;
+  return img;
+}
+
 /* ── Render ───────────────────────────────────────────── */
 
 // Shared IntersectionObserver for all video tiles across all grids.
@@ -595,65 +641,6 @@ var vidObs = new IntersectionObserver(function(entries) {
     }
   });
 }, { threshold: [0, 0.15], rootMargin: '50% 0px' });
-
-/* ── Similar-photo avoidance ─────────────────────────────
-   pHash hamming distance ≤ 10 pairs, computed once from all assets.
-   areSimilar() used to desimilarize media arrays before rendering.
-── */
-var similarPairs = (function() {
-  var raw = [
-    ['assets/peca/peca1.jpg',                   'assets/peca/peca3.jpg'],
-    ['assets/mustique/MUSTIQUE25.webp',          'assets/mustique/mustique27.webp'],
-    ['assets/fairly-normal/fairly23.webp',       'assets/paez/PAEZ21.webp'],
-    ['assets/fairly-normal/fairly24.webp',       'assets/mustique/mustique1.webp'],
-    ['assets/mustique/MUSTIQUE25.webp',          'assets/paez/PAEZ23.webp'],
-    ['assets/mix/MIX4.webp',                    'assets/mustique/MUSTIQUE33.webp'],
-    ['assets/mustique/MUSTIQUE33.webp',          'assets/paez/PAEZ21.webp'],
-    ['assets/mustique/MUSTIQUE33.webp',          'assets/paez/PAEZ24.webp'],
-    ['assets/mustique/mustique28.webp',          'assets/paez/PAEZ21.webp'],
-    ['assets/fairly-normal/fairly10.webp',       'assets/fairly-normal/fairly16.webp'],
-    ['assets/fairly-normal/fairly14.webp',       'assets/paez/PAEZ21.webp'],
-    ['assets/fairly-normal/fairly16.webp',       'assets/paez/PAEZ24.webp'],
-    ['assets/fairly-normal/fairly17.webp',       'assets/mustique/mustique20.webp'],
-    ['assets/fairly-normal/fairly24.webp',       'assets/paez/PAEZ21.webp'],
-    ['assets/fairly-normal/fairly26.webp',       'assets/mustique/MUSTIQUE25.webp'],
-    ['assets/mix/MIX13.webp',                   'assets/mix/MIX8.webp'],
-    ['assets/mix/MIX13.webp',                   'assets/paez/paez9.webp'],
-    ['assets/mix/MIX4.webp',                    'assets/mustique/mustique23.webp'],
-    ['assets/mix/MIX4.webp',                    'assets/paez/PAEZ21.webp'],
-    ['assets/mix/MIX9.webp',                    'assets/mustique/MUSTIQUE32.webp'],
-    ['assets/mix/MIX9.webp',                    'assets/paez/PAEZ39.webp'],
-    ['assets/mix/MIX9.webp',                    'assets/paez/paez9.webp'],
-    ['assets/mustique/MUSTIQUE32.webp',          'assets/paez/paez9.webp'],
-    ['assets/mustique/MUSTIQUE6.webp',           'assets/paez/PAEZ29.webp'],
-    ['assets/mustique/mustique1.webp',           'assets/paez/PAEZ21.webp'],
-    ['assets/mustique/mustique27.webp',          'assets/paez/PAEZ23.webp'],
-  ];
-  var set = {};
-  raw.forEach(function(p) { set[[p[0],p[1]].sort().join('|')] = true; });
-  return set;
-})();
-
-function areSimilar(a, b) { return !!similarPairs[[a,b].sort().join('|')]; }
-
-function desimilarize(arr) {
-  var changed = true, passes = 0;
-  while (changed && passes++ < arr.length) {
-    changed = false;
-    for (var i = 0; i < arr.length - 1; i++) {
-      if (areSimilar(arr[i].src, arr[i+1].src)) {
-        for (var j = i + 2; j < arr.length; j++) {
-          if (!areSimilar(arr[i].src, arr[j].src)) {
-            var tmp = arr[i+1]; arr[i+1] = arr[j]; arr[j] = tmp;
-            changed = true;
-            break;
-          }
-        }
-      }
-    }
-  }
-  return arr;
-}
 
 /* ── Blob mosaic engine ───────────────────────────────────
    Each *project* is one contiguous block (shuffle inside the block only).
@@ -735,7 +722,7 @@ function prepareMediaForProject(pi, isMobile) {
     var imgI = 0;
     arr = result.map(function(x) { return x !== null ? x : imgs[imgI++]; });
     var minGap = isMobile ? 3 : 5;
-    var out = desimilarize(arr);
+    var out = arr;
     var lastVid = -9999;
     for (var ri = 0; ri < out.length; ri++) {
       if (out[ri] && out[ri].type === 'vid') {
@@ -752,7 +739,7 @@ function prepareMediaForProject(pi, isMobile) {
     }
     return out;
   }
-  return desimilarize(arr);
+  return arr;
 }
 
 // Mobile breathing knob: when the blob engine would place two small photos
@@ -761,152 +748,160 @@ function prepareMediaForProject(pi, isMobile) {
 var MOBILE_ISOLATE_PROB = 0.95;
 var DESKTOP_ISOLATE_PROB = 0.45;
 
-/** @returns {Array<Array<{t:'m'|'e', item?: *, wide?: boolean}>>} */
-function planBlobRows(items, cols, isMixBlob) {
+// Single random column for a one-cell row in a 3-col grid.
+function planDesktopOneSmall(item) {
+  var r = Math.random();
+  if (r < 0.34) return [{ t: 'm', item: item }, { t: 'e' }, { t: 'e' }];      // col 1
+  if (r < 0.67) return [{ t: 'e' }, { t: 'm', item: item }, { t: 'e' }];      // col 2
+  return [{ t: 'e' }, { t: 'e' }, { t: 'm', item: item }];                    // col 3
+}
+
+// Plan rows for a 3-column desktop grid.
+function planDesktop(items, isMixBlob) {
   var rows = [];
   var i = 0;
   var streakWide = 0;
-  // Mobile: strict alternation of single-tile rows (left/right) per blob.
-  // `mobileSingleStart` randomizes which side starts first so the whole page isn't biased.
+  while (i < items.length) {
+    var left = items.length - i;
+    var u = Math.random();
+
+    // twoSmall (35%): with DESKTOP_ISOLATE_PROB, drop one item alone instead.
+    if (left >= 2 && (left === 2 || u < 0.35)) {
+      if (Math.random() < DESKTOP_ISOLATE_PROB) {
+        rows.push(planDesktopOneSmall(items[i++]));
+        streakWide = 0;
+      } else {
+        rows.push([{ t: 'm', item: items[i++] }, { t: 'm', item: items[i++] }, { t: 'e' }]);
+        streakWide = 0;
+      }
+      continue;
+    }
+
+    // wideSmall (30%): wide cell + small cell. Portrait video can't be wide → pad to 3 slots.
+    if (left >= 2 && u < 0.35 + 0.30) {
+      var a = items[i++], b = items[i++];
+      var aw = !mosaicPortraitVideo(a) && streakWide < 2;
+      if (aw && Math.random() < 0.5) {
+        rows.push([{ t: 'm', item: b }, { t: 'm', item: a, wide: true }]);
+      } else if (aw) {
+        rows.push([{ t: 'm', item: a, wide: true }, { t: 'm', item: b }]);
+      } else {
+        rows.push([{ t: 'm', item: a }, { t: 'm', item: b }, { t: 'e' }]);
+      }
+      streakWide = aw ? streakWide + 1 : 0;
+      continue;
+    }
+
+    // wideEmpty (17%): wide cell + 1 empty (or padded if portrait video).
+    if (left >= 1 && u < 0.35 + 0.30 + 0.17 && streakWide < 2) {
+      var w = items[i++];
+      var ww = !mosaicPortraitVideo(w);
+      if (ww && Math.random() < 0.5) {
+        rows.push([{ t: 'e' }, { t: 'm', item: w, wide: true }]);
+      } else if (ww) {
+        rows.push([{ t: 'm', item: w, wide: true }, { t: 'e' }]);
+      } else {
+        rows.push([{ t: 'm', item: w }, { t: 'e' }, { t: 'e' }]);
+      }
+      streakWide = ww ? streakWide + 1 : 0;
+      continue;
+    }
+
+    // oneSmall (fallback): single item in random column.
+    if (left >= 1) {
+      rows.push(planDesktopOneSmall(items[i++]));
+      streakWide = 0;
+      continue;
+    }
+
+    break;
+  }
+  return rows;
+}
+
+// Plan rows for a 2-column mobile grid.
+// Lively rhythm with constraints: no >2 wide rows in a row, alternate sides
+// (70% flip / 30% stay — breaks strict zigzag), with MOBILE_ISOLATE_PROB
+// chance of breaking 2-media rows into isolated singles for whitespace.
+function planMobile(items, isMixBlob) {
+  var rows = [];
+  var i = 0;
+  var streakWide = 0;
   var mobileSingleStart = Math.random() < 0.5 ? 0 : 1; // 0 => left, 1 => right
   var afterWide = false;
   var lastSingleLane = mobileSingleStart;
   var mobileConsecWideRows = 0;
   var mobileConsecSingleRows = 0;
   var mobileSingleIndex = 0;
+
+  function placeMobileSingle(item, forceFlipFromLast) {
+    streakWide = 0;
+    var useLane;
+    if (forceFlipFromLast) {
+      useLane = (Math.random() < 0.70) ? (1 - lastSingleLane) : lastSingleLane;
+    } else if (mobileSingleIndex === 0) {
+      useLane = mobileSingleStart;
+    } else {
+      useLane = (Math.random() < 0.70) ? (1 - lastSingleLane) : lastSingleLane;
+    }
+    if (useLane === 0) rows.push([{ t: 'm', item: item }, { t: 'e' }]);
+    else rows.push([{ t: 'e' }, { t: 'm', item: item }]);
+    lastSingleLane = useLane;
+    mobileConsecSingleRows = mobileConsecSingleRows + 1;
+    mobileConsecWideRows = 0;
+    mobileSingleIndex++;
+  }
+
   while (i < items.length) {
     var left = items.length - i;
     var u = Math.random();
-    if (cols === 3) {
-      if (left >= 2 && (left === 2 || u < 0.35)) {
-        if (Math.random() < DESKTOP_ISOLATE_PROB) {
-          var dOne = items[i++];
-          streakWide = 0;
-          var dr = Math.random();
-          if (dr < 0.34) rows.push([{ t: 'm', item: dOne }, { t: 'e' }, { t: 'e' }]);
-          else if (dr < 0.67) rows.push([{ t: 'e' }, { t: 'm', item: dOne }, { t: 'e' }]);
-          else rows.push([{ t: 'e' }, { t: 'e' }, { t: 'm', item: dOne }]);
-        } else {
-          rows.push([{ t: 'm', item: items[i++] }, { t: 'm', item: items[i++] }, { t: 'e' }]);
-          streakWide = 0;
-        }
-      } else if (left >= 2 && u < 0.35 + 0.30) {
-        var a = items[i++], b = items[i++];
-        var aw = !mosaicPortraitVideo(a) && streakWide < 2;
-        // wideSmall: sometimes place the wide on the right side (empty/weight shifts)
-        if (aw && Math.random() < 0.5) {
-          // small in col 1, wide starts in col 2 (spans col 2-3)
-          rows.push([{ t: 'm', item: b }, { t: 'm', item: a, wide: true }]);
-        } else {
-          // wide starts in col 1 (spans col 1-2), small in col 3
-          // When aw=false (portrait video), item is 1-col — must pad to 3 slots.
-          if (aw) {
-            rows.push([{ t: 'm', item: a, wide: true }, { t: 'm', item: b }]);
-          } else {
-            rows.push([{ t: 'm', item: a }, { t: 'm', item: b }, { t: 'e' }]);
-          }
-        }
-        streakWide = aw ? streakWide + 1 : 0;
-      } else if (left >= 1 && u < 0.35 + 0.30 + 0.17 && streakWide < 2) {
-        var w = items[i++];
-        var ww = !mosaicPortraitVideo(w);
-        // wideEmpty: balance which side is visually heavier
-        if (ww && Math.random() < 0.5) {
-          // empty col 1, wide starts in col 2 (spans col 2-3)
-          rows.push([{ t: 'e' }, { t: 'm', item: w, wide: true }]);
-        } else if (ww) {
-          // wide starts in col 1 (spans col 1-2), empty col 3
-          rows.push([{ t: 'm', item: w, wide: true }, { t: 'e' }]);
-        } else {
-          // portrait video: 1-col item — pad to 3 slots so grid stays aligned
-          rows.push([{ t: 'm', item: w }, { t: 'e' }, { t: 'e' }]);
-        }
-        streakWide = ww ? streakWide + 1 : 0;
-      } else if (left >= 1) {
-        var one = items[i++];
-        streakWide = 0;
-        // oneSmall: allow right column too, otherwise the grid biases left.
-        var r = Math.random();
-        if (r < 0.34) rows.push([{ t: 'm', item: one }, { t: 'e' }, { t: 'e' }]);          // col 1
-        else if (r < 0.67) rows.push([{ t: 'e' }, { t: 'm', item: one }, { t: 'e' }]);     // col 2
-        else rows.push([{ t: 'e' }, { t: 'e' }, { t: 'm', item: one }]);                   // col 3
-      } else {
-        break;
-      }
-    } else {
-      // Mobile: keep rhythm lively and avoid "one-side column" artifacts.
-      // Rules:
-      // - never >2 wide rows in a row
-      // - never allow many consecutive (empty + small) rows; prefer 2-media rows to re-balance
-      // - after any wide row, force the next single to flip sides (visible dynamism)
-      var mustFlipAfterWide = afterWide;
 
-      // If we just placed a wide, force a single row next (if possible). 70% flip side, 30% stay
-      // (breaks strict zigzag — client preference).
-      if (mustFlipAfterWide && left >= 1) {
-        afterWide = false;
-        var postWide = items[i++];
-        var useLanePW = (Math.random() < 0.70) ? (1 - lastSingleLane) : lastSingleLane;
-        if (useLanePW === 0) rows.push([{ t: 'm', item: postWide }, { t: 'e' }]);
-        else rows.push([{ t: 'e' }, { t: 'm', item: postWide }]);
-        lastSingleLane = useLanePW;
-        mobileConsecSingleRows = 1;
-        mobileConsecWideRows = 0;
-        mobileSingleIndex++;
-        continue;
-      }
-
-      // Try a 2-media row — but break it apart (MOBILE_ISOLATE_PROB) into
-      // two isolated single rows for breathing room.
-      if (left >= 2 && u < 0.36 && !(isMixBlob && left === 2 && Math.random() < 0.4)) {
-        if (Math.random() < MOBILE_ISOLATE_PROB) {
-          // Don't consume items here — fall through to single-row logic so
-          // the existing lane-alternation rules place each item separately.
-        } else {
-          rows.push([{ t: 'm', item: items[i++] }, { t: 'm', item: items[i++] }]);
-          mobileConsecSingleRows = 0;
-          mobileConsecWideRows = 0;
-          streakWide = 0;
-          continue;
-        }
-      }
-
-      // Try a wide row (full-width on mobile), but never more than 2 in a row.
-      if (left >= 1 && u < 0.36 + 0.28 && streakWide < 2 && mobileConsecWideRows < 2) {
-        var mw = items[i++];
-        var mww = !mosaicPortraitVideo(mw);
-        rows.push([{ t: 'm', item: mw, wide: mww }]);
-        streakWide = mww ? streakWide + 1 : 0;
-        mobileConsecWideRows = mww ? (mobileConsecWideRows + 1) : 0;
-        mobileConsecSingleRows = 0;
-        if (mww) afterWide = true;
-        continue;
-      }
-
-      // Otherwise do a single row. 70% flip side from previous, 30% stay
-      // (breaks strict zigzag — client preference).
-      if (left >= 1) {
-        var mo = items[i++];
-        streakWide = 0;
-        var useLane;
-        if (mobileSingleIndex === 0) {
-          useLane = mobileSingleStart;
-        } else {
-          useLane = (Math.random() < 0.70) ? (1 - lastSingleLane) : lastSingleLane;
-        }
-        if (useLane === 0) rows.push([{ t: 'm', item: mo }, { t: 'e' }]);
-        else rows.push([{ t: 'e' }, { t: 'm', item: mo }]);
-        lastSingleLane = useLane;
-        mobileConsecSingleRows = mobileConsecSingleRows + 1;
-        mobileConsecWideRows = 0;
-        mobileSingleIndex++;
-        continue;
-      }
-
-      break;
+    // Just placed a wide → next is a single (70% flip side, 30% stay).
+    if (afterWide && left >= 1) {
+      afterWide = false;
+      placeMobileSingle(items[i++], true);
+      mobileConsecSingleRows = 1;
+      continue;
     }
+
+    // 2-media row (36%) — break it apart MOBILE_ISOLATE_PROB of the time.
+    if (left >= 2 && u < 0.36 && !(isMixBlob && left === 2 && Math.random() < 0.4)) {
+      if (Math.random() >= MOBILE_ISOLATE_PROB) {
+        rows.push([{ t: 'm', item: items[i++] }, { t: 'm', item: items[i++] }]);
+        mobileConsecSingleRows = 0;
+        mobileConsecWideRows = 0;
+        streakWide = 0;
+        continue;
+      }
+      // else fall through: keep both items in queue; place one as single below.
+    }
+
+    // Wide row (28%): full-width on mobile, max 2 in a row.
+    if (left >= 1 && u < 0.36 + 0.28 && streakWide < 2 && mobileConsecWideRows < 2) {
+      var mw = items[i++];
+      var mww = !mosaicPortraitVideo(mw);
+      rows.push([{ t: 'm', item: mw, wide: mww }]);
+      streakWide = mww ? streakWide + 1 : 0;
+      mobileConsecWideRows = mww ? (mobileConsecWideRows + 1) : 0;
+      mobileConsecSingleRows = 0;
+      if (mww) afterWide = true;
+      continue;
+    }
+
+    // Default: single row.
+    if (left >= 1) {
+      placeMobileSingle(items[i++], false);
+      continue;
+    }
+
+    break;
   }
   return rows;
+}
+
+/** @returns {Array<Array<{t:'m'|'e', item?: *, wide?: boolean}>>} */
+function planBlobRows(items, cols, isMixBlob) {
+  return cols === 3 ? planDesktop(items, isMixBlob) : planMobile(items, isMixBlob);
 }
 
 function appendEmptyMosaicCell(parent) {
@@ -929,42 +924,14 @@ function appendMixCell(item, parent, aboveFold, isWide) {
   div.className = 'mosaic-cell is-mix' + (item.type === 'vid' ? ' is-video' : '');
   if (isWide) div.classList.add('is-wide');
 
-  if (item.type === 'vid') {
-    var video = document.createElement('video');
-    video.className = 'mosaic-media';
-    setIntrinsicDimensions(video, item.src);
-    video.muted = true;
-    video.loop  = true;
-    video.setAttribute('playsinline', '');
-    video.setAttribute('preload', aboveFold ? 'metadata' : 'none');
-    video.addEventListener('loadeddata', function() {
-      markMediaLoaded(this.closest('.mosaic-cell'), this);
-    }, { once: true });
-    video.addEventListener('error', function() {
-      markMediaLoaded(this.closest('.mosaic-cell'), this);
-    }, { once: true });
-    var vsrc = document.createElement('source');
-    vsrc.src = item.src;
-    video.appendChild(vsrc);
-    div.appendChild(video);
-    vidObs.observe(div);
-  } else {
-    var img = document.createElement('img');
-    img.className = 'mosaic-media';
-    img.decoding = 'async';
-    setIntrinsicDimensions(img, item.src);
-    img.alt = '';
-    img.setAttribute('loading', aboveFold ? 'eager' : 'lazy');
-    img.setAttribute('fetchpriority', aboveFold ? 'high' : 'low');
-    img.addEventListener('load', function() {
-      markMediaLoaded(this.closest('.mosaic-cell'), this);
-    }, { once: true });
-    img.addEventListener('error', function() {
-      markMediaLoaded(this.closest('.mosaic-cell'), this);
-    }, { once: true });
-    img.src = item.src;
-    div.appendChild(img);
-  }
+  var media = createMosaicMediaElement(item, {
+    alt: '',
+    loading: aboveFold ? 'eager' : 'lazy',
+    fetchpriority: aboveFold ? 'high' : 'low',
+    preload: aboveFold ? 'metadata' : 'none'
+  });
+  div.appendChild(media);
+  if (item.type === 'vid') vidObs.observe(div);
 
   parent.appendChild(div);
 }
@@ -991,7 +958,7 @@ function buildMosaicLayout(container, isFirst) {
     }
   }
 
-  var mixPool = desimilarize(shuffle(mixMedia.slice()));
+  var mixPool = shuffle(mixMedia.slice());
   var mixPos = 0;
 
   function nextMixSlice() {
@@ -1111,12 +1078,7 @@ function buildMosaicLayout(container, isFirst) {
               stripImg.setAttribute('fetchpriority', 'low');
               setIntrinsicDimensions(stripImg, stripSrc);
               stripImg.alt = '';
-              stripImg.addEventListener('load', function() {
-                markMediaLoaded(this.closest('.mosaic-cell'), this);
-              }, { once: true });
-              stripImg.addEventListener('error', function() {
-                markMediaLoaded(this.closest('.mosaic-cell'), this);
-              }, { once: true });
+              bindLoadOrError(stripImg);
               stripImg.src = stripSrc;
               strip.appendChild(stripImg);
             }
@@ -1124,56 +1086,24 @@ function buildMosaicLayout(container, isFirst) {
 
           var stripAbove = strip && Math.random() < 0.5;
 
-          if (item.type === 'vid') {
-            var video = document.createElement('video');
-            video.className = 'mosaic-media';
-            setIntrinsicDimensions(video, item.src);
-            video.muted = true;
-            video.loop  = true;
-            video.setAttribute('playsinline', '');
-            var preloadMode = 'none';
-            if (aboveFold && !aboveFoldVideoUsed) {
-              preloadMode = 'metadata';
-              aboveFoldVideoUsed = true;
-            }
-            video.setAttribute('preload', preloadMode);
-            video.addEventListener('loadeddata', function() {
-              markMediaLoaded(this.closest('.mosaic-cell'), this);
-            }, { once: true });
-            video.addEventListener('error', function() {
-              markMediaLoaded(this.closest('.mosaic-cell'), this);
-            }, { once: true });
-            var vsrc = document.createElement('source');
-            vsrc.src = item.src;
-            video.appendChild(vsrc);
-            if (stripAbove) div.appendChild(strip);
-            div.appendChild(video);
-            if (strip && !stripAbove) div.appendChild(strip);
-            vidObs.observe(div);
-          } else {
-            var img = document.createElement('img');
-            img.className = 'mosaic-media';
-            img.decoding = 'async';
-            setIntrinsicDimensions(img, item.src);
-            img.alt = projects[pi].name;
-            img.setAttribute('loading', aboveFold ? 'eager' : 'lazy');
-            if (aboveFold) {
-              img.setAttribute('fetchpriority', 'high');
-              preloadHeroImage(item.src);
-            } else {
-              img.setAttribute('fetchpriority', 'low');
-            }
-            img.addEventListener('load', function() {
-              markMediaLoaded(this.closest('.mosaic-cell'), this);
-            }, { once: true });
-            img.addEventListener('error', function() {
-              markMediaLoaded(this.closest('.mosaic-cell'), this);
-            }, { once: true });
-            img.src = item.src;
-            if (stripAbove) div.appendChild(strip);
-            div.appendChild(img);
-            if (strip && !stripAbove) div.appendChild(strip);
+          var preloadMode = 'none';
+          if (item.type === 'vid' && aboveFold && !aboveFoldVideoUsed) {
+            preloadMode = 'metadata';
+            aboveFoldVideoUsed = true;
           }
+          if (item.type === 'img' && aboveFold) preloadHeroImage(item.src);
+
+          var mediaEl = createMosaicMediaElement(item, {
+            alt: item.type === 'img' ? projects[pi].name : '',
+            loading: aboveFold ? 'eager' : 'lazy',
+            fetchpriority: aboveFold ? 'high' : 'low',
+            preload: preloadMode
+          });
+
+          if (stripAbove) div.appendChild(strip);
+          div.appendChild(mediaEl);
+          if (strip && !stripAbove) div.appendChild(strip);
+          if (item.type === 'vid') vidObs.observe(div);
 
           var label = document.createElement('span');
           label.className = 'mosaic-label';
@@ -1277,41 +1207,54 @@ function appendGrid() {
    content when the grid comes back into range.
 ── */
 var gridRecycler = (function() {
-  var savedGrids = new WeakMap();
+  var savedGrids = new WeakSet();
   var rebuilding = new WeakSet();
+  var obs = null;
 
-  var obs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      var grid = entry.target;
-      if (entry.isIntersecting) {
-        var saved = savedGrids.get(grid);
-        if (!saved) return;
-        if (rebuilding.has(grid)) return;
-        rebuilding.add(grid);
-        savedGrids.delete(grid);
-        grid.style.minHeight = '';
-        try {
-          buildMosaicLayout(grid);
-        } catch (e) {
-          console.error('[mosaic] gridRecycler rebuild failed:', e);
+  function createObserver() {
+    return new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var grid = entry.target;
+        if (entry.isIntersecting) {
+          if (!savedGrids.has(grid)) return;
+          if (rebuilding.has(grid)) return;
+          rebuilding.add(grid);
+          savedGrids.delete(grid);
+          grid.style.minHeight = '';
+          try {
+            buildMosaicLayout(grid);
+          } catch (e) {
+            console.error('[mosaic] gridRecycler rebuild failed:', e);
+          }
+          rebuilding.delete(grid);
+        } else {
+          if (savedGrids.has(grid)) return;
+          var h = grid.getBoundingClientRect().height;
+          savedGrids.add(grid);
+          var vids = grid.querySelectorAll('.is-video');
+          for (var i = 0; i < vids.length; i++) vidObs.unobserve(vids[i]);
+          grid.innerHTML = '';
+          grid.style.minHeight = h + 'px';
         }
-        rebuilding.delete(grid);
-      } else {
-        if (savedGrids.has(grid)) return;
-        var h = grid.getBoundingClientRect().height;
-        savedGrids.set(grid, true);
-        var vids = grid.querySelectorAll('.is-video');
-        for (var i = 0; i < vids.length; i++) vidObs.unobserve(vids[i]);
-        grid.innerHTML = '';
-        grid.style.minHeight = h + 'px';
-      }
+      });
+    }, {
+      rootMargin: (window.innerHeight * 3) + 'px 0px'
     });
-  }, {
-    rootMargin: (window.innerHeight * 3) + 'px 0px'
-  });
+  }
+
+  var observedGrids = [];
+  obs = createObserver();
 
   return {
-    observe: function(grid) { obs.observe(grid); }
+    observe: function(grid) {
+      observedGrids.push(grid);
+      obs.observe(grid);
+    },
+    refresh: function() {
+      obs.disconnect();
+      obs = createObserver();
+      observedGrids.forEach(function(g) { obs.observe(g); });
+    }
   };
 })();
 
@@ -1352,8 +1295,8 @@ var ContactOverlay = (function() {
   var overlay = document.getElementById('contact-overlay');
   var panel = document.getElementById('contact-panel');
   var trigger = document.getElementById('contact-trigger');
-  var sections = Array.prototype.slice.call(panel.querySelectorAll('.contact-section'));
-  var toggles = Array.prototype.slice.call(panel.querySelectorAll('.contact-section-toggle'));
+  var sections = Array.from(panel.querySelectorAll('.contact-section'));
+  var toggles = Array.from(panel.querySelectorAll('.contact-section-toggle'));
   var open = false;
 
   function setOpenSection(nextIndex) {
@@ -1386,12 +1329,14 @@ var ContactOverlay = (function() {
   function syncA11y() {
     overlay.setAttribute('aria-hidden', open ? 'false' : 'true');
     trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) panel.setAttribute('aria-modal', 'true');
+    else panel.removeAttribute('aria-modal');
   }
 
   function openOverlay() {
     if (open) return;
     open = true;
-    var contents = Array.prototype.slice.call(panel.querySelectorAll('.contact-section-content'));
+    var contents = Array.from(panel.querySelectorAll('.contact-section-content'));
     contents.forEach(function(el) { el.style.transition = 'none'; });
     setOpenSection(-1);
     requestAnimationFrame(function() {
@@ -1729,6 +1674,7 @@ var FrameNavigator = (function() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function() {
       setupInfiniteObserver();
+      gridRecycler.refresh();
       ensureContentAhead(window.innerHeight * 2.5);
       snapToNearestFrame();
     }, 140);

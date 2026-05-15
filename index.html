@@ -53,13 +53,13 @@
 
 <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">M. ORTIGÃO - ARQUITETURA</h1>
 
-<button id="contact-trigger" type="button" aria-controls="contact-overlay" aria-expanded="false">
+<button id="contact-trigger" type="button" aria-controls="contact-overlay" aria-expanded="false" aria-label="M. ORTIGÃO — abrir menu">
   <img src="logo.svg" alt="" aria-hidden="true" onerror="this.style.display='none';this.nextElementSibling.removeAttribute('hidden')" />
   <span hidden>M. ORTIGÃO</span>
 </button>
 
 <div id="contact-overlay" aria-hidden="true">
-  <div id="contact-panel" role="dialog" aria-modal="true" aria-label="Contacto" tabindex="-1">
+  <div id="contact-panel" role="dialog" aria-label="Contacto" tabindex="-1">
     <div class="contact-accordion">
       <section class="contact-section" data-idx="0">
         <button class="contact-section-toggle" type="button" aria-expanded="false" aria-controls="studio-content">OFFICE</button>
@@ -95,10 +95,10 @@
 
 <div id="frame-fade"></div>
 
-<div id="site-shell">
-  <div id="mosaic"></div>
+<main id="site-shell">
+  <div id="mosaic" class="mosaic-grid"></div>
   <div id="scroll-sentinel"></div>
-</div>
+</main>
 
 <script src="main.js?v=mobile-menor2-20260511-1508"></script>
 </body>
