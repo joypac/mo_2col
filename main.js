@@ -1,3 +1,10 @@
+/* Force scroll to top on every load (incl. refresh). The grid order is
+   round-based — fairly1 is always in round 0 (first grid). If the browser
+   restored scroll position to a later grid (round 1+), the user would see
+   fairly2/3 instead and think the order is broken. */
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+
 /* ── Data ─────────────────────────────────────────────────
    Format notes:
      MOV  → Safari + Chrome (H.264); may fail on Firefox
@@ -451,42 +458,102 @@ function shuffle(arr) {
   return a;
 }
 
-// Project order is fixed for the session (shuffled once on load) so that
-// the same project never appears first in one grid and last in the next.
-// `fairly normal 1` is always pinned at position 0 — explicit editorial choice.
-// Sub-projects of the same parent (e.g., fairly normal 1/2/3) are never placed
-// consecutively — they get spread across the round.
+// Project order, round-based.
+// Each grid (page load, infinite-scroll append, or recycled rebuild) is one
+// "round". Projects are split into:
+//   - principais: families with multiple sub-projects (fairly normal, mustique, paez)
+//   - menores:    single-folder projects (banco, lapa lofts, lareira, peça)
+// Per round:
+//   - 1 sub of each principal — drawn from a per-prefix queue. Queue is a random
+//     permutation refilled when empty, guaranteeing every sub-project is seen
+//     within 3 rounds (no repeats).
+//     SPECIAL: on round 0 (first page load), fairly's sub is forced to fairly1.
+//   - 4 menores (all) intercalated, distributed randomly across 3 slots between
+//     principais (slot sizes: 2+1+1 or 1+2+1 or 1+1+2 — random per round).
+// Pattern per round:
+//   [fairly_sub, ...slot0, mustique_sub, ...slot1, paez_sub, ...slot2]
 function projectPrefix(p) {
   return p.name.replace(/\s+\d+$/, '');
 }
 
-var sessionProjectOrder = (function() {
-  var pinName = 'fairly normal 1';
-  var pinIdx = -1;
+var projectMeta = (function() {
+  var byPrefix = {};
   for (var i = 0; i < projects.length; i++) {
-    if (projects[i].name === pinName) { pinIdx = i; break; }
+    var pfx = projectPrefix(projects[i]);
+    if (!byPrefix[pfx]) byPrefix[pfx] = [];
+    byPrefix[pfx].push(i);
   }
-
-  var rest = projects.map(function(_, i) { return i; }).filter(function(i) { return i !== pinIdx; });
-
-  // Constrained shuffle: avoid consecutive same-prefix projects.
-  var result = [];
-  var lastPrefix = pinIdx !== -1 ? projectPrefix(projects[pinIdx]) : null;
-  while (rest.length) {
-    var candidates = rest.filter(function(i) {
-      return projectPrefix(projects[i]) !== lastPrefix;
-    });
-    // Fallback if all remaining share the previous prefix (shouldn't happen in practice).
-    if (!candidates.length) candidates = rest;
-    var pick = candidates[Math.floor(Math.random() * candidates.length)];
-    result.push(pick);
-    rest.splice(rest.indexOf(pick), 1);
-    lastPrefix = projectPrefix(projects[pick]);
-  }
-
-  if (pinIdx !== -1) result.unshift(pinIdx);
-  return result;
+  var principal = {};
+  var menoresArr = [];
+  Object.keys(byPrefix).forEach(function(prefix) {
+    if (byPrefix[prefix].length > 1) {
+      principal[prefix] = byPrefix[prefix].slice();
+    } else {
+      menoresArr.push(byPrefix[prefix][0]);
+    }
+  });
+  return { principal: principal, menores: menoresArr };
 })();
+
+// One queue per principal. Each queue pops one sub per round; when empty, it
+// refills with a fresh random permutation. This guarantees that within any
+// 3 consecutive rounds, all 3 subs of each principal are shown exactly once.
+var _principalQueues = (function() {
+  var queues = {};
+  Object.keys(projectMeta.principal).forEach(function(prefix) {
+    queues[prefix] = [];
+  });
+  // Seed fairly's first round to start with fairly1 (idx 0 after sort by name).
+  // The remaining two are randomized.
+  var fairlySubs = projectMeta.principal['fairly normal'];
+  if (fairlySubs && fairlySubs.length === 3) {
+    // Find the index of "fairly normal 1" (smallest by name).
+    var sorted = fairlySubs.slice().sort(function(a, b) {
+      return projects[a].name.localeCompare(projects[b].name);
+    });
+    var rest = sorted.slice(1);
+    // Shuffle the remaining two so round 1 and 2 are randomized.
+    rest = shuffle(rest);
+    queues['fairly normal'] = [sorted[0]].concat(rest);
+  }
+  return queues;
+})();
+
+function nextPrincipalSub(prefix) {
+  var q = _principalQueues[prefix];
+  if (!q || q.length === 0) {
+    _principalQueues[prefix] = shuffle(projectMeta.principal[prefix].slice());
+  }
+  return _principalQueues[prefix].shift();
+}
+
+// Distribute 4 menores into 3 slots between principais. Each slot has 1 or 2
+// items, total = 4. The 3 possible distributions: 2+1+1, 1+2+1, 1+1+2.
+function distributeMenoresRandom(shuffledMenores) {
+  var distributions = [[2, 1, 1], [1, 2, 1], [1, 1, 2]];
+  var dist = distributions[Math.floor(Math.random() * distributions.length)];
+  var slots = [];
+  var cursor = 0;
+  for (var s = 0; s < 3; s++) {
+    slots.push(shuffledMenores.slice(cursor, cursor + dist[s]));
+    cursor += dist[s];
+  }
+  return slots;
+}
+
+function nextProjectOrder() {
+  var fairlySub = nextPrincipalSub('fairly normal');
+  var mustiqueSub = nextPrincipalSub('mustique');
+  var paezSub = nextPrincipalSub('paez');
+  var menShuf = shuffle(projectMeta.menores.slice());
+  var slots = distributeMenoresRandom(menShuf);
+  return [fairlySub]
+    .concat(slots[0])
+    .concat([mustiqueSub])
+    .concat(slots[1])
+    .concat([paezSub])
+    .concat(slots[2]);
+}
 
 var preloadedHeroImages = Object.create(null);
 var imageCache = [];
@@ -928,9 +995,9 @@ function buildMosaicLayout(container, isFirst) {
     container.setAttribute('data-mosaic-rhythm', (rhythmPhase++ % 2 === 0) ? 'a' : 'b');
   }
 
-  var order = sessionProjectOrder.slice();
-  // If there is any video project, always put one first (user preference).
-  // This is session-stable because `order` is session-stable.
+  var order = nextProjectOrder();
+  // If the first project in the round has no videos, surface the first one
+  // that has (preserves "always a video in the first viewport" UX).
   for (var vi = 0; vi < order.length; vi++) {
     if (projects[order[vi]].media.some(function(m) { return m.type === 'vid'; })) {
       if (vi > 0) order.unshift(order.splice(vi, 1)[0]);
@@ -1350,6 +1417,9 @@ var ContactOverlay = (function() {
 
   trigger.addEventListener('click', function(e) {
     e.stopPropagation();
+    // First click ever (even on the invisible logo) just reveals the brand,
+    // never opens the menu — matches behaviour everywhere else.
+    if (revealBrand()) return;
     toggleOverlay();
   });
 
