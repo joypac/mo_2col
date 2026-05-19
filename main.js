@@ -1350,6 +1350,9 @@ var ContactOverlay = (function() {
 
   trigger.addEventListener('click', function(e) {
     e.stopPropagation();
+    // First click ever (even on the invisible logo) just reveals the brand,
+    // never opens the menu — matches behaviour everywhere else.
+    if (revealBrand()) return;
     toggleOverlay();
   });
 
