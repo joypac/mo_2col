@@ -1,24 +1,21 @@
-@font-face {
-  font-family: 'Roboto Mono';
-  src: url('assets/fonts/RobotoMono-VariableFont_wght.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: block;
-}
-
-@font-face {
-  font-family: 'Walter Neue';
-  src: url('assets/fonts/ABCWalterNeue-Regular-Trial.otf') format('opentype');
-  font-style: normal;
-  font-weight: 400;
-  font-display: block;
-}
-
+/* Walter Neue Light — the main UI font (licensed). woff2 first (smallest),
+   woff fallback. */
 @font-face {
   font-family: 'Walter Neue Light';
-  src: url('assets/fonts/ABCWalterNeue-Light-Trial.otf') format('opentype');
+  src: url('assets/fonts/ABCWalterNeue-Light.woff2') format('woff2'),
+       url('assets/fonts/ABCWalterNeue-Light.woff') format('woff');
   font-style: normal;
   font-weight: 300;
+  font-display: block;
+}
+
+/* Walter Neue Regular (licensed) — only used as the text fallback for the
+   logo if logo.svg fails to load. */
+@font-face {
+  font-family: 'Walter Neue';
+  src: url('assets/fonts/ABCWalterNeue-Regular.otf') format('opentype');
+  font-style: normal;
+  font-weight: 400;
   font-display: block;
 }
 
