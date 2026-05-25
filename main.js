@@ -447,10 +447,10 @@ var mediaDimensions = {
   'assets/mix/mix19.mp4':   [1080, 1920],
   'assets/mix/mix20.mp4':   [1080, 1920],
   'assets/mix/mix21.mp4':   [720, 1280],
-  'assets/mix/mix22.webp':  [2682, 4018],
-  'assets/mix/mix23.webp':  [3273, 3710],
-  'assets/mix/mix24.webp':  [3202, 3292],
-  'assets/mix/mix25.webp':  [4436, 3018],
+  'assets/mix/mix22.webp':  [1335, 2000],
+  'assets/mix/mix23.webp':  [1764, 2000],
+  'assets/mix/mix24.webp':  [1945, 2000],
+  'assets/mix/mix25.webp':  [2000, 1361],
   'assets/mix/mix26.webp':  [2239, 2838],
   'assets/mix/mix27.webp':  [2061, 1338]
 };
