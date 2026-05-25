@@ -112,7 +112,8 @@ var projects = [
       { src: 'assets/mustique/mustique1/mustique25.webp', type: 'img' },
       { src: 'assets/mustique/mustique1/mustique33.webp', type: 'img' },
       { src: 'assets/mustique/mustique1/mustique34.webp', type: 'img' },
-      { src: 'assets/mustique/mustique1/mustique35.webp', type: 'img' }
+      { src: 'assets/mustique/mustique1/mustique35.webp', type: 'img' },
+      { src: 'assets/mustique/mustique1/mustique45.webp', type: 'img' }
     ]
   },
   {
@@ -133,7 +134,8 @@ var projects = [
       { src: 'assets/mustique/mustique2/mustique37.webp', type: 'img' },
       { src: 'assets/mustique/mustique2/mustique38.webp', type: 'img' },
       { src: 'assets/mustique/mustique2/mustique39.webp', type: 'img' },
-      { src: 'assets/mustique/mustique2/mustique40.webp', type: 'img' }
+      { src: 'assets/mustique/mustique2/mustique40.webp', type: 'img' },
+      { src: 'assets/mustique/mustique2/mustique46.webp', type: 'img' }
     ]
   },
   {
@@ -152,7 +154,8 @@ var projects = [
       { src: 'assets/mustique/mustique3/mustique41.webp', type: 'img' },
       { src: 'assets/mustique/mustique3/mustique42.webp', type: 'img' },
       { src: 'assets/mustique/mustique3/mustique43.webp', type: 'img' },
-      { src: 'assets/mustique/mustique3/mustique44.webp', type: 'img' }
+      { src: 'assets/mustique/mustique3/mustique44.webp', type: 'img' },
+      { src: 'assets/mustique/mustique3/mustique47.webp', type: 'img' }
     ]
   },
   {
@@ -248,7 +251,13 @@ var mixMedia = [
   { src: 'assets/mix/mix18.mp4',   type: 'vid' },
   { src: 'assets/mix/mix19.mp4',   type: 'vid' },
   { src: 'assets/mix/mix20.mp4',   type: 'vid' },
-  { src: 'assets/mix/mix21.mp4',   type: 'vid' }
+  { src: 'assets/mix/mix21.mp4',   type: 'vid' },
+  { src: 'assets/mix/mix22.webp', type: 'img' },
+  { src: 'assets/mix/mix23.webp', type: 'img' },
+  { src: 'assets/mix/mix24.webp', type: 'img' },
+  { src: 'assets/mix/mix25.webp', type: 'img' },
+  { src: 'assets/mix/mix26.webp', type: 'img' },
+  { src: 'assets/mix/mix27.webp', type: 'img' }
 ];
 
 /* Intrinsic dimensions per asset → reserves layout space before load,
@@ -328,6 +337,7 @@ var mediaDimensions = {
   'assets/mustique/mustique1/mustique33.webp': [1440, 1920],
   'assets/mustique/mustique1/mustique34.webp': [1440, 1920],
   'assets/mustique/mustique1/mustique35.webp': [1440, 2560],
+  'assets/mustique/mustique1/mustique45.webp': [1440, 1800],
   // mustique 2
   'assets/mustique/mustique2/mustique3.webp':  [1536, 1920],
   'assets/mustique/mustique2/mustique6.webp':  [1536, 1920],
@@ -345,6 +355,7 @@ var mediaDimensions = {
   'assets/mustique/mustique2/mustique38.webp': [1440, 1920],
   'assets/mustique/mustique2/mustique39.webp': [1440, 1920],
   'assets/mustique/mustique2/mustique40.webp': [1440, 2560],
+  'assets/mustique/mustique2/mustique46.webp': [1440, 1800],
   // mustique 3
   'assets/mustique/mustique3/mustique1.webp':  [1540, 1920],
   'assets/mustique/mustique3/mustique4.webp':  [1536, 1920],
@@ -360,6 +371,7 @@ var mediaDimensions = {
   'assets/mustique/mustique3/mustique42.webp': [1440, 1920],
   'assets/mustique/mustique3/mustique43.webp': [1440, 1920],
   'assets/mustique/mustique3/mustique44.webp': [1440, 2560],
+  'assets/mustique/mustique3/mustique47.webp': [1440, 1800],
   // paez 1
   'assets/paez/paez1/paez1.webp':       [1536, 1920],
   'assets/paez/paez1/paez2.webp':       [1536, 1920],
@@ -434,7 +446,13 @@ var mediaDimensions = {
   'assets/mix/mix18.mp4':   [390, 694],
   'assets/mix/mix19.mp4':   [1080, 1920],
   'assets/mix/mix20.mp4':   [1080, 1920],
-  'assets/mix/mix21.mp4':   [720, 1280]
+  'assets/mix/mix21.mp4':   [720, 1280],
+  'assets/mix/mix22.webp':  [2682, 4018],
+  'assets/mix/mix23.webp':  [3273, 3710],
+  'assets/mix/mix24.webp':  [3202, 3292],
+  'assets/mix/mix25.webp':  [4436, 3018],
+  'assets/mix/mix26.webp':  [2239, 2838],
+  'assets/mix/mix27.webp':  [2061, 1338]
 };
 
 /* ── Runtime validation ───────────────────────────────── */
