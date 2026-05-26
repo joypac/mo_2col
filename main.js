@@ -1026,18 +1026,6 @@ function buildMosaicLayout(container, isFirst) {
   var mixPool = shuffle(mixMedia.slice());
   var mixPos = 0;
 
-  function nextMixSlice() {
-    if (mixPos >= mixPool.length) return [];
-    // Bias to 1 item ("quase sempre") with occasional 2 ("muitas vezes").
-    // Max 2 consecutive — editorial constraint.
-    var n = Math.random() < 0.25 ? 2 : 1;
-    n = Math.min(n, mixPool.length - mixPos);
-    if (n < 1) n = 1;
-    var sl = mixPool.slice(mixPos, mixPos + n);
-    mixPos += sl.length;
-    return sl;
-  }
-
   var mediaEmitted = 0;
   var aboveFoldVideoUsed = false;
   var lastStripIdx = -99;
@@ -1183,54 +1171,84 @@ function buildMosaicLayout(container, isFirst) {
     }
   }
 
-  // Probability of interrupting a project mid-way with a mix slice.
-  // Mix only interrupts if the project has enough media to make a split meaningful.
-  var MIX_INSIDE_PROJECT_PROB = 0.45;
+  // Pull exactly n mix items from the shuffled pool (fewer if exhausted).
+  function takeMix(n) {
+    var sl = mixPool.slice(mixPos, mixPos + n);
+    mixPos += sl.length;
+    return sl;
+  }
 
-  function renderProjectMaybeInterrupted(media, pi, forceHero) {
-    // First project (hero) renders whole — keep the opening clean, no mix in
-    // the first viewport. Short projects also render whole (no room to split).
-    if (forceHero || media.length < 5 || Math.random() >= MIX_INSIDE_PROJECT_PROB) {
+  // Split arr into k contiguous, roughly-equal chunks (k clamped to length).
+  function splitIntoChunks(arr, k) {
+    k = Math.max(1, Math.min(k, arr.length));
+    var chunks = [], base = Math.floor(arr.length / k), extra = arr.length % k, idx = 0;
+    for (var i = 0; i < k; i++) {
+      var size = base + (i < extra ? 1 : 0);
+      chunks.push(arr.slice(idx, idx + size));
+      idx += size;
+    }
+    return chunks;
+  }
+
+  // Render a project, weaving `mixCount` mix items between its chunks. Each mix
+  // slice is 1-2 items and is always separated by project photos → never more
+  // than 2 mix in a row. Chunk 0 keeps the hero (forceHero) so the opening
+  // viewport stays clean.
+  function renderProjectWovenWithMix(media, pi, forceHero, mixCount) {
+    if (mixCount <= 0 || media.length < 2) {
       renderBlobChunk(media, pi, 'project', forceHero);
       return;
     }
-
-    // Pick a split point that leaves at least 2 items on each side.
-    var splitAt = 2 + Math.floor(Math.random() * (media.length - 3));
-    var firstChunk = media.slice(0, splitAt);
-    var secondChunk = media.slice(splitAt);
-
-    renderBlobChunk(firstChunk, pi, 'project', forceHero);
-
-    var interruptMix = nextMixSlice();
-    if (interruptMix.length) {
-      renderBlobChunk(interruptMix, pi, 'mix', false);
+    var slices = [];
+    var want = mixCount;
+    while (want > 0) {
+      var n = (want >= 2 && Math.random() < 0.6) ? 2 : 1;
+      var sl = takeMix(n);
+      if (!sl.length) break;
+      slices.push(sl);
+      want -= sl.length;
     }
-
-    renderBlobChunk(secondChunk, pi, 'project', false);
-  }
-
-  for (var si = 0; si < order.length; si++) {
-    var pi = order[si];
-    var media = prepareMediaForProject(pi, isMobile);
-    // First grid: the blob renderer will enforce a video row in the first viewport (if any exists).
-
-    renderProjectMaybeInterrupted(media, pi, isFirst && si === 0);
-
-    if (si < order.length - 1) {
-      if (Math.random() < 0.62) appendMosaicBreather(container, isMobile);
-      var mixChunk = nextMixSlice();
-      if (mixChunk.length) {
-        renderBlobChunk(mixChunk, pi, 'mix', false);
-        if (Math.random() < 0.55) appendMosaicBreather(container, isMobile);
+    if (!slices.length) { renderBlobChunk(media, pi, 'project', forceHero); return; }
+    var chunks = splitIntoChunks(media, slices.length + 1);
+    for (var c = 0; c < chunks.length; c++) {
+      renderBlobChunk(chunks[c], pi, 'project', forceHero && c === 0);
+      if (c < slices.length) {
+        renderBlobChunk(slices[c], pi, 'mix', false);
+        if (Math.random() < 0.3) appendMosaicBreather(container, isMobile);
       }
     }
   }
 
+  // Distribute ALL mix items across the round's projects, proportional to each
+  // project's photo capacity, so every mix photo is shown each round — woven
+  // through the projects, never piled at the end.
+  var roundMedia = [];
+  for (var si = 0; si < order.length; si++) roundMedia.push(prepareMediaForProject(order[si], isMobile));
+
+  var caps = roundMedia.map(function(m) { return Math.max(0, m.length - 1); });
+  var totalCap = caps.reduce(function(a, c) { return a + c; }, 0) || 1;
+  var poolLen = mixPool.length;
+  var alloc = caps.map(function(c) { return Math.min(c, Math.floor(poolLen * c / totalCap)); });
+  var assigned = alloc.reduce(function(a, c) { return a + c; }, 0);
+  // Spread the rounding remainder onto projects that still have spare capacity.
+  var byCap = caps.map(function(_, i) { return i; }).sort(function(a, b) { return caps[b] - caps[a]; });
+  var rem = poolLen - assigned, guard = 0;
+  while (rem > 0 && guard < 100000) {
+    var gIdx = byCap[guard % byCap.length];
+    if (alloc[gIdx] < caps[gIdx]) { alloc[gIdx]++; rem--; }
+    guard++;
+  }
+
+  for (var si = 0; si < order.length; si++) {
+    if (si > 0 && Math.random() < 0.5) appendMosaicBreather(container, isMobile);
+    renderProjectWovenWithMix(roundMedia[si], order[si], isFirst && si === 0, alloc[si]);
+  }
+
+  // Safety net: if capacity ever fell short (shouldn't, capacity >> pool), place
+  // whatever's left so no mix is silently dropped.
   while (mixPos < mixPool.length) {
-    var rest = nextMixSlice();
+    var rest = takeMix(2);
     if (!rest.length) break;
-    if (Math.random() < 0.5) appendMosaicBreather(container, isMobile);
     renderBlobChunk(rest, -1, 'mix', false);
   }
 }
